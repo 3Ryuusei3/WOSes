@@ -6,10 +6,10 @@ function useZoom() {
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width >= 1250) {
+      if (width >= 1350) {
         setZoom(1);
       } else {
-        setZoom(width / 1250);
+        setZoom(width / 1350);
       }
     };
 

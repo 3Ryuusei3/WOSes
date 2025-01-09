@@ -17,6 +17,7 @@
   --clr-accent-primary: #F7C351;
   --clr-accent-primary-highlight: #ffe600;
   --clr-accent-secondary: #bb4704;
+  --clr-accent-terciary: #f9d27f;
 
 
   font-family: "M PLUS Rounded 1c", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -33,6 +34,8 @@
 * {
   margin: 0;
   padding: 0;
+  font-family: "M PLUS Rounded 1c", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 900;
 }
 
 body {
@@ -67,9 +70,28 @@ h3 {
   font-weight: 900;
 }
 
+h4 {
+  font-size: 1.5em;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--clr-text-primary);
+}
+
 p {
   margin: 0;
   font-weight: 600;
+}
+
+button {
+  width: fit-content;
+  margin: auto;
+  padding: 1rem 2rem;
+  color: var(--clr-text-primary);
+  font-size: 1.25rem;
+  border: 1px solid var(--clr-accent-primary);
+  background-color: var(--clr-accent-primary);
+  box-shadow: 0 3px 0 0 var(--clr-accent-secondary), 0 -3px 0 0 var(--clr-accent-terciary);
+  border-radius: 16px;
 }
 
 ul {
@@ -79,18 +101,25 @@ ul {
 }
 
 input {
-  padding: 0.5rem;
+  padding: 0.75rem;
   background-color: var(--clr-text-secondary);
   border: 3px solid var(--clr-border-primary);
-  font-family: "M PLUS Rounded 1c", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 900;
+  font-size: 1.2rem;
   border-radius: 4px;
   text-transform: uppercase;
+  width: 500px;
+}
+
+.w100 {
+  width: 100%;
+}
+
+.mx-auto {
+  margin-inline: auto;
 }
 
 .container {
-  max-width: 1250px;
+  max-width: 1350px;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -220,7 +249,7 @@ input {
 
 .playerName {
   color: var(--clr-text-primary);
-  font-size: 1.25rem;
+  font-size: 1rem;
   padding-left: 0.25rem;
 }
 
