@@ -1,35 +1,66 @@
+import { useRef, useEffect, useState } from 'react';
+
+import GameLogo from '../atoms/GameLogo';
+
 import useRandomWords from './../hooks/useRandomWords';
 import useShuffledWord from './../hooks/useShuffledWord';
 import useInputWords from './../hooks/useInputWords';
 import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
+import useTruncatePlayerName from './../hooks/useTruncatePlayerName';
 
-import logo from './../assets/logo.png';
 import points from './../points.json';
-import { useEffect } from 'react';
 
 interface GameScreenProps {
   playerName: string;
-  setMode: React.Dispatch<React.SetStateAction<"start" | "lobby" | "game" | "lost">>;
+  setMode: React.Dispatch<React.SetStateAction<"start" | "lobby" | "game" | "lost" | "loading">>;
   setTotalPoints: React.Dispatch<React.SetStateAction<number>>;
   setLastRoundPoints: React.Dispatch<React.SetStateAction<number>>;
+  level: number;
+  setLevel: React.Dispatch<React.SetStateAction<number>>;
+  setLevelsToAdvance: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function GameScreen({ playerName, setMode, setTotalPoints, setLastRoundPoints }: GameScreenProps) {
+export default function GameScreen({ playerName, setMode, setTotalPoints, setLastRoundPoints, level, setLevel, setLevelsToAdvance }: GameScreenProps) {
   const { randomWord, possibleWords } = useRandomWords();
-  const { percentage } = useProgressBar(30);
+  const { percentage } = useProgressBar(60);
   const shuffledWord = useShuffledWord(randomWord, 8000, percentage > 0);
   const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
-  const { correctWordsPoints, goalPoints } = useCalculatePoints(possibleWords, correctWords);
+  const { correctWordsPoints, goalPoints, totalPoints } = useCalculatePoints(possibleWords, correctWords);
+  const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const [shake, setShake] = useState(false);
+
+  const handleKeyDownWithShake = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    handleKeyDown(event);
+    if (event.key === 'Enter' && !possibleWords.includes(inputWord)) {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+    }
+  };
 
   useEffect(() => {
-    if (percentage === 0 && correctWordsPoints() >= goalPoints) {
+    if (percentage === 0 && correctWordsPoints() >= goalPoints
+      || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
+      let levelsAdded = 0;
+      const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
+
+      if (completionPercentage >= 90) {
+        levelsAdded = 3;
+      } else if (completionPercentage >= 70) {
+        levelsAdded = 2;
+      } else if (completionPercentage >= 40) {
+        levelsAdded = 1;
+      }
+
+      setLevelsToAdvance(levelsAdded);
       setTotalPoints(prev => prev + correctWordsPoints());
+      setLevel(prev => prev + levelsAdded);
       setLastRoundPoints(correctWordsPoints());
       setMode('lobby');
     }
     if (percentage === 0 && correctWordsPoints() < goalPoints) {
       setTotalPoints(prev => prev + correctWordsPoints());
+      setLevel(1);
       setMode('lost');
     }
   }, [percentage, correctWordsPoints, goalPoints, setMode, setTotalPoints, setLastRoundPoints]);
@@ -37,14 +68,22 @@ export default function GameScreen({ playerName, setMode, setTotalPoints, setLas
   return (
     <>
       <div className='score__container'>
-        <div className={`score__container--box ${correctWords.length === possibleWords.length ? 'highlight' : ''}`}>
+        <div className={`score__container--box ${correctWords.length === possibleWords.length ? 'won' : ''}`}>
           <p>PALABRAS</p>
-          <h3>{correctWords.length} / {possibleWords.length}</h3>
+          <h3>{correctWords.length}/{possibleWords.length}</h3>
         </div>
-        <img src={logo} alt='logo' width={170} />
-        <div className={`score__container--box ${correctWordsPoints() >= goalPoints ? 'highlight' : ''}`}>
-          <p>OBJETIVO</p>
-          <h3>{correctWordsPoints()} / {goalPoints}</h3>
+        <GameLogo />
+        <div className={`score__container--box ${correctWordsPoints() >= goalPoints ? 'won' : ''}`}>
+          <div className="v-section gap-md">
+            <div className="h-section">
+              <p>OBJETIVO</p>
+              <h3>{correctWordsPoints()}/{goalPoints}</h3>
+            </div>
+            <div className="h-section">
+              <p>NIVEL</p>
+              <h3>{level}</h3>
+            </div>
+          </div>
         </div>
       </div>
       <div className='game__container'>
@@ -56,15 +95,22 @@ export default function GameScreen({ playerName, setMode, setTotalPoints, setLas
             </span>
           ))}
         </div>
-        <div className="progress" style={{ '--remaining-percentage': `${percentage}%` } as React.CSSProperties}></div>
-        <ul className='wordlist'>
+        <div
+          className="progress"
+          style={{
+          '--remaining-percentage': `${percentage}%`,
+          '--clr-progress-color': percentage < 10 ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
+          } as React.CSSProperties}
+        ></div>
+        <ul className='wordlist' style={{ '--wordlist-rows': Math.ceil(possibleWords.length / 3) } as React.CSSProperties}>
           {possibleWords.map((word, index) => (
             <li
               key={`${index}-${word}`}
               className={`word ${inputtedWords.includes(word) ? 'active' : ''}`}
+              ref={el => wordRefs.current[index] = el}
             >
               {inputtedWords.includes(word) && (
-                <span className='playerName'>{playerName.substring(0, 6)}</span>
+                <span className='playerName'>{useTruncatePlayerName(playerName, word.length)}</span>
               )}
               <span className='wordLetters'>
                 {word.split('').map((letter, letterIndex) => (
@@ -78,11 +124,12 @@ export default function GameScreen({ playerName, setMode, setTotalPoints, setLas
         </ul>
         <input
           type="text"
-          className='mx-auto'
+          className={`mx-auto mt-auto ${shake ? 'shake' : ''}`}
+          placeholder='INTRODUCE LA PALABRA...'
           value={inputWord}
           onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          disabled={correctWords.length === possibleWords.length || percentage === 0}
+          onKeyDown={handleKeyDownWithShake}
+          disabled={percentage === 0}
         />
       </div>
     </>

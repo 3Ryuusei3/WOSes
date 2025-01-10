@@ -7,12 +7,11 @@ import useGameVariables from './hooks/useGameVariables';
 
 import './App.css';
 import GameLobby from './components/GameLobby';
+import GameLoading from './components/GameLoading';
 
 function App() {
   const zoom = useZoom();
-  const { mode, setMode, playerName, setPlayerName, totalPoints, setTotalPoints, lastRoundPoints, setLastRoundPoints } = useGameVariables();
-
-  console.log(totalPoints)
+  const { mode, setMode, playerName, setPlayerName, totalPoints, setTotalPoints, lastRoundPoints, setLastRoundPoints, level, setLevel, levelsToAdvance, setLevelsToAdvance } = useGameVariables();
 
   return (
     <main className='container' style={{ zoom }}>
@@ -28,18 +27,28 @@ function App() {
           setMode={setMode}
           setTotalPoints={setTotalPoints}
           setLastRoundPoints={setLastRoundPoints}
+          level={level}
+          setLevel={setLevel}
+          setLevelsToAdvance={setLevelsToAdvance}
         />
       ) : mode === 'lost' ? (
         <GameLost
           setMode={setMode}
           totalPoints={totalPoints}
           setTotalPoints={setTotalPoints}
+          level={level}
+        />
+      ) : mode === 'loading' ? (
+        <GameLoading
+          setMode={setMode}
         />
       ) : (
         <GameLobby
           setMode={setMode}
           totalPoints={totalPoints}
           lastRoundPoints={lastRoundPoints}
+          level={level}
+          levelsToAdvance={levelsToAdvance}
         />
       )}
 
