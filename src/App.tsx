@@ -11,7 +11,24 @@ import GameLoading from './components/GameLoading';
 
 function App() {
   const zoom = useZoom();
-  const { mode, setMode, playerName, setPlayerName, totalPoints, setTotalPoints, lastRoundPoints, setLastRoundPoints, level, setLevel, levelsToAdvance, setLevelsToAdvance } = useGameVariables();
+  const {
+    mode,
+    setMode,
+    playerName,
+    setPlayerName,
+    totalPoints,
+    setTotalPoints,
+    gameTime,
+    setGameTime,
+    lastRoundPoints,
+    setLastRoundPoints,
+    level,
+    setLevel,
+    levelsToAdvance,
+    setLevelsToAdvance,
+    highestScore,
+    setHighestScore
+  } = useGameVariables();
 
   return (
     <main className='container' style={{ zoom }}>
@@ -25,6 +42,7 @@ function App() {
         <GameScreen
           playerName={playerName}
           setMode={setMode}
+          gameTime={gameTime}
           setTotalPoints={setTotalPoints}
           setLastRoundPoints={setLastRoundPoints}
           level={level}
@@ -37,6 +55,10 @@ function App() {
           totalPoints={totalPoints}
           setTotalPoints={setTotalPoints}
           level={level}
+          setLevel={setLevel}
+          playerName={playerName}
+          highestScore={highestScore}
+          setHighestScore={setHighestScore}
         />
       ) : mode === 'loading' ? (
         <GameLoading
@@ -45,6 +67,8 @@ function App() {
       ) : (
         <GameLobby
           setMode={setMode}
+          gameTime={gameTime}
+          setGameTime={setGameTime}
           totalPoints={totalPoints}
           lastRoundPoints={lastRoundPoints}
           level={level}

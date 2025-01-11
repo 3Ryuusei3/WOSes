@@ -20,10 +20,11 @@
 
   --clr-lose: #F85091;
   --clr-lose-highlight: #c8316b;
+  --clr-win: #1dffee;
+  --clr-win-highlight: #00d4ff;
 
-  --clr-progress-primary: #1dffee;
-  --clr-progress-secondary: #1c0c2f;
-  --clr-progress-on-time: var(--clr-progress-primary);
+  --clr-progress-bg: #1c0c2f;
+  --clr-progress-on-time: var(--clr-win);
   --clr-progress-late: var(--clr-lose);
   --clr-progress-color: var(--clr-progress-on-time);
 
@@ -152,7 +153,26 @@ input::placeholder {
   }
 }
 
-.shake {
+@keyframes success {
+  0% {
+    transform: scale(1);
+    border: 3px solid var(--clr-border-primary);
+  }
+  50% {
+    transform: scale(1.05);
+    border: 3px solid var(--clr-win);
+  }
+  100% {
+    transform: scale(1);
+    border: 3px solid var(--clr-border-primary);
+  }
+}
+
+.animate-success {
+  animation: success 0.5s;
+}
+
+.animate-error {
   animation: shake 0.5s;
 }
 
@@ -239,7 +259,7 @@ input::placeholder {
   background-color: var(--clr-bg-primary);
   border: 3px solid var(--clr-accent-primary);
   border-radius: 8px;
-  box-shadow: 0 0 20px 4px var(--clr-progress-secondary);
+  box-shadow: 0 0 20px 4px var(--clr-progress-bg);
   z-index: -1;
   animation: scaleBoxAnimation 1s infinite;
 }
@@ -315,7 +335,7 @@ input::placeholder {
   text-shadow: 0px 2px 0 var(--clr-accent-secondary);
   background-color: var(--clr-bg-secondary);
   border: 2px solid var(--clr-accent-primary);
-  box-shadow: 0 0 0 4px var(--clr-progress-secondary);
+  box-shadow: 0 0 0 4px var(--clr-progress-bg);
   border-radius: 8px;
   text-align: center;
 }
@@ -361,7 +381,26 @@ input::placeholder {
   border: 2px solid var(--clr-border-secondary);
   box-shadow: 0 0 0 4px var(--clr-border-primary);
   text-shadow: 0px 2px 0 var(--clr-border-secondary);
-  transition: all 0.2s ease;
+  transform: rotateX(0deg);
+  animation: selectedLetter 0.5s linear forwards;
+}
+
+@keyframes selectedLetter {
+  0% {
+    color: var(--clr-text-secondary);
+    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    transform: rotateX(180deg);
+  }
+  50% {
+    color: var(--clr-text-secondary);
+    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    transform: rotateX(90deg);
+  }
+  100% {
+    color: var(--clr-text-primary);
+    text-shadow: 0px 2px 0 var(--clr-border-secondary);
+    transform: rotateX(0deg);
+  }
 }
 
 .letterPoints {
@@ -371,14 +410,20 @@ input::placeholder {
   right: 2px;
 }
 
-.progress {
+.progress__container {
+  position: relative;
   width: 100%;
   border-radius: 8px;
   height: 10px;
   border: 2px solid var(--clr-border-secondary);
   box-shadow: 0 0 0 4px var(--clr-border-primary);
-  background: linear-gradient(to right, var(--clr-progress-color) 0%, var(--clr-progress-color) var(--remaining-percentage), var(--clr-progress-secondary) var(--remaining-percentage), var(--clr-progress-secondary) 100%);
+  background: linear-gradient(to right, var(--clr-progress-color) 0%, var(--clr-progress-color) var(--remaining-percentage), var(--clr-progress-bg) var(--remaining-percentage), var(--clr-progress-bg) 100%);
   transition: all 0.1s linear;
+}
+
+.progress__time {
+  padding-block: 0.25rem;
+  margin-left: auto;
 }
 
 .wordlist {
@@ -420,7 +465,12 @@ input::placeholder {
   text-align: center;
   border: 2px solid var(--clr-border-primary);
   box-shadow: 0 0 0 2px var(--clr-bg-secondary);
-  transition: all 0.3s ease;
+  transform: rotateX(180deg);
+  transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease, transform 0.5s ease;
+}
+
+.letter span {
+  opacity: 0;
 }
 
 .word.active {
@@ -428,6 +478,26 @@ input::placeholder {
   border: 2px solid var(--clr-bg-quaternary);
   justify-content: space-between;
   animation: correctWord 1s ease;
+}
+
+.playerName {
+  color: var(--clr-text-primary);
+  font-size: 1.3rem;
+  padding-left: 0.25rem;
+  font-weight: 600;
+  letter-spacing: 0.05px;
+}
+
+.word.active .letter {
+  background-color: var(--clr-text-secondary);
+  border: 2px solid var(--clr-border-secondary);
+  box-shadow: 0 0 0 2px var(--clr-border-primary);
+  transform: rotateX(0);
+  animation: correctLetter 0.3s ease;
+}
+
+.word.active .letter span {
+  opacity: 1;
 }
 
 @keyframes correctWord {
@@ -445,17 +515,11 @@ input::placeholder {
   }
 }
 
-.playerName {
-  color: var(--clr-text-primary);
-  font-size: 1.3rem;
-  padding-left: 0.25rem;
-  font-weight: 600;
-  letter-spacing: 0.05px;
-}
-
-.word.active .letter {
-  color: var(--clr-text-primary);
-  background-color: var(--clr-text-secondary);
-  border: 2px solid var(--clr-border-secondary);
-  box-shadow: 0 0 0 2px var(--clr-border-primary);
+@keyframes correctLetter {
+  0% {
+    color: var(--clr-text-primary);
+  }
+  100% {
+    color: var(--clr-text-primary);
+  }
 }

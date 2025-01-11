@@ -13,7 +13,7 @@ const useCalculatePoints = (possibleWords: string[], correctWords: string[]) => 
     }, 0);
   };
 
-  const goalPoints = Math.floor(possibleWordsPoints() * 0.4);
+  const goalPoints = Math.ceil(possibleWordsPoints() * 0.4);
   const totalPoints = possibleWordsPoints();
 
   return { correctWordsPoints, possibleWordsPoints, goalPoints, totalPoints };

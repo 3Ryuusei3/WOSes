@@ -1,14 +1,26 @@
+import { useEffect } from 'react';
+
 import GameLogo from '../atoms/GameLogo';
 
 interface GameLobbyProps {
   setMode: React.Dispatch<React.SetStateAction<"start" | "lobby" | "game" | "lost" | "loading">>;
+  gameTime: number;
+  setGameTime: React.Dispatch<React.SetStateAction<number>>;
   totalPoints: number;
   lastRoundPoints: number;
   level: number;
   levelsToAdvance: number;
 }
 
-export default function GameLobby({ setMode, totalPoints, lastRoundPoints, level, levelsToAdvance }: GameLobbyProps) {
+export default function GameLobby({ setMode, gameTime, setGameTime, totalPoints, lastRoundPoints, level, levelsToAdvance }: GameLobbyProps) {
+  const secondsToRemove = Math.floor(Math.random() * 2) + 1;
+
+  useEffect(() => {
+    if (gameTime - secondsToRemove > 5) {
+      setGameTime(prev => prev - secondsToRemove);
+    }
+  }, [setGameTime, secondsToRemove]);
+
   return (
     <>
       <GameLogo />
@@ -25,6 +37,9 @@ export default function GameLobby({ setMode, totalPoints, lastRoundPoints, level
             <h3>{totalPoints}</h3>
           </div>
         </div>
+        {gameTime - secondsToRemove > 5 && (
+          <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
+        )}
         <button onClick={() => {
           setMode('loading');
         } }>JUGAR AL NIVEL {level}</button>

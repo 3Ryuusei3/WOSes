@@ -4,6 +4,10 @@ const useProgressBar = (duration: number) => {
   const [timeLeft, setTimeLeft] = useState(duration * 1000);
 
   useEffect(() => {
+    setTimeLeft(duration * 1000);
+  }, [duration]);
+
+  useEffect(() => {
     if (timeLeft <= 0) return;
 
     const intervalId = setInterval(() => {
