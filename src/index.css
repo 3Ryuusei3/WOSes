@@ -15,6 +15,7 @@
 
   --clr-accent-primary: #F7C351;
   --clr-accent-primary-highlight: #ffe600;
+  --clr-accent-primary-dim: #f7c35180;
   --clr-accent-secondary: #bb4704;
   --clr-accent-terciary: #f9d27f;
 
@@ -206,6 +207,18 @@ input::placeholder {
   align-items: center;
 }
 
+.txt-center {
+  text-align: center;
+}
+
+.d-none {
+  display: none;
+}
+
+.op-0 {
+  opacity: 0;
+}
+
 .highlight {
   color: var(--clr-accent-primary);
   text-shadow: 0px 2px 0 var(--clr-accent-secondary);
@@ -214,6 +227,11 @@ input::placeholder {
 .lost {
   color: var(--clr-lose);
   text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+}
+
+.unguessed {
+  color: var(--clr-accent-primary-dim);
+  text-shadow: 0px 2px 0 var(--clr-accent-secondary);
 }
 
 .gap-xs {
@@ -333,7 +351,7 @@ input::placeholder {
 .score__container--box {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
   padding: 0.75rem 2rem;
   color: var(--clr-accent-primary);
   text-shadow: 0px 2px 0 var(--clr-accent-secondary);
@@ -348,6 +366,14 @@ input::placeholder {
   color: var(--clr-accent-primary-highlight);
   border: 2px solid var(--clr-accent-primary-highlight);
   background-color: var(--clr-bg-terciary);
+}
+
+.score__container--wordlist {
+  display: grid;
+  grid-template: repeat(var(--wordlist-rows), 1fr) / repeat(3, 1fr);
+  column-gap: 1rem;
+  row-gap: 0.1rem;
+  grid-auto-flow: column dense;
 }
 
 .game__container {

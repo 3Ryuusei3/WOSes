@@ -4,7 +4,7 @@ import useGameStore from '../store/useGameStore';
 
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
 
-import { LETTERS, FAKE_LETTER_LEVEL_START, HIDDEN_LETTER_LEVEL_START } from '../constant';
+import { LETTERS, FAKE_LETTER_LEVEL_START } from '../constant';
 
 const createLetterObject = (word: string, level: number, fakeLetter: string, hiddenLetterIndex: number) => {
   let letterObject = word.split('').map((letter, index) => ({
@@ -43,7 +43,7 @@ const useShuffledWord = (word: string, intervalTime: number, shouldShuffle: bool
     }
 
     const initialLetterObject = createLetterObject(word, level, fakeLetter, hiddenLetterIndex);
-    setShuffledWordObject(initialLetterObject);
+    setShuffledWordObject(initialLetterObject.sort(() => Math.random() - 0.5));
 
     if (!shouldShuffle) return;
 

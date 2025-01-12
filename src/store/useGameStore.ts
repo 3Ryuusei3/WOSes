@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import Mode from '../types/Mode';
+import Word from '../types/Word';
 
 import { START_TIME } from '../constant';
 
@@ -23,6 +24,8 @@ interface GameState {
   setHighestScore: (score: { name: string; score: number }) => void;
   hiddenLetterIndex: number;
   setHiddenLetterIndex: (letter: number) => void;
+  lastLevelWords: Word[];
+  setLastLevelWords: (words: Word[]) => void;
 }
 
 const useGameStore = create<GameState>((set) => ({
@@ -49,7 +52,9 @@ const useGameStore = create<GameState>((set) => ({
   highestScore: { name: '', score: 0 },
   setHighestScore: (score) => set({ highestScore: score }),
   hiddenLetterIndex: 0,
-  setHiddenLetterIndex: (letter) => set({ hiddenLetterIndex: letter })
+  setHiddenLetterIndex: (letter) => set({ hiddenLetterIndex: letter }),
+  lastLevelWords: [],
+  setLastLevelWords: (words) => set({ lastLevelWords: words }),
 }));
 
 export default useGameStore;

@@ -5,16 +5,16 @@ const useInputWords = (possibleWords: string[]) => {
   const [inputtedWords, setInputtedWords] = useState<string[]>([]);
   const [correctWords, setCorrectWords] = useState<string[]>([]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputWord(event.target.value.toLowerCase());
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputWord(e.target.value);
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && inputWord.trim() !== '') {
-      setInputtedWords([...inputtedWords, inputWord.trim()]);
-      if (possibleWords.includes(inputWord.trim())) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && inputWord.trim() !== '') {
+      if (possibleWords.includes(inputWord.trim()) && !correctWords.includes(inputWord.trim())) {
         setCorrectWords([...correctWords, inputWord.trim()]);
       }
+      setInputtedWords([...inputtedWords, inputWord.trim()]);
       setInputWord('');
     }
   };

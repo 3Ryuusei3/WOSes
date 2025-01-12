@@ -33,7 +33,8 @@ export default function GameScreen() {
     setLastRoundPoints,
     level,
     setLevel,
-    setLevelsToAdvance
+    setLevelsToAdvance,
+    setLastLevelWords
   } = useGameStore();
   const { randomWord, possibleWords } = useRandomWords();
   const { percentage, timeLeft } = useProgressBar(gameTime);
@@ -45,31 +46,38 @@ export default function GameScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (percentage === 0 && correctWordsPoints() >= goalPoints
-      || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
-      let levelsAdded = 0;
-      const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
+    const updateLastLevelWordsAndPoints = () => {
+      setTotalPoints(prev => prev + correctWordsPoints());
+      setLastLevelWords(possibleWords.map(word => ({
+        word,
+        guessed: correctWords.includes(word)
+      })));
+    };
 
-      if (completionPercentage >= THRESHHOLD.THREE_STAR) {
-        levelsAdded = LEVELS_TO_ADVANCE.THREE_STAR;
-      } else if (completionPercentage >= THRESHHOLD.TWO_STAR) {
-        levelsAdded = LEVELS_TO_ADVANCE.TWO_STAR;
-      } else if (completionPercentage >= THRESHHOLD.ONE_STAR) {
-        levelsAdded = LEVELS_TO_ADVANCE.ONE_STAR;
+    if (percentage === 0) {
+      if (correctWordsPoints() >= goalPoints || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
+        let levelsAdded = 0;
+        const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
+
+        if (completionPercentage >= THRESHHOLD.THREE_STAR) {
+          levelsAdded = LEVELS_TO_ADVANCE.THREE_STAR;
+        } else if (completionPercentage >= THRESHHOLD.TWO_STAR) {
+          levelsAdded = LEVELS_TO_ADVANCE.TWO_STAR;
+        } else if (completionPercentage >= THRESHHOLD.ONE_STAR) {
+          levelsAdded = LEVELS_TO_ADVANCE.ONE_STAR;
+        }
+        setLevelsToAdvance(levelsAdded);
+        setLevel((prev: number) => prev + levelsAdded);
+        setLastRoundPoints(correctWordsPoints());
+        updateLastLevelWordsAndPoints();
+        setMode('lobby');
+      } else {
+        console.log(possibleWords);
+        updateLastLevelWordsAndPoints();
+        setMode('lost');
       }
-      console.log(possibleWords);
-      setLevelsToAdvance(levelsAdded);
-      setTotalPoints(prev => prev + correctWordsPoints());
-      setLevel((prev: number) => prev + levelsAdded);
-      setLastRoundPoints(correctWordsPoints());
-      setMode('lobby');
     }
-    if (percentage === 0 && correctWordsPoints() < goalPoints) {
-      console.log(possibleWords);
-      setTotalPoints(prev => prev + correctWordsPoints());
-      setMode('lost');
-    }
-  }, [percentage, correctWordsPoints, goalPoints, setMode, setTotalPoints, setLastRoundPoints]);
+  }, [percentage, correctWordsPoints, goalPoints, setMode, setTotalPoints, setLastRoundPoints, correctWords, possibleWords, setLevelsToAdvance, setLevel, setLastLevelWords]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -100,10 +108,10 @@ export default function GameScreen() {
       </div>
       <div className='game__container'>
         <div className="h-section gap-sm">
-        { level >= FAKE_LETTER_LEVEL_START ? (
-            <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span></h4>
-          ) : level >= HIDDEN_LETTER_LEVEL_START ? (
+        { level >= HIDDEN_LETTER_LEVEL_START ? (
             <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span> Y OTRA <span className="highlight">OCULTA</span></h4>
+          ) : level >= FAKE_LETTER_LEVEL_START ? (
+            <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span></h4>
           ) : (
             <h4>ENCUENTRA ANAGRAMAS</h4>
           )}
