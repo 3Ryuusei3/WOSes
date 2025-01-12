@@ -1,21 +1,8 @@
-import React, { useEffect, useState } from 'react';
 import GameLogo from '../atoms/GameLogo';
+import useCountdown from '../hooks/useCountdown';
 
-interface GameLoadingProps {
-  setMode: React.Dispatch<React.SetStateAction<"start" | "lobby" | "game" | "lost" | "loading">>;
-}
-
-export default function GameLoading({ setMode }: GameLoadingProps) {
-  const [countdown, setCountdown] = useState(3);
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setMode('game');
-    }
-  }, [countdown, setMode]);
+export default function GameLoading() {
+  const countdown = useCountdown();
 
   return (
     <>

@@ -2,17 +2,18 @@ import { useEffect } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
 
-interface GameLobbyProps {
-  setMode: React.Dispatch<React.SetStateAction<"start" | "lobby" | "game" | "lost" | "loading">>;
-  gameTime: number;
-  setGameTime: React.Dispatch<React.SetStateAction<number>>;
-  totalPoints: number;
-  lastRoundPoints: number;
-  level: number;
-  levelsToAdvance: number;
-}
+import useGameStore from '../store/useGameStore';
 
-export default function GameLobby({ setMode, gameTime, setGameTime, totalPoints, lastRoundPoints, level, levelsToAdvance }: GameLobbyProps) {
+export default function GameLobby() {
+  const {
+    setMode,
+    totalPoints,
+    level,
+    lastRoundPoints,
+    levelsToAdvance,
+    gameTime,
+    setGameTime
+  } = useGameStore();
   const secondsToRemove = Math.floor(Math.random() * 2) + 1;
 
   useEffect(() => {

@@ -1,12 +1,9 @@
 import GameLogo from '../atoms/GameLogo';
 
-interface GameStartProps {
-  playerName: string;
-  setPlayerName: (name: string) => void;
-  setMode: React.Dispatch<React.SetStateAction<"start" | "lobby" | "game" | "lost" | "loading">>;
-}
+import useGameStore from '../store/useGameStore';
 
-export default function GameStart({ playerName, setPlayerName, setMode }: GameStartProps) {
+export default function GameStart() {
+  const { playerName, setPlayerName, setMode } = useGameStore();
 
   const handleSubmit = () => {
     setMode('loading')

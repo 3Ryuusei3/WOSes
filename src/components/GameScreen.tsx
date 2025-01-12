@@ -10,29 +10,23 @@ import useCalculatePoints from './../hooks/useCalculatePoints';
 import useTruncatePlayerName from './../hooks/useTruncatePlayerName';
 import useInputResponse from './../hooks/useInputResponse';
 
+import useGameStore from '../store/useGameStore';
+
+import { THRESHHOLD, LEVELS_TO_ADVANCE, RUNNING_OUT_OF_TIME } from '../contant';
+
 import points from './../points.json';
 
-interface GameScreenProps {
-  playerName: string;
-  setMode: React.Dispatch<React.SetStateAction<"start" | "lobby" | "game" | "lost" | "loading">>;
-  gameTime: number;
-  setTotalPoints: React.Dispatch<React.SetStateAction<number>>;
-  setLastRoundPoints: React.Dispatch<React.SetStateAction<number>>;
-  level: number;
-  setLevel: React.Dispatch<React.SetStateAction<number>>;
-  setLevelsToAdvance: React.Dispatch<React.SetStateAction<number>>;
-}
-
-export default function GameScreen({
-  playerName,
-  setMode,
-  gameTime,
-  setTotalPoints,
-  setLastRoundPoints,
-  level,
-  setLevel,
-  setLevelsToAdvance
-}: GameScreenProps) {
+export default function GameScreen() {
+  const {
+    playerName,
+    setMode,
+    gameTime,
+    setTotalPoints,
+    setLastRoundPoints,
+    level,
+    setLevel,
+    setLevelsToAdvance
+  } = useGameStore();
   const { randomWord, possibleWords } = useRandomWords();
   const { percentage, timeLeft } = useProgressBar(gameTime);
   const shuffledWord = useShuffledWord(randomWord, 8000, percentage > 0);
@@ -40,25 +34,26 @@ export default function GameScreen({
   const { correctWordsPoints, goalPoints, totalPoints } = useCalculatePoints(possibleWords, correctWords);
   const { animateError, animateSuccess, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, handleKeyDown);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-
+    console.log(correctWordsPoints())
     if (percentage === 0 && correctWordsPoints() >= goalPoints
       || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
       let levelsAdded = 0;
       const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
 
-      if (completionPercentage >= 90) {
-        levelsAdded = 3;
-      } else if (completionPercentage >= 70) {
-        levelsAdded = 2;
-      } else if (completionPercentage >= 40) {
-        levelsAdded = 1;
+      if (completionPercentage >= THRESHHOLD.THREE_STAR) {
+        levelsAdded = LEVELS_TO_ADVANCE.THREE_STAR;
+      } else if (completionPercentage >= THRESHHOLD.TWO_STAR) {
+        levelsAdded = LEVELS_TO_ADVANCE.TWO_STAR;
+      } else if (completionPercentage >= THRESHHOLD.ONE_STAR) {
+        levelsAdded = LEVELS_TO_ADVANCE.ONE_STAR;
       }
       console.log(possibleWords);
       setLevelsToAdvance(levelsAdded);
       setTotalPoints(prev => prev + correctWordsPoints());
-      setLevel(prev => prev + levelsAdded);
+      setLevel((prev: number) => prev + levelsAdded);
       setLastRoundPoints(correctWordsPoints());
       setMode('lobby');
     }
@@ -68,6 +63,12 @@ export default function GameScreen({
       setMode('lost');
     }
   }, [percentage, correctWordsPoints, goalPoints, setMode, setTotalPoints, setLastRoundPoints]);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   return (
     <>
@@ -105,7 +106,7 @@ export default function GameScreen({
             className="progress__container"
             style={{
             '--remaining-percentage': `${percentage}%`,
-            '--clr-progress-color': percentage < 10 ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
+            '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
             } as React.CSSProperties}
           >
           </div>
@@ -138,6 +139,7 @@ export default function GameScreen({
           onChange={handleChange}
           onKeyDown={handleKeyDownWithShake}
           disabled={percentage === 0}
+          ref={inputRef}
         />
       </div>
     </>

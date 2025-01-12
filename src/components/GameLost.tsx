@@ -1,21 +1,20 @@
 import { useEffect } from 'react';
 
-import GameLogo from '../atoms/GameLogo';
-interface GameLostProps {
-  setMode: React.Dispatch<React.SetStateAction<"start" | "lobby" | "game" | "lost" | "loading">>;
-  totalPoints: number;
-  setTotalPoints: React.Dispatch<React.SetStateAction<number>>;
-  level: number;
-  setLevel: React.Dispatch<React.SetStateAction<number>>;
-  playerName: string;
-  highestScore: {
-    name: string;
-    score: number;
-  }
-  setHighestScore: React.Dispatch<React.SetStateAction<{ name: string; score: number }>>;
-}
+import useGameStore from '../store/useGameStore';
 
-export default function GameLost({ setMode, totalPoints, setTotalPoints, level, setLevel, playerName, highestScore, setHighestScore }: GameLostProps) {
+import GameLogo from '../atoms/GameLogo';
+
+export default function GameLost() {
+  const {
+    setMode,
+    totalPoints,
+    setTotalPoints,
+    level,
+    setLevel,
+    playerName,
+    highestScore,
+    setHighestScore
+  } = useGameStore();
 
   useEffect(() => {
     if (totalPoints > highestScore.score) {
