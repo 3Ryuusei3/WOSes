@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import useGameStore from '../store/useGameStore';
-import { COUNTDOWN } from '../contant';
+import { COUNTDOWN } from '../constant';
 
 const useCountdown = () => {
   const { setMode } = useGameStore();

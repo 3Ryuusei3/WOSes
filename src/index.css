@@ -216,6 +216,10 @@ input::placeholder {
   text-shadow: 0px 2px 0 var(--clr-lose-highlight);
 }
 
+.gap-xs {
+  gap: 0.5rem;
+}
+
 .gap-sm {
   gap: 1rem;
 }
@@ -399,6 +403,60 @@ input::placeholder {
   100% {
     color: var(--clr-text-primary);
     text-shadow: 0px 2px 0 var(--clr-border-secondary);
+    transform: rotateX(0deg);
+  }
+}
+
+.selectedLetter.fake {
+  background-color: var(--clr-lose);
+  text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+  animation: fakeSelectedLetter 0.5s linear forwards;
+}
+
+@keyframes fakeSelectedLetter {
+  0% {
+    color: var(--clr-text-secondary);
+    background-color: var(--clr-text-secondary);
+    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    transform: rotateX(180deg);
+  }
+  50% {
+    color: var(--clr-text-secondary);
+    background-color: var(--clr-text-secondary);
+    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    transform: rotateX(90deg);
+  }
+  100% {
+    color: var(--clr-text-primary);
+    text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+    background-color: var(--clr-lose);
+    transform: rotateX(0deg);
+  }
+}
+
+.selectedLetter.hidden {
+  background-color: var(--clr-accent-primary);
+  text-shadow: 0px 2px 0 var(--clr-accent-primary-highlight);
+  animation: hiddenSelectedLetter 0.5s linear forwards;
+}
+
+@keyframes hiddenSelectedLetter {
+  0% {
+    color: var(--clr-text-secondary);
+    background-color: var(--clr-text-secondary);
+    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    transform: rotateX(180deg);
+  }
+  50% {
+    color: var(--clr-text-secondary);
+    background-color: var(--clr-text-secondary);
+    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    transform: rotateX(90deg);
+  }
+  100% {
+    color: var(--clr-text-primary);
+    text-shadow: 0px 2px 0 var(--clr-accent-primary-highlight);
+    background-color: var(--clr-accent-primary);
     transform: rotateX(0deg);
   }
 }

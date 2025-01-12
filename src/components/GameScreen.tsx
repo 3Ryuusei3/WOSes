@@ -12,9 +12,17 @@ import useInputResponse from './../hooks/useInputResponse';
 
 import useGameStore from '../store/useGameStore';
 
-import { THRESHHOLD, LEVELS_TO_ADVANCE, RUNNING_OUT_OF_TIME } from '../contant';
+import ShuffledWordObjectType from '../types/ShuffledWordObject';
 
-import points from './../points.json';
+import {
+  THRESHHOLD,
+  LEVELS_TO_ADVANCE,
+  RUNNING_OUT_OF_TIME_PERCENTAGE,
+  SHUFFLE_INTERVAL,
+  POINTS_PER_LETTER,
+  FAKE_LETTER_LEVEL_START,
+  HIDDEN_LETTER_LEVEL_START,
+} from '../constant';
 
 export default function GameScreen() {
   const {
@@ -29,7 +37,7 @@ export default function GameScreen() {
   } = useGameStore();
   const { randomWord, possibleWords } = useRandomWords();
   const { percentage, timeLeft } = useProgressBar(gameTime);
-  const shuffledWord = useShuffledWord(randomWord, 8000, percentage > 0);
+  const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
   const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, totalPoints } = useCalculatePoints(possibleWords, correctWords);
   const { animateError, animateSuccess, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, handleKeyDown);
@@ -37,7 +45,6 @@ export default function GameScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    console.log(correctWordsPoints())
     if (percentage === 0 && correctWordsPoints() >= goalPoints
       || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
       let levelsAdded = 0;
@@ -92,13 +99,25 @@ export default function GameScreen() {
         </div>
       </div>
       <div className='game__container'>
-        <div className="selectedWord">
-          {shuffledWord.split('').map((letter, index) => (
-            <span key={`${index}-${letter}`} className='selectedLetter'>
-              {letter}
-              <span className='letterPoints'>{points[letter as keyof typeof points]}</span>
-            </span>
-          ))}
+        <div className="h-section gap-sm">
+        { level >= FAKE_LETTER_LEVEL_START ? (
+            <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span></h4>
+          ) : level >= HIDDEN_LETTER_LEVEL_START ? (
+            <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span> Y OTRA <span className="highlight">OCULTA</span></h4>
+          ) : (
+            <h4>ENCUENTRA ANAGRAMAS</h4>
+          )}
+          <div key={shuffledWordObject.map((letter: ShuffledWordObjectType) => letter.letter).join('')} className="selectedWord">
+            {shuffledWordObject.map((letter: ShuffledWordObjectType, index: number) => (
+              <span
+                key={`${index}-${letter.letter}`}
+                className={`selectedLetter${letter.isFake && percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? ' fake' : ''}${letter.isHidden && level > HIDDEN_LETTER_LEVEL_START ? ' hidden' : ''}`}
+              >
+                {letter.isHidden && level > HIDDEN_LETTER_LEVEL_START && percentage > RUNNING_OUT_OF_TIME_PERCENTAGE ? '?' : letter.letter}
+                <span className='letterPoints'>{POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER]}</span>
+              </span>
+            ))}
+          </div>
         </div>
         <div className="h-section">
           <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
@@ -106,7 +125,7 @@ export default function GameScreen() {
             className="progress__container"
             style={{
             '--remaining-percentage': `${percentage}%`,
-            '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
+            '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
             } as React.CSSProperties}
           >
           </div>

@@ -1,17 +1,15 @@
-import { THRESHHOLD } from '../contant';
-
-import points from '../points.json'
+import { THRESHHOLD, POINTS_PER_LETTER } from '../constant';
 
 const useCalculatePoints = (possibleWords: string[], correctWords: string[]) => {
   const correctWordsPoints = () => {
     return correctWords.reduce((acc: number, word: string) => {
-      return acc + word.split('').reduce((acc, letter) => acc + points[letter as keyof typeof points], 0);
+      return acc + word.split('').reduce((acc, letter) => acc + POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER], 0);
     }, 0);
   };
 
   const possibleWordsPoints = () => {
     return possibleWords.reduce((acc: number, word: string) => {
-      return acc + word.split('').reduce((acc, letter) => acc + points[letter as keyof typeof points], 0);
+      return acc + word.split('').reduce((acc, letter) => acc + POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER], 0);
     }, 0);
   };
 

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import wordsData from '../words.json';
+
+import wordsData from '../data/words.json';
+
+import useGameStore from '../store/useGameStore';
 
 const normalize = (str: string) => {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/Ñ/g, 'Ñ');
@@ -28,6 +31,7 @@ const canFormWord = (word: string, letters: string) => {
 };
 
 const useRandomWords = () => {
+  const setHiddenLetterIndex = useGameStore(state => state.setHiddenLetterIndex);
   const [randomWord, setRandomWord] = useState<string>('');
   const [possibleWords, setPossibleWords] = useState<string[]>([]);
 
@@ -48,6 +52,7 @@ const useRandomWords = () => {
 
     setRandomWord(word);
     setPossibleWords(words);
+    setHiddenLetterIndex(Math.floor(Math.random() * word.length));
   }, []);
 
   return { randomWord, possibleWords };

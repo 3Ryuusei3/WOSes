@@ -1,5 +1,8 @@
 import { create } from 'zustand';
+
 import Mode from '../types/Mode';
+
+import { START_TIME } from '../constant';
 
 interface GameState {
   mode: Mode;
@@ -18,6 +21,8 @@ interface GameState {
   setLevelsToAdvance: (levels: number) => void;
   highestScore: { name: string; score: number };
   setHighestScore: (score: { name: string; score: number }) => void;
+  hiddenLetterIndex: number;
+  setHiddenLetterIndex: (letter: number) => void;
 }
 
 const useGameStore = create<GameState>((set) => ({
@@ -25,7 +30,7 @@ const useGameStore = create<GameState>((set) => ({
   setMode: (mode) => set({ mode }),
   playerName: '',
   setPlayerName: (name) => set({ playerName: name }),
-  gameTime: 75,
+  gameTime: START_TIME,
   setGameTime: (time) => set((state) => ({
     gameTime: typeof time === 'function' ? time(state.gameTime) : time
   })),
@@ -43,6 +48,8 @@ const useGameStore = create<GameState>((set) => ({
   setLevelsToAdvance: (levels) => set({ levelsToAdvance: levels }),
   highestScore: { name: '', score: 0 },
   setHighestScore: (score) => set({ highestScore: score }),
+  hiddenLetterIndex: 0,
+  setHiddenLetterIndex: (letter) => set({ hiddenLetterIndex: letter })
 }));
 
 export default useGameStore;
