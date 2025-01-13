@@ -1,33 +1,17 @@
-import GameScreen from './components/GameScreen';
-import GameStart from './components/GameStart';
-import GameLost from './components/GameLost';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import useZoom from './hooks/useZoom';
-
-import useGameStore from './store/useGameStore';
-
-import './App.scss';
-import GameLobby from './components/GameLobby';
-import GameLoading from './components/GameLoading';
+import HomePage from './components/HomePage';
+import GamePage from './components/GamePage';
 
 function App() {
-  const { mode } = useGameStore();
-  const zoom = useZoom();
   return (
-    <main className='container' style={{ zoom }}>
-      {mode === 'start' ? (
-         <GameStart/>
-      ) : mode === 'game' ? (
-        <GameScreen />
-      ) : mode === 'lost' ? (
-        <GameLost />
-      ) : mode === 'loading' ? (
-        <GameLoading />
-      ) : (
-        <GameLobby />
-      )}
-
-    </main>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/game" element={<GamePage />} />
+        <Route path="*" element={<HomePage />} />
+      </Routes>
+    </Router>
   );
 }
 
