@@ -2,11 +2,15 @@ import { useState } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
 
+import useBackgroundAudio from '../hooks/useBackgroundAudio';
+
 import useGameStore from '../store/useGameStore';
 
 export default function GameStart() {
   const { playerName, setPlayerName, setMode } = useGameStore();
   const [error, setError] = useState(false);
+
+  useBackgroundAudio(0.5, 1000);
 
   const handleSubmit = () => {
     if (playerName.length >= 3 && playerName.length <= 12) {

@@ -4,6 +4,8 @@ import GameLogo from '../atoms/GameLogo';
 
 import useGameStore from '../store/useGameStore';
 
+import levelPassedSound from '../assets/win.mp3';
+
 export default function GameLobby() {
   const {
     setMode,
@@ -15,12 +17,19 @@ export default function GameLobby() {
     setGameTime,
     lastLevelWords
   } = useGameStore();
-  const secondsToRemove = Math.floor(Math.random() * 2) + 1;
+  const secondsToRemove = Math.floor(Math.random() * 4); // Cambiado a 0-3
 
   useEffect(() => {
     if (gameTime - secondsToRemove > 5) {
       setGameTime(prev => prev - secondsToRemove);
     }
+    const audio = new Audio(levelPassedSound);
+    audio.play();
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
   }, [setGameTime, secondsToRemove]);
 
   return (
@@ -49,7 +58,7 @@ export default function GameLobby() {
             </div>
           </div>
         </div>
-        {gameTime - secondsToRemove > 5 && (
+        {secondsToRemove > 0 && gameTime - secondsToRemove > 5 && (
           <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
         )}
         <button onClick={() => {

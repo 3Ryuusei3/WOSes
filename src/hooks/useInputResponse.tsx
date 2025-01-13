@@ -1,29 +1,51 @@
 import { useState } from 'react';
 
-export default function useInputResponse(possibleWords: string[], inputWord: string, handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void) {
+import hitMusic from '../assets/hit.mp3';
+
+export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void) {
   const [animateError, setAnimateError] = useState(false);
   const [animateSuccess, setAnimateSuccess] = useState(false);
+  const [animateRepeated, setAnimateRepeated] = useState(false);
 
-  const triggerShake = () => {
+  const playHitAudio = () => {
+    const audio = new Audio(hitMusic);
+    audio.volume = 0.5;
+    audio.play();
+    return audio;
+  };
+
+  const triggerAnimateErrpr = () => {
     setAnimateError(true);
     setTimeout(() => setAnimateError(false), 500);
   };
 
   const triggerAnimateSuccess = () => {
     setAnimateSuccess(true);
-    setTimeout(() => setAnimateSuccess(false), 500);
+    const audio = playHitAudio();
+    setTimeout(() => {
+      setAnimateSuccess(false);
+      audio.pause();
+      audio.currentTime = 0;
+    }, 500);
+  };
+
+  const triggerAnimateRepeated = () => {
+    setAnimateRepeated(true);
+    setTimeout(() => setAnimateRepeated(false), 500);
   };
 
   const handleKeyDownWithShake = (event: React.KeyboardEvent<HTMLInputElement>) => {
     handleKeyDown(event);
     if (event.key === 'Enter') {
       if (!possibleWords.includes(inputWord)) {
-        triggerShake();
+        triggerAnimateErrpr();
+      } else if (correctWords.includes(inputWord)) {
+        triggerAnimateRepeated();
       } else {
         triggerAnimateSuccess();
       }
     }
   };
 
-  return { animateError, animateSuccess, triggerShake, triggerAnimateSuccess, handleKeyDownWithShake };
+  return { animateError, animateSuccess, animateRepeated, triggerAnimateErrpr, triggerAnimateSuccess, triggerAnimateRepeated, handleKeyDownWithShake };
 }

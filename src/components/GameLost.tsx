@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 
+import GameLogo from '../atoms/GameLogo';
+
 import useGameStore from '../store/useGameStore';
 
-import GameLogo from '../atoms/GameLogo';
+import gameOverSound from '../assets/gameover.mp3';
 
 export default function GameLost() {
   const {
@@ -24,6 +26,14 @@ export default function GameLost() {
         score: totalPoints
       });
     }
+
+    const audio = new Audio(gameOverSound);
+    audio.play();
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
   }, [totalPoints, highestScore, setHighestScore]);
 
   return (

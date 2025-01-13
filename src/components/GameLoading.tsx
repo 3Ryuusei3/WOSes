@@ -1,8 +1,29 @@
+import { useEffect } from 'react';
+
+
 import GameLogo from '../atoms/GameLogo';
+
+import countdownMusic from '../assets/countdown.mp3';
 import useCountdown from '../hooks/useCountdown';
 
 export default function GameLoading() {
   const countdown = useCountdown();
+
+  useEffect(() => {
+    const audio = new Audio(countdownMusic);
+    audio.loop = true;
+    audio.volume = 0.5;
+
+    const playAudio = setTimeout(() => {
+      audio.play();
+    }, 100);
+
+    return () => {
+      clearTimeout(playAudio);
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [countdownMusic]);
 
   return (
     <>

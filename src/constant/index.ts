@@ -1,4 +1,4 @@
-const START_TIME = 75;
+const START_TIME = 85;
 
 const THRESHHOLD = {
   ONE_STAR: 40,
@@ -49,7 +49,7 @@ const FAKE_LETTER_LEVEL_START = 5;
 
 const HIDDEN_LETTER_LEVEL_START = 10;
 
-const SHUFFLE_INTERVAL = 8000;
+const SHUFFLE_INTERVAL = 10000;
 
 export {
   START_TIME,

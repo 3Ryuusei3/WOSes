@@ -1,7 +1,5 @@
-import { useRef, useEffect } from 'react';
-
+import { useRef, useEffect, useState } from 'react';
 import GameLogo from '../atoms/GameLogo';
-
 import useRandomWords from './../hooks/useRandomWords';
 import useShuffledWord from './../hooks/useShuffledWord';
 import useInputWords from './../hooks/useInputWords';
@@ -9,11 +7,8 @@ import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
 import useTruncatePlayerName from './../hooks/useTruncatePlayerName';
 import useInputResponse from './../hooks/useInputResponse';
-
 import useGameStore from '../store/useGameStore';
-
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
-
 import {
   THRESHHOLD,
   LEVELS_TO_ADVANCE,
@@ -23,6 +18,7 @@ import {
   FAKE_LETTER_LEVEL_START,
   HIDDEN_LETTER_LEVEL_START,
 } from '../constant';
+import goalSound from '../assets/goal.mp3';
 
 export default function GameScreen() {
   const {
@@ -41,49 +37,58 @@ export default function GameScreen() {
   const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
   const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, totalPoints } = useCalculatePoints(possibleWords, correctWords);
-  const { animateError, animateSuccess, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, handleKeyDown);
+  const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);
 
-  useEffect(() => {
-    const updateLastLevelWordsAndPoints = () => {
-      setTotalPoints(prev => prev + correctWordsPoints());
-      setLastLevelWords(possibleWords.map(word => ({
-        word,
-        guessed: correctWords.includes(word)
-      })));
-    };
+  const updateLastLevelWordsAndPoints = () => {
+    setTotalPoints(prev => prev + correctWordsPoints());
+    setLastLevelWords(possibleWords.map(word => ({
+      word,
+      guessed: correctWords.includes(word)
+    })));
+  };
 
-    if (percentage === 0) {
-      if (correctWordsPoints() >= goalPoints || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
-        let levelsAdded = 0;
-        const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
+  const handleEndOfLevel = () => {
+    if (correctWordsPoints() >= goalPoints || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
+      let levelsAdded = 0;
+      const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
 
-        if (completionPercentage >= THRESHHOLD.THREE_STAR) {
-          levelsAdded = LEVELS_TO_ADVANCE.THREE_STAR;
-        } else if (completionPercentage >= THRESHHOLD.TWO_STAR) {
-          levelsAdded = LEVELS_TO_ADVANCE.TWO_STAR;
-        } else if (completionPercentage >= THRESHHOLD.ONE_STAR) {
-          levelsAdded = LEVELS_TO_ADVANCE.ONE_STAR;
-        }
-        setLevelsToAdvance(levelsAdded);
-        setLevel((prev: number) => prev + levelsAdded);
-        setLastRoundPoints(correctWordsPoints());
-        updateLastLevelWordsAndPoints();
-        setMode('lobby');
-      } else {
-        console.log(possibleWords);
-        updateLastLevelWordsAndPoints();
-        setMode('lost');
+      if (completionPercentage >= THRESHHOLD.THREE_STAR) {
+        levelsAdded = LEVELS_TO_ADVANCE.THREE_STAR;
+      } else if (completionPercentage >= THRESHHOLD.TWO_STAR) {
+        levelsAdded = LEVELS_TO_ADVANCE.TWO_STAR;
+      } else if (completionPercentage >= THRESHHOLD.ONE_STAR) {
+        levelsAdded = LEVELS_TO_ADVANCE.ONE_STAR;
       }
+      setLevelsToAdvance(levelsAdded);
+      setLevel((prev: number) => prev + levelsAdded);
+      setLastRoundPoints(correctWordsPoints());
+      updateLastLevelWordsAndPoints();
+      setMode('lobby');
+    } else {
+      console.log(possibleWords);
+      updateLastLevelWordsAndPoints();
+      setMode('lost');
     }
-  }, [percentage, correctWordsPoints, goalPoints, setMode, setTotalPoints, setLastRoundPoints, correctWords, possibleWords, setLevelsToAdvance, setLevel, setLastLevelWords]);
+  };
 
   useEffect(() => {
+    if (percentage === 0) {
+      handleEndOfLevel();
+    }
+
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, []);
+
+    if (totalPoints > 0 && correctWordsPoints() >= goalPoints && !hasPlayedGoalSound) {
+      const audio = new Audio(goalSound);
+      audio.play();
+      setHasPlayedGoalSound(true);
+    }
+  }, [percentage, totalPoints, correctWordsPoints, goalPoints, hasPlayedGoalSound]);
 
   return (
     <>
@@ -109,7 +114,7 @@ export default function GameScreen() {
       <div className='game__container'>
         <div className="h-section gap-sm">
         { level >= HIDDEN_LETTER_LEVEL_START ? (
-            <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span> Y OTRA <span className="highlight">OCULTA</span></h4>
+            <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span> Y OTRA <span className="highlight">OCULTa</span></h4>
           ) : level >= FAKE_LETTER_LEVEL_START ? (
             <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span></h4>
           ) : (
@@ -160,7 +165,7 @@ export default function GameScreen() {
         </ul>
         <input
           type="text"
-          className={`mx-auto mt-auto ${animateError ? 'animate-error' : ''} ${animateSuccess ? 'animate-success' : ''}`}
+          className={`mx-auto mt-auto ${animateError ? 'animate-error' : ''} ${animateSuccess ? 'animate-success' : ''} ${animateRepeated ? 'animate-repeated' : ''}`}
           placeholder='INTRODUCE LA PALABRA...'
           value={inputWord}
           onChange={handleChange}

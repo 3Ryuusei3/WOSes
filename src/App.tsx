@@ -6,7 +6,7 @@ import useZoom from './hooks/useZoom';
 
 import useGameStore from './store/useGameStore';
 
-import './App.css';
+import './App.scss';
 import GameLobby from './components/GameLobby';
 import GameLoading from './components/GameLoading';
 

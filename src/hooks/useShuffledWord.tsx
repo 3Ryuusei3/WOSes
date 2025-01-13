@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-
 import useGameStore from '../store/useGameStore';
-
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
-
 import { LETTERS, FAKE_LETTER_LEVEL_START } from '../constant';
+import shuffleSound from '../assets/shuffle.mp3';
 
 const createLetterObject = (word: string, level: number, fakeLetter: string, hiddenLetterIndex: number) => {
   let letterObject = word.split('').map((letter, index) => ({
@@ -16,6 +14,11 @@ const createLetterObject = (word: string, level: number, fakeLetter: string, hid
   if (level >= FAKE_LETTER_LEVEL_START) {
     const randomIndex = Math.floor(Math.random() * letterObject.length);
     letterObject.splice(randomIndex, 0, { letter: fakeLetter, isFake: true, isHidden: false });
+  }
+
+  for (let i = letterObject.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [letterObject[i], letterObject[j]] = [letterObject[j], letterObject[i]];
   }
 
   return letterObject;
@@ -43,7 +46,7 @@ const useShuffledWord = (word: string, intervalTime: number, shouldShuffle: bool
     }
 
     const initialLetterObject = createLetterObject(word, level, fakeLetter, hiddenLetterIndex);
-    setShuffledWordObject(initialLetterObject.sort(() => Math.random() - 0.5));
+    setShuffledWordObject(initialLetterObject);
 
     if (!shouldShuffle) return;
 
@@ -51,6 +54,9 @@ const useShuffledWord = (word: string, intervalTime: number, shouldShuffle: bool
       let letterObject = createLetterObject(word, level, fakeLetter, hiddenLetterIndex);
       letterObject = letterObject.sort(() => Math.random() - 0.5);
       setShuffledWordObject(letterObject);
+
+      const audio = new Audio(shuffleSound);
+      audio.play();
     };
 
     const interval = setInterval(shuffleAndAddLetter, intervalTime);

@@ -103,12 +103,14 @@ button {
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
+
+  &:hover {
+    background-color: var(--clr-accent-primary-highlight);
+    box-shadow: 0 3px 0 0 var(--clr-accent-secondary), 0 -3px 0 0 var(--clr-accent-terciary);
+  }
 }
 
-button:hover {
-  background-color: var(--clr-accent-primary-highlight);
-  box-shadow: 0 3px 0 0 var(--clr-accent-secondary), 0 -3px 0 0 var(--clr-accent-terciary);
-}
+
 
 ul {
   list-style: none;
@@ -125,10 +127,10 @@ input {
   border-radius: 8px;
   text-transform: uppercase;
   width: 500px;
-}
 
-input::placeholder {
-  color: var(--clr-text-terciary);
+  &::placeholder {
+    color: var(--clr-text-terciary);
+  }
 }
 
 @keyframes shake {
@@ -169,12 +171,39 @@ input::placeholder {
   }
 }
 
+@keyframes repeat {
+  0% {
+    transform: translateX(0);
+    border: 3px solid var(--clr-border-primary);
+  }
+  25% {
+    transform: translateX(-5px);
+    border: 3px solid var(--clr-accent-primary);
+  }
+  50% {
+    transform: translateX(5px);
+    border: 3px solid var(--clr-accent-primary);
+  }
+  75% {
+    transform: translateX(-5px);
+    border: 3px solid var(--clr-accent-primary);
+  }
+  100% {
+    transform: translateX(0);
+    border: 3px solid var(--clr-border-primary);
+  }
+}
+
 .animate-success {
   animation: success 0.5s;
 }
 
 .animate-error {
   animation: shake 0.5s;
+}
+
+.animate-repeated {
+  animation: repeat 0.5s;
 }
 
 .w100 {
@@ -269,21 +298,25 @@ input::placeholder {
   align-items: center;
   justify-content: center;
   z-index: 1;
-}
 
-.loading__container--box {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(45deg);
-  width: 200px;
-  height: 200px;
-  background-color: var(--clr-bg-primary);
-  border: 3px solid var(--clr-accent-primary);
-  border-radius: 8px;
-  box-shadow: 0 0 20px 4px var(--clr-progress-bg);
-  z-index: -1;
-  animation: scaleBoxAnimation 1s infinite;
+  h2 {
+    animation: scaleTitleAnimation 1s infinite;
+  }
+
+  &--box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 200px;
+    height: 200px;
+    background-color: var(--clr-bg-primary);
+    border: 3px solid var(--clr-accent-primary);
+    border-radius: 8px;
+    box-shadow: 0 0 20px 4px var(--clr-progress-bg);
+    z-index: -1;
+    animation: scaleBoxAnimation 1s infinite;
+  }
 }
 
 .loading__container--box-md {
@@ -305,10 +338,6 @@ input::placeholder {
   height: 320px;
   opacity: 0.2;
   animation: scaleBoxAnimation 1s infinite 0.3s;
-}
-
-.loading__container h2 {
-  animation: scaleTitleAnimation 1s infinite;
 }
 
 @keyframes scaleBoxAnimation {
@@ -360,12 +389,12 @@ input::placeholder {
   box-shadow: 0 0 0 4px var(--clr-progress-bg);
   border-radius: 8px;
   text-align: center;
-}
 
-.score__container--box.won {
-  color: var(--clr-accent-primary-highlight);
-  border: 2px solid var(--clr-accent-primary-highlight);
-  background-color: var(--clr-bg-terciary);
+  &.won {
+    color: var(--clr-accent-primary-highlight);
+    border: 2px solid var(--clr-accent-primary-highlight);
+    background-color: var(--clr-bg-terciary);
+  }
 }
 
 .score__container--wordlist {
@@ -413,6 +442,18 @@ input::placeholder {
   text-shadow: 0px 2px 0 var(--clr-border-secondary);
   transform: rotateX(0deg);
   animation: selectedLetter 0.5s linear forwards;
+
+  &.fake {
+    background-color: var(--clr-lose);
+    text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+    animation: fakeSelectedLetter 0.5s linear forwards;
+  }
+
+  &.hidden {
+    background-color: var(--clr-accent-primary);
+    text-shadow: 0px 2px 0 var(--clr-accent-primary-highlight);
+    animation: hiddenSelectedLetter 0.5s linear forwards;
+  }
 }
 
 @keyframes selectedLetter {
@@ -431,12 +472,6 @@ input::placeholder {
     text-shadow: 0px 2px 0 var(--clr-border-secondary);
     transform: rotateX(0deg);
   }
-}
-
-.selectedLetter.fake {
-  background-color: var(--clr-lose);
-  text-shadow: 0px 2px 0 var(--clr-lose-highlight);
-  animation: fakeSelectedLetter 0.5s linear forwards;
 }
 
 @keyframes fakeSelectedLetter {
@@ -458,12 +493,6 @@ input::placeholder {
     background-color: var(--clr-lose);
     transform: rotateX(0deg);
   }
-}
-
-.selectedLetter.hidden {
-  background-color: var(--clr-accent-primary);
-  text-shadow: 0px 2px 0 var(--clr-accent-primary-highlight);
-  animation: hiddenSelectedLetter 0.5s linear forwards;
 }
 
 @keyframes hiddenSelectedLetter {
@@ -518,23 +547,6 @@ input::placeholder {
   grid-auto-flow: column dense;
 }
 
-.word {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: 8px;
-  border: 2px solid var(--clr-bg-secondary);
-  transition: all 0.3s ease;
-}
-
-.wordLetters {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.35rem;
-}
-
 .letter {
   display: flex;
   justify-content: center;
@@ -551,17 +563,46 @@ input::placeholder {
   box-shadow: 0 0 0 2px var(--clr-bg-secondary);
   transform: rotateX(180deg);
   transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease, transform 0.5s ease;
+
+  span {
+    opacity: 0;
+  }
 }
 
-.letter span {
-  opacity: 0;
+.word {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 2px solid var(--clr-bg-secondary);
+  transition: all 0.3s ease;
+
+  &.active {
+    background-color: var(--clr-bg-terciary);
+    border: 2px solid var(--clr-bg-quaternary);
+    justify-content: space-between;
+    animation: correctWord 1s ease;
+
+    .letter {
+      background-color: var(--clr-text-secondary);
+      border: 2px solid var(--clr-border-secondary);
+      box-shadow: 0 0 0 2px var(--clr-border-primary);
+      transform: rotateX(0);
+      animation: correctLetter 0.3s ease;
+
+      span {
+        opacity: 1;
+      }
+    }
+  }
 }
 
-.word.active {
-  background-color: var(--clr-bg-terciary);
-  border: 2px solid var(--clr-bg-quaternary);
-  justify-content: space-between;
-  animation: correctWord 1s ease;
+.wordLetters {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.35rem;
 }
 
 .playerName {
@@ -570,18 +611,6 @@ input::placeholder {
   padding-left: 0.25rem;
   font-weight: 600;
   letter-spacing: 0.05px;
-}
-
-.word.active .letter {
-  background-color: var(--clr-text-secondary);
-  border: 2px solid var(--clr-border-secondary);
-  box-shadow: 0 0 0 2px var(--clr-border-primary);
-  transform: rotateX(0);
-  animation: correctLetter 0.3s ease;
-}
-
-.word.active .letter span {
-  opacity: 1;
 }
 
 @keyframes correctWord {
