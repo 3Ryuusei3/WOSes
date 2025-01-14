@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
 
+import useRemoveSeconds from '../hooks/useRemoveSeconds';
 import useRandomWords from '../hooks/useRandomWords';
 
 import useGameStore from '../store/useGameStore';
@@ -15,17 +16,12 @@ export default function GameLobby() {
     level,
     lastRoundPoints,
     levelsToAdvance,
-    gameTime,
-    setGameTime,
     lastLevelWords
   } = useGameStore();
   useRandomWords();
-  const secondsToRemove = Math.floor(Math.random() * 4);
+  const secondsToRemove = useRemoveSeconds();
 
   useEffect(() => {
-    if (gameTime - secondsToRemove > 5) {
-      setGameTime(prev => prev - secondsToRemove);
-    }
     const audio = new Audio(levelPassedSound);
     audio.play();
 
@@ -33,7 +29,7 @@ export default function GameLobby() {
       audio.pause();
       audio.currentTime = 0;
     };
-  }, [setGameTime, secondsToRemove]);
+  }, []);
 
   return (
     <>
@@ -61,7 +57,7 @@ export default function GameLobby() {
             </div>
           </div>
         </div>
-        {secondsToRemove > 0 && gameTime - secondsToRemove > 5 && (
+        {secondsToRemove > 0 && (
           <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
         )}
         <button onClick={() => {
