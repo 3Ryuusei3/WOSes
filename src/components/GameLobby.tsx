@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
 
+import useRandomWords from '../hooks/useRandomWords';
+
 import useGameStore from '../store/useGameStore';
 
 import levelPassedSound from '../assets/win.mp3';
@@ -17,7 +19,8 @@ export default function GameLobby() {
     setGameTime,
     lastLevelWords
   } = useGameStore();
-  const secondsToRemove = Math.floor(Math.random() * 4); // Cambiado a 0-3
+  useRandomWords();
+  const secondsToRemove = Math.floor(Math.random() * 4);
 
   useEffect(() => {
     if (gameTime - secondsToRemove > 5) {

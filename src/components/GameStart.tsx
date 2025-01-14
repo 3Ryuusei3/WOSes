@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
 
+import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
 
 import useGameStore from '../store/useGameStore';
@@ -9,6 +10,7 @@ import useGameStore from '../store/useGameStore';
 export default function GameStart() {
   const { playerName, setPlayerName, setMode } = useGameStore();
   const [error, setError] = useState(false);
+  useRandomWords();
 
   useBackgroundAudio(0.5, 1000);
 

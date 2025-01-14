@@ -10,6 +10,10 @@ interface GameState {
   setMode: (mode: Mode) => void;
   playerName: string;
   setPlayerName: (name: string) => void;
+  randomWord: string;
+  setRandomWord: (word: string) => void;
+  possibleWords: string[];
+  setPossibleWords: (words: string[]) => void;
   gameTime: number;
   setGameTime: (time: number | ((prev: number) => number)) => void;
   lastRoundPoints: number;
@@ -33,6 +37,10 @@ const useGameStore = create<GameState>((set) => ({
   setMode: (mode) => set({ mode }),
   playerName: '',
   setPlayerName: (name) => set({ playerName: name }),
+  randomWord: '',
+  setRandomWord: (word) => set({ randomWord: word }),
+  possibleWords: [],
+  setPossibleWords: (words) => set({ possibleWords: words }),
   gameTime: START_TIME,
   setGameTime: (time) => set((state) => ({
     gameTime: typeof time === 'function' ? time(state.gameTime) : time

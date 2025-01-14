@@ -25,6 +25,8 @@ export default function GameScreen() {
     playerName,
     setMode,
     gameTime,
+    randomWord,
+    possibleWords,
     setTotalPoints,
     setLastRoundPoints,
     level,
@@ -32,7 +34,6 @@ export default function GameScreen() {
     setLevelsToAdvance,
     setLastLevelWords
   } = useGameStore();
-  const { randomWord, possibleWords } = useRandomWords();
   const { percentage, timeLeft } = useProgressBar(gameTime);
   const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
   const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
