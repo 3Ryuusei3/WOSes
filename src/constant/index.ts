@@ -10,7 +10,7 @@ const LEVELS_TO_ADVANCE = {
   TWO_STAR: 2,
   THREE_STAR: 3,
 }
-const COUNTDOWN = 3.2;
+const COUNTDOWN = 3.1;
 
 const RUNNING_OUT_OF_TIME_PERCENTAGE = 15;
 
