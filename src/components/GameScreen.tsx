@@ -1,13 +1,17 @@
 import { useRef, useEffect, useState } from 'react';
-import GameLogo from '../atoms/GameLogo';
-import useRandomWords from './../hooks/useRandomWords';
+
+import ScoreContainer from '../atoms/ScoreContainer';
+import WarningMessage from '../atoms/WarningMessage';
+
 import useShuffledWord from './../hooks/useShuffledWord';
 import useInputWords from './../hooks/useInputWords';
 import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
 import useTruncatePlayerName from './../hooks/useTruncatePlayerName';
 import useInputResponse from './../hooks/useInputResponse';
+
 import useGameStore from '../store/useGameStore';
+
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
 import {
   THRESHHOLD,
@@ -17,7 +21,9 @@ import {
   POINTS_PER_LETTER,
   FAKE_LETTER_LEVEL_START,
   HIDDEN_LETTER_LEVEL_START,
+  HIDDEN_WORDS_LEVEL_START,
 } from '../constant';
+
 import goalSound from '../assets/goal.mp3';
 
 export default function GameScreen() {
@@ -93,55 +99,44 @@ export default function GameScreen() {
 
   return (
     <>
-      <div className='score__container'>
-        <div className={`score__container--box ${correctWords.length === possibleWords.length ? 'won' : ''}`}>
-          <p>PALABRAS</p>
-          <h3>{correctWords.length}/{possibleWords.length}</h3>
-        </div>
-        <GameLogo />
-        <div className={`score__container--box ${correctWordsPoints() >= goalPoints ? 'won' : ''}`}>
-          <div className="v-section gap-md">
-            <div className="h-section">
-              <p>OBJETIVO</p>
-              <h3>{correctWordsPoints()}/{goalPoints}</h3>
-            </div>
-            <div className="h-section">
-              <p>NIVEL</p>
-              <h3>{level}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ScoreContainer
+        correctWords={correctWords}
+        possibleWords={possibleWords}
+        correctWordsPoints={correctWordsPoints}
+        goalPoints={goalPoints}
+        level={level}
+      />
       <div className='game__container'>
-        <div className="h-section gap-sm">
-        { level >= HIDDEN_LETTER_LEVEL_START ? (
-            <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span> Y OTRA <span className="highlight">OCULTa</span></h4>
-          ) : level >= FAKE_LETTER_LEVEL_START ? (
-            <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span></h4>
-          ) : (
-            <h4>ENCUENTRA ANAGRAMAS</h4>
-          )}
-          <div key={shuffledWordObject.map((letter: ShuffledWordObjectType) => letter.letter).join('')} className="selectedWord">
-            {shuffledWordObject.map((letter: ShuffledWordObjectType, index: number) => (
-              <span
-                key={`${index}-${letter.letter}`}
-                className={`selectedLetter${letter.isFake && percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? ' fake' : ''}${letter.isHidden && level > HIDDEN_LETTER_LEVEL_START ? ' hidden' : ''}`}
-              >
-                {letter.isHidden && level > HIDDEN_LETTER_LEVEL_START && percentage > RUNNING_OUT_OF_TIME_PERCENTAGE ? '?' : letter.letter}
-                <span className='letterPoints'>{POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER]}</span>
-              </span>
-            ))}
+        <div className="h-section gap-xs">
+          <div className="h-section gap-sm">
+            <WarningMessage
+              level={level}
+              HIDDEN_LETTER_LEVEL_START={HIDDEN_LETTER_LEVEL_START}
+              FAKE_LETTER_LEVEL_START={FAKE_LETTER_LEVEL_START}
+              HIDDEN_WORDS_LEVEL_START={HIDDEN_WORDS_LEVEL_START}
+            />
+            <div key={shuffledWordObject.map((letter: ShuffledWordObjectType) => letter.letter).join('')} className="selectedWord">
+              {shuffledWordObject.map((letter: ShuffledWordObjectType, index: number) => (
+                <span
+                  key={`${index}-${letter.letter}`}
+                  className={`selectedLetter${letter.isFake && percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? ' fake' : ''}${letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START ? ' hidden' : ''}`}
+                >
+                  {letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START && percentage > RUNNING_OUT_OF_TIME_PERCENTAGE ? '?' : letter.letter}
+                  <span className='letterPoints'>{POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER]}</span>
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="h-section">
-          <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
-          <div
-            className="progress__container"
-            style={{
-            '--remaining-percentage': `${percentage}%`,
-            '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
-            } as React.CSSProperties}
-          >
+          <div className="h-section">
+            <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
+            <div
+              className="progress__container"
+              style={{
+              '--remaining-percentage': `${percentage}%`,
+              '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
+              } as React.CSSProperties}
+            >
+            </div>
           </div>
         </div>
         <ul className='wordlist' style={{ '--wordlist-rows': Math.ceil(possibleWords.length / 3) } as React.CSSProperties}>
@@ -157,7 +152,9 @@ export default function GameScreen() {
               <span className='wordLetters'>
                 {word.split('').map((letter, letterIndex) => (
                   <span key={`${index}-${word}-${letter}-${letterIndex}`} className='letter'>
-                    <span>{letter}</span>
+                    <span>
+                      {(level >= HIDDEN_WORDS_LEVEL_START && percentage > RUNNING_OUT_OF_TIME_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
+                    </span>
                   </span>
                 ))}
               </span>

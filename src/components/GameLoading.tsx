@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 
-
 import GameLogo from '../atoms/GameLogo';
 
 import countdownMusic from '../assets/countdown.mp3';
@@ -11,7 +10,6 @@ export default function GameLoading() {
 
   useEffect(() => {
     const audio = new Audio(countdownMusic);
-    audio.loop = true;
     audio.volume = 0.5;
 
     const playAudio = setTimeout(() => {
@@ -31,7 +29,9 @@ export default function GameLoading() {
       <div className='game__container'>
         <h1 className='highlight'>EL JUEGO COMIENZA EN...</h1>
         <div className="loading__container">
-          <h2 className='highlight'>{countdown}</h2>
+          <h2 className='highlight'>
+            {Math.floor(countdown) === 0 ? '¡YA!' : Math.floor(countdown)}
+          </h2>
           <div className="loading__container--box loading__container--box-xl"></div>
           <div className="loading__container--box loading__container--box-lg"></div>
           <div className="loading__container--box loading__container--box-md"></div>
