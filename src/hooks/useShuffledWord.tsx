@@ -63,8 +63,6 @@ const useShuffledWord = (word: string, intervalTime: number, shouldShuffle: bool
     return () => clearInterval(interval);
   }, [word, intervalTime, shouldShuffle, initialShuffledWord, fakeLetter, level, hiddenLetterIndex]);
 
-  console.log(shuffledWordObject);
-
   return shuffledWordObject;
 };
 

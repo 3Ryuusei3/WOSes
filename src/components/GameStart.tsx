@@ -42,7 +42,7 @@ export default function GameStart() {
       <div className='game__container f-jc-c'>
         <div className="v-section gap-md">
           <div className='qr__container'>
-            <h4 className='highlight'>ACCEDE A ESTE QR Y<br/>ÚNETE A LA PARTIDA</h4>
+            <h4 className='highlight ws-nw'>ACCEDE A ESTE QR Y<br/>ÚNETE A LA PARTIDA</h4>
             <Link to={window.location.href}>
               <QRCodeSVG
                 value={window.location.href}
@@ -50,9 +50,6 @@ export default function GameStart() {
                 size={170}
                 fgColor='#ddccff'
               />
-            </Link>
-            <Link to={window.location.href}>
-              <p className='link'>{window.location.href} </p>
             </Link>
           </div>
           <div className='h-section gap-md w100 f-jc-c'>
