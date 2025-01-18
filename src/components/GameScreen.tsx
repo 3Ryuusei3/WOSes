@@ -7,7 +7,6 @@ import useShuffledWord from './../hooks/useShuffledWord';
 import useInputWords from './../hooks/useInputWords';
 import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
-import useTruncatePlayerName from './../hooks/useTruncatePlayerName';
 import useInputResponse from './../hooks/useInputResponse';
 
 import useGameStore from '../store/useGameStore';
@@ -82,7 +81,8 @@ export default function GameScreen() {
   };
 
   useEffect(() => {
-    if (percentage === 0) {
+    if (percentage === 0 ||
+      totalPoints > 0 && correctWords.length === possibleWords.length) {
       handleEndOfLevel();
     }
 
@@ -147,7 +147,7 @@ export default function GameScreen() {
               ref={el => wordRefs.current[index] = el}
             >
               {inputtedWords.includes(word) && (
-                <span className='playerName'>{useTruncatePlayerName(playerName, word.length)}</span>
+                <span className='playerName'>{playerName}</span>
               )}
               <span className='wordLetters'>
                 {word.split('').map((letter, letterIndex) => (

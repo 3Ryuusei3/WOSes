@@ -42,14 +42,15 @@ const POINTS_PER_LETTER = {
   "ñ": 8,
   "x": 8,
   "z": 10,
-  "k": 10
+  "k": 10,
+  "w": 10,
 }
 
-const FAKE_LETTER_LEVEL_START = 5;
+const FAKE_LETTER_LEVEL_START = 7;
 
-const HIDDEN_LETTER_LEVEL_START = 10;
+const HIDDEN_LETTER_LEVEL_START = 14;
 
-const HIDDEN_WORDS_LEVEL_START = 15;
+const HIDDEN_WORDS_LEVEL_START = 21;
 
 const SHUFFLE_INTERVAL = 10000;
 

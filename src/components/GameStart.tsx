@@ -17,7 +17,7 @@ export default function GameStart() {
   useBackgroundAudio(0.5, 1000);
 
   const handleSubmit = () => {
-    if (playerName.length >= 3 && playerName.length <= 12) {
+    if (playerName.length >= 3 && playerName.length <= 10) {
       setMode('loading');
     } else {
       setError(true);
@@ -64,7 +64,7 @@ export default function GameStart() {
                 onKeyDown={handleKeyDown}
               />
               <small className={`txt-center ${error ? '' : 'op-0'}`}>
-                EL NOMBRE DEBE TENER ENTRE 3 Y 12 CARACTERES
+                EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES
               </small>
             </div>
             <button onClick={handleSubmit}>EMPEZAR PARTIDA</button>
