@@ -13,7 +13,7 @@ export default function GameLost() {
     setTotalPoints,
     level,
     setLevel,
-    playerName,
+    player,
     highestScore,
     setHighestScore,
     lastLevelWords
@@ -22,7 +22,7 @@ export default function GameLost() {
   useEffect(() => {
     if (totalPoints > highestScore.score) {
       setHighestScore({
-        name: playerName,
+        name: player.name,
         score: totalPoints
       });
     }

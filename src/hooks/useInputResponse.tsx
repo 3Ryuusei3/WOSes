@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import hitMusic from '../assets/hit.mp3';
 
-export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void) {
+export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void, setGuessedWords: (guessedWords: string[]) => void) {
   const [animateError, setAnimateError] = useState(false);
   const [animateSuccess, setAnimateSuccess] = useState(false);
   const [animateRepeated, setAnimateRepeated] = useState(false);
@@ -14,7 +14,7 @@ export default function useInputResponse(possibleWords: string[], inputWord: str
     return audio;
   };
 
-  const triggerAnimateErrpr = () => {
+  const triggerAnimateError = () => {
     setAnimateError(true);
     setTimeout(() => setAnimateError(false), 500);
   };
@@ -38,14 +38,15 @@ export default function useInputResponse(possibleWords: string[], inputWord: str
     handleKeyDown(event);
     if (event.key === 'Enter') {
       if (!possibleWords.includes(inputWord)) {
-        triggerAnimateErrpr();
+        triggerAnimateError();
       } else if (correctWords.includes(inputWord)) {
         triggerAnimateRepeated();
       } else {
         triggerAnimateSuccess();
       }
     }
+    setGuessedWords([...correctWords, inputWord]);
   };
 
-  return { animateError, animateSuccess, animateRepeated, triggerAnimateErrpr, triggerAnimateSuccess, triggerAnimateRepeated, handleKeyDownWithShake };
+  return { animateError, animateSuccess, animateRepeated, triggerAnimateError, triggerAnimateSuccess, triggerAnimateRepeated, handleKeyDownWithShake };
 }

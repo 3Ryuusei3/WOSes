@@ -8,11 +8,11 @@ import useZoom from '../hooks/useZoom';
 import useGameStore from '../store/useGameStore';
 
 const GamePage = () => {
-  const { mode } = useGameStore();
+  const { mode, player } = useGameStore();
   const zoom = useZoom();
 
   return (
-    <main style={{ zoom }}>
+    <main style={{ zoom: player && player.role === 'screen' ? zoom : 1 }}>
       <div className="container">
         {mode === 'start' ? (
           <GameStart />

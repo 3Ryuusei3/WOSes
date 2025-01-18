@@ -2,7 +2,7 @@
 
 :root {
   --clr-bg-primary: #420072;
-  --clr-bg-primary-dim: #4e0582;
+  --clr-bg-primary-dim: #470377;
   --clr-bg-secondary: #7534c4;
   --clr-bg-terciary: #b76efa;
   --clr-bg-quaternary: #c88efe;
@@ -128,6 +128,13 @@ button, .btn {
     background-color: var(--clr-accent-primary-highlight);
     box-shadow: 0 3px 0 0 var(--clr-accent-secondary), 0 -3px 0 0 var(--clr-accent-terciary);
   }
+
+  &:disabled {
+    background-color: var(--clr-bg-primary);
+    color: var(--clr-text-terciary);
+    box-shadow: 0 3px 0 0 var(--clr-bg-terciary), 0 -3px 0 0 var(--clr-bg-terciary);
+    cursor: not-allowed;
+  }
 }
 
 ul {
@@ -149,7 +156,8 @@ input {
   font-size: 1.1rem;
   border-radius: 8px;
   text-transform: uppercase;
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
 
   &::placeholder {
     color: var(--clr-text-terciary);
@@ -233,6 +241,7 @@ main {
   display: flex;
   flex-direction: column;
   padding: 1.5rem 2rem;
+  height: calc(100% - 3rem);
 }
 
 .container {
@@ -695,7 +704,7 @@ main {
   gap: 0.3rem;
 }
 
-.playerName {
+.player {
   color: var(--clr-text-primary);
   font-size: 1.15rem;
   padding-left: 0.25rem;

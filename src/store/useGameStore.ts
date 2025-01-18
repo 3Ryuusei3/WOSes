@@ -2,14 +2,15 @@ import { create } from 'zustand';
 
 import Mode from '../types/Mode';
 import Word from '../types/Word';
+import Player from '../types/Player';
 
 import { START_TIME } from '../constant';
 
 interface GameState {
   mode: Mode;
   setMode: (mode: Mode) => void;
-  playerName: string;
-  setPlayerName: (name: string) => void;
+  player: Player;
+  setPlayer: (player: Player) => void;
   randomWord: string;
   setRandomWord: (word: string) => void;
   possibleWords: string[];
@@ -35,8 +36,8 @@ interface GameState {
 const useGameStore = create<GameState>((set) => ({
   mode: 'start',
   setMode: (mode) => set({ mode }),
-  playerName: '',
-  setPlayerName: (name) => set({ playerName: name }),
+  player: { name: '', role: '', score: 0 },
+  setPlayer: (player) => set({ player: player }),
   randomWord: '',
   setRandomWord: (word) => set({ randomWord: word }),
   possibleWords: [],

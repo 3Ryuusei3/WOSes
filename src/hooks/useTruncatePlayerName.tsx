@@ -1,21 +1,21 @@
-const useTruncatePlayerName = (playerName: string, wordLength: number) => {
-  let truncatedName = playerName;
+const useTruncateplayer = (player: string, wordLength: number) => {
+  let truncatedName = player;
 
   if (wordLength === 9) {
-    truncatedName = playerName.length > 8 ? playerName.substring(0, 8) + '...' : playerName;
+    truncatedName = player.length > 8 ? player.substring(0, 8) + '...' : player;
   } else if (wordLength === 8) {
-    truncatedName = playerName.length > 10 ? playerName.substring(0, 10) + '...' : playerName;
+    truncatedName = player.length > 10 ? player.substring(0, 10) + '...' : player;
   } else if (wordLength === 7) {
-    truncatedName = playerName.length > 12 ? playerName.substring(0, 12) + '...' : playerName;
+    truncatedName = player.length > 12 ? player.substring(0, 12) + '...' : player;
   } else if (wordLength === 6) {
-    truncatedName = playerName.length > 14 ? playerName.substring(0, 14) + '...' : playerName;
+    truncatedName = player.length > 14 ? player.substring(0, 14) + '...' : player;
   } else if (wordLength === 5) {
-    truncatedName = playerName.length > 16 ? playerName.substring(0, 16) + '...' : playerName;
+    truncatedName = player.length > 16 ? player.substring(0, 16) + '...' : player;
   } else if (wordLength === 4) {
-    truncatedName = playerName.length > 18 ? playerName.substring(0, 18) + '...' : playerName;
+    truncatedName = player.length > 18 ? player.substring(0, 18) + '...' : player;
   }
 
   return truncatedName;
 };
 
-export default useTruncatePlayerName;
+export default useTruncateplayer;

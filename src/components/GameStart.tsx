@@ -12,23 +12,50 @@ import useGameStore from '../store/useGameStore';
 import supabase from './../config/supabaseClient';
 
 export default function GameStart() {
-  const { playerName, setPlayerName, setMode } = useGameStore();
+  const { player, setPlayer, setMode } = useGameStore();
+  const [playerName, setPlayerName] = useState('');
   const [error, setError] = useState(false);
   const navigate = useNavigate();
   useRandomWords();
   useBackgroundAudio(0.5, 1000);
 
-  const handleSubmit = () => {
-    if (playerName.length >= 3 && playerName.length <= 10) {
-      setMode('loading');
+  const handleSubmit = async () => {
+    if (playerName?.length >= 3 && playerName?.length <= 10) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomId = urlParams.get('id');
+
+      if (roomId) {
+        const { data: roomData, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('room_id', roomId);
+
+        if (error) {
+          setError(true);
+          return;
+        }
+
+        const role = roomData.length === 1 ? 'host' : 'player';
+        const { error: userError } = await supabase
+        .from('users')
+        .insert([{ nickname: playerName, role, room_id: roomId }])
+        .select();
+
+        if (userError) throw userError;
+        setPlayer({ name: playerName, role, score: 0 });
+      }
     } else {
       setError(true);
     }
   };
 
+  const handleGameStart = () => {
+    setMode('loading');
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    setError(false);
     if (e.key === 'Enter') {
+      setError(false);
       handleSubmit();
     }
   };
@@ -58,41 +85,62 @@ export default function GameStart() {
     checkRoomId();
   }, [navigate]);
 
+  console.log(player);
+
   return (
     <>
-      <GameLogo />
-      <div className='game__container f-jc-c'>
-        <div className="v-section gap-md">
-          <div className='qr__container'>
-            <h4 className='highlight ws-nw'>ACCEDE A ESTE QR Y<br/>ÚNETE A LA PARTIDA</h4>
-            <Link to={window.location.href}>
-              <QRCodeSVG
-                value={window.location.href}
-                bgColor='#420072'
-                size={170}
-                fgColor='#ddccff'
-              />
-            </Link>
-          </div>
-          <div className='h-section gap-md w100 f-jc-c'>
-            <h2 className='highlight'>INTRODUCE TU NOMBRE<br/>PARA JUGAR</h2>
-            <div className="h-section gap-xs">
-              <input
-                className='mx-auto'
-                type='text'
-                placeholder='NOMBRE'
-                value={playerName}
-                onChange={handleChange}
-                onKeyDown={handleKeyDown}
-              />
-              <small className={`txt-center ${error ? '' : 'op-0'}`}>
-                EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES
-              </small>
+      {(player && player.role === 'screen') ? (
+        <>
+          <GameLogo />
+          <div className='game__container f-jc-c'>
+            <div className="v-section gap-md">
+              <div className='h-section gap-md w100 f-jc-c f-ai-c'>
+                <h2 className='highlight'>ESPERANDO A MÁS JUGADORES</h2>
+                <div className="qr__container">
+                  <h4 className='highlight ws-nw'>ACCEDE A ESTE QR Y<br/>ÚNETE A LA PARTIDA</h4>
+                  <Link to={window.location.href}>
+                    <QRCodeSVG
+                      value={window.location.href}
+                      bgColor='#420072'
+                      size={170}
+                      fgColor='#ddccff'
+                    />
+                  </Link>
+                </div>
+              </div>
             </div>
-            <button onClick={handleSubmit}>EMPEZAR PARTIDA</button>
           </div>
-        </div>
-      </div>
+        </>
+      ) : (player && player.role === 'host') ? (
+        <>
+          <h4 className='highlight'>TU NOMBRE:</h4>
+          <h2 className='highlight'>{player.name}</h2>
+          <button onClick={handleGameStart}>EMPEZAR PARTIDA</button>
+        </>
+      ) : (player && player.role === 'player') ? (
+        <>
+          <h4 className='highlight'>TU NOMBRE:</h4>
+          <h2 className='highlight'>{player.name}</h2>
+          <button disabled>ESPERANDO AL ANFITRIÓN</button>
+        </>
+      ) : (
+        <>
+          <div className="h-section gap-xs w100">
+            <input
+              className='mx-auto'
+              type='text'
+              placeholder='NOMBRE'
+              value={playerName}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+            />
+            <small className={`txt-center ${error ? '' : 'op-0'}`}>
+              EL NOMBRE DEBE TENER ENTRE 3 Y 12 CARACTERES
+            </small>
+          </div>
+          <button onClick={handleSubmit}>ENTRAR A LA SALA</button>
+        </>
+      )}
     </>
   );
 }
