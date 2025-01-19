@@ -1,4 +1,4 @@
-const  generateRandomRoom = () =>{
+const generateRandomRoom = () =>{
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   const charactersLength = characters.length;
@@ -8,4 +8,9 @@ const  generateRandomRoom = () =>{
   return result;
 }
 
-export { generateRandomRoom };
+const getRoomIdFromURL = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('id');
+}
+
+export { generateRandomRoom, getRoomIdFromURL };

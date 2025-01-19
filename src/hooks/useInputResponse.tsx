@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import hitMusic from '../assets/hit.mp3';
 
-export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void, setGuessedWords: (guessedWords: string[]) => void) {
+export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void, guessedWords: string[], setGuessedWords: (guessedWords: string[]) => void) {
   const [animateError, setAnimateError] = useState(false);
   const [animateSuccess, setAnimateSuccess] = useState(false);
   const [animateRepeated, setAnimateRepeated] = useState(false);
@@ -44,8 +44,10 @@ export default function useInputResponse(possibleWords: string[], inputWord: str
       } else {
         triggerAnimateSuccess();
       }
+      if (inputWord.trim() !== '') {
+        setGuessedWords([...guessedWords, inputWord.trim()]);
+      }
     }
-    setGuessedWords([...correctWords, inputWord]);
   };
 
   return { animateError, animateSuccess, animateRepeated, triggerAnimateError, triggerAnimateSuccess, triggerAnimateRepeated, handleKeyDownWithShake };

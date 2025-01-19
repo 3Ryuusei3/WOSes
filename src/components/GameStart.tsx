@@ -11,19 +11,19 @@ import useGameStore from '../store/useGameStore';
 
 import supabase from './../config/supabaseClient';
 
+import { getRoomIdFromURL } from '../utils/index';
+
 export default function GameStart() {
   const { player, setPlayer, setMode } = useGameStore();
   const [playerName, setPlayerName] = useState('');
   const [error, setError] = useState(false);
+  const roomId = getRoomIdFromURL();
   const navigate = useNavigate();
   useRandomWords();
   useBackgroundAudio(0.5, 1000);
 
   const handleSubmit = async () => {
     if (playerName?.length >= 3 && playerName?.length <= 10) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomId = urlParams.get('id');
-
       if (roomId) {
         const { data: roomData, error } = await supabase
           .from('users')
@@ -49,9 +49,26 @@ export default function GameStart() {
     }
   };
 
-  const handleGameStart = () => {
-    setMode('loading');
-  }
+  const handleGameStart = async () => {
+    const { data } = await supabase
+      .from('rooms')
+      .select('room')
+      .eq('room', roomId);
+
+    if (data) {
+      const { error: updateError } = await supabase
+        .from('rooms')
+        .update({ mode: 'loading' })
+        .eq('room', roomId);
+
+      if (updateError) {
+        console.error('Error:', updateError);
+        return;
+      }
+
+      setMode('loading');
+    }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -84,8 +101,6 @@ export default function GameStart() {
 
     checkRoomId();
   }, [navigate]);
-
-  console.log(player);
 
   return (
     <>

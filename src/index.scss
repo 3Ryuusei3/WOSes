@@ -46,11 +46,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
 * {
   margin: 0;
   padding: 0;
   font-family: "M PLUS Rounded 1c", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 900;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 body {
@@ -733,5 +740,26 @@ main {
   }
   100% {
     color: var(--clr-text-primary);
+  }
+}
+
+.game-input__container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 90vh;
+  width: 100%;
+
+  .wordlist {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    overflow: auto;
+    margin-block: 2rem 0.5rem;
+
+    .word {
+      width: max-content;
+    }
   }
 }

@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 
 import ScoreContainer from '../atoms/ScoreContainer';
 import WarningMessage from '../atoms/WarningMessage';
+import GameInput from '../atoms/GameInput';
 
 import useShuffledWord from './../hooks/useShuffledWord';
 import useInputWords from './../hooks/useInputWords';
@@ -45,7 +46,7 @@ export default function GameScreen() {
   const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
   const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, totalPoints } = useCalculatePoints(possibleWords, correctWords);
-  const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown, setGuessedWords);
+  const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown, guessedWords, setGuessedWords);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -168,23 +169,17 @@ export default function GameScreen() {
         </div>
       </>
       ) : (
-        <>
-          <div className="v-section gap-xs">
-            {guessedWords.map((word, index) => (
-              <h3 className="highlight" key={`${index}-${word}`}>{word}</h3>
-            ))}
-          </div>
-          <input
-            type="text"
-            className={`mx-auto mt-auto ${animateError ? 'animate-error' : ''} ${animateSuccess ? 'animate-success' : ''} ${animateRepeated ? 'animate-repeated' : ''}`}
-            placeholder='INTRODUCE LA PALABRA...'
-            value={inputWord}
-            onChange={handleChange}
-            onKeyDown={handleKeyDownWithShake}
-            disabled={percentage === 0}
-            ref={inputRef}
-          />
-        </>
+        <GameInput
+          guessedWords={guessedWords}
+          inputtedWords={inputtedWords}
+          inputWord={inputWord}
+          handleChange={handleChange}
+          handleKeyDownWithShake={handleKeyDownWithShake}
+          animateError={animateError}
+          animateSuccess={animateSuccess}
+          animateRepeated={animateRepeated}
+          percentage={percentage}
+        />
       )}
     </>
   )
