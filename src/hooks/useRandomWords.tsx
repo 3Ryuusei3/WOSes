@@ -4,6 +4,10 @@ import wordsData from '../data/words.json';
 
 import useGameStore from '../store/useGameStore';
 
+import supabase from './../config/supabaseClient';
+
+import { getRoomIdFromURL } from '../utils/index';
+
 const normalize = (str: string) => {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/Ñ/g, 'Ñ');
 };
@@ -29,34 +33,58 @@ const canFormWord = (wordCount: { [key: string]: number }, lettersCount: { [key:
 };
 
 const useRandomWords = () => {
-  const setHiddenLetterIndex = useGameStore(state => state.setHiddenLetterIndex);
-  const setRandomWord = useGameStore(state => state.setRandomWord);
-  const setPossibleWords = useGameStore(state => state.setPossibleWords);
+  const { player, setHiddenLetterIndex, setRandomWord, setPossibleWords, level } = useGameStore();
 
   useEffect(() => {
-    const normalizedWords = Array.from(new Set(wordsData.words.map(normalize)));
-    const filteredWords = normalizedWords.filter(word => word.length >= 4 && word.length <= 9);
+    if (player && player.role === 'screen') {
+      const normalizedWords = Array.from(new Set(wordsData.words.map(normalize)));
+      const filteredWords = normalizedWords.filter(word => word.length >= 4 && word.length <= 9);
 
-    let word = getRandomWord(filteredWords);
-    let wordCount = countLetters(word);
-    let words = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
+      let word = getRandomWord(filteredWords);
+      let wordCount = countLetters(word);
+      let words = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
 
-    const maxAttempts = 100;
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      if (words.length >= 12 && words.length <= 22) {
-        break;
+      const maxAttempts = 100;
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (words.length >= 12 && words.length <= 22) {
+          break;
+        }
+        word = getRandomWord(filteredWords);
+        wordCount = countLetters(word);
+        words = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
       }
-      word = getRandomWord(filteredWords);
-      wordCount = countLetters(word);
-      words = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
+
+      words.sort((a, b) => a.length - b.length || a.localeCompare(b));
+
+      setRandomWord(word);
+      setPossibleWords(words);
+      setHiddenLetterIndex(Math.floor(Math.random() * word.length));
+
+      const updateRoomRandomWord = async () => {
+        const roomId = getRoomIdFromURL();
+        if (roomId) {
+          const { error: roomError } = await supabase
+            .from('rooms')
+            .update({ current_word: word, current_possible_words: [...words] })
+            .eq('room', roomId);
+
+          if (roomError) {
+            console.error('Error updating currentWord:', roomError);
+          }
+
+          const { error: wordsError } = await supabase
+            .from('words')
+            .insert(words.map(w => ({ word: w, room_id: roomId, original_word: word, level })));
+
+          if (wordsError) {
+            console.error('Error inserting possibleWords:', wordsError);
+          }
+        }
+      };
+
+      updateRoomRandomWord();
     }
-
-    words.sort((a, b) => a.length - b.length || a.localeCompare(b));
-
-    setRandomWord(word);
-    setPossibleWords(words);
-    setHiddenLetterIndex(Math.floor(Math.random() * word.length));
-  }, [setRandomWord, setPossibleWords, setHiddenLetterIndex]);
+  }, []);
 
   return null;
 };

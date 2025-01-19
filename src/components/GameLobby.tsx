@@ -16,7 +16,8 @@ export default function GameLobby() {
     level,
     lastRoundPoints,
     levelsToAdvance,
-    lastLevelWords
+    lastLevelWords,
+    player
   } = useGameStore();
   useRandomWords();
   const secondsToRemove = useRemoveSeconds();
@@ -35,49 +36,65 @@ export default function GameLobby() {
 
   return (
     <>
-      <GameLogo />
-      <div className='game__container f-jc-c'>
-        {allWordsGuessed ? (
-          <h1 className='won'>¡PERFECTO!</h1>
-        ) : (
-          <h1 className='highlight'>¡ENHORABUENA!</h1>
-        )}
-        <h3>
-          HAS AVANZADO
-          {allWordsGuessed ? (
-            <span className='won'> {levelsToAdvance} </span>
-          ) : (
-            <span className='highlight'> {levelsToAdvance} </span>
-          )}
-          NIVEL{levelsToAdvance > 1 ? 'ES': ''}
-        </h3>
-        <div className="v-section gap-md mx-auto">
-          <div className="h-section gap-md">
-            <div className='score__container--box'>
-              <p>PUNTOS DEL NIVEL {level - levelsToAdvance}</p>
-              <h3>{lastRoundPoints}</h3>
+      {(player && player.role === 'screen') ? (
+        <>
+          <GameLogo />
+          <div className='game__container f-jc-c'>
+            {allWordsGuessed ? (
+              <h1 className='won'>¡PERFECTO!</h1>
+            ) : (
+              <h1 className='highlight'>¡ENHORABUENA!</h1>
+            )}
+            <h3>
+              HAS AVANZADO
+              {allWordsGuessed ? (
+                <span className='won'> {levelsToAdvance} </span>
+              ) : (
+                <span className='highlight'> {levelsToAdvance} </span>
+              )}
+              NIVEL{levelsToAdvance > 1 ? 'ES': ''}
+            </h3>
+            <div className="v-section gap-md mx-auto">
+              <div className="h-section gap-md">
+                <div className='score__container--box'>
+                  <p>PUNTOS DEL NIVEL {level - levelsToAdvance}</p>
+                  <h3>{lastRoundPoints}</h3>
+                </div>
+                <div className='score__container--box'>
+                  <p>TUS PUNTOS TOTALES</p>
+                  <h3>{totalPoints}</h3>
+                </div>
+              </div>
+              <div className="h-section score__container--box">
+                <p>ÚLTIMAS PALABRAS</p>
+                <div className="h-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
+                  {lastLevelWords.map((word, index) => (
+                    <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>{word.word.toUpperCase()}</h4>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className='score__container--box'>
-              <p>TUS PUNTOS TOTALES</p>
-              <h3>{totalPoints}</h3>
-            </div>
+            {secondsToRemove > 0 && (
+              <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
+            )}
           </div>
-          <div className="h-section score__container--box">
-            <p>ÚLTIMAS PALABRAS</p>
-            <div className="h-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
-              {lastLevelWords.map((word, index) => (
-                <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>{word.word.toUpperCase()}</h4>
-              ))}
-            </div>
-          </div>
-        </div>
-        {secondsToRemove > 0 && (
-          <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
-        )}
-        <button onClick={() => {
-          setMode('loading');
-        } }>JUGAR AL NIVEL {level}</button>
-      </div>
+        </>
+      ) : (player && player.role === 'host') ? (
+        <>
+          <h4 className='highlight'>TU NOMBRE:</h4>
+          <h2 className='highlight'>{player.name}</h2>
+          <button className='mx-auto' onClick={() => {setMode('loading')}}>
+            JUGAR AL NIVEL {level}
+          </button>
+        </>
+      ) : (
+        <>
+          <h4 className='highlight'>TU NOMBRE:</h4>
+          <h2 className='highlight'>{player.name}</h2>
+          <button disabled>ESPERANDO AL ANFITRIÓN</button>
+        </>
+      )}
+
     </>
   )
 }

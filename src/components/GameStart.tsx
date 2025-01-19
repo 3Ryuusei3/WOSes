@@ -8,24 +8,24 @@ import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
 
 import useGameStore from '../store/useGameStore';
+import { getRoomIdFromURL } from '../utils/index';
 
 import supabase from './../config/supabaseClient';
 
-import { getRoomIdFromURL } from '../utils/index';
-
 export default function GameStart() {
-  const { player, setPlayer, setMode } = useGameStore();
+  const { player, setPlayer, setMode, setRandomWord, setPossibleWords, randomWord } = useGameStore();
   const [playerName, setPlayerName] = useState('');
   const [error, setError] = useState(false);
   const roomId = getRoomIdFromURL();
   const navigate = useNavigate();
+
   useRandomWords();
   useBackgroundAudio(0.5, 1000);
 
   const handleSubmit = async () => {
     if (playerName?.length >= 3 && playerName?.length <= 10) {
       if (roomId) {
-        const { data: roomData, error } = await supabase
+        const { data: usersData, error } = await supabase
           .from('users')
           .select('*')
           .eq('room_id', roomId);
@@ -35,14 +35,25 @@ export default function GameStart() {
           return;
         }
 
-        const role = roomData.length === 1 ? 'host' : 'player';
+        const role = usersData.length === 1 ? 'host' : 'player';
         const { error: userError } = await supabase
-        .from('users')
-        .insert([{ nickname: playerName, role, room_id: roomId }])
-        .select();
+          .from('users')
+          .insert([{ nickname: playerName, role, room_id: roomId }])
+          .select();
 
         if (userError) throw userError;
         setPlayer({ name: playerName, role, score: 0 });
+
+        const { data: roomData, error: roomError } = await supabase
+          .from('rooms')
+          .select('*')
+          .eq('room', roomId);
+
+          if (roomError) throw roomError;
+
+        console.log(roomData);
+        setRandomWord(roomData[0].current_word);
+        setPossibleWords([...roomData[0].current_possible_words]);
       }
     } else {
       setError(true);
@@ -101,6 +112,8 @@ export default function GameStart() {
 
     checkRoomId();
   }, [navigate]);
+
+  console.log(randomWord);
 
   return (
     <>
