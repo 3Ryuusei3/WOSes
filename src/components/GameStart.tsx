@@ -49,11 +49,17 @@ export default function GameStart() {
           .select('*')
           .eq('room', roomId);
 
-          if (roomError) throw roomError;
+        if (roomError) throw roomError;
 
-        console.log(roomData);
         setRandomWord(roomData[0].current_word);
-        setPossibleWords([...roomData[0].current_possible_words]);
+
+        const possibleWords = JSON.parse(roomData[0].current_possible_words).map((word: string) => ({
+          word,
+          guessed_by: null
+        }));
+
+        setPossibleWords(possibleWords);
+        console.log(possibleWords);
       }
     } else {
       setError(true);

@@ -1,6 +1,6 @@
 interface Word {
   word: string;
-  guessed: boolean;
+  guessed_by: string;
 }
 
 export default Word;

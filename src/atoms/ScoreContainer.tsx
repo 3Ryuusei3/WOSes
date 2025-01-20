@@ -1,20 +1,21 @@
 import GameLogo from './GameLogo';
+import Word from '../types/Word';
 
 interface ScoreContainerProps {
-  correctWords: string[];
-  possibleWords: string[];
+  guessedWords: Word[];
+  possibleWords: Word[];
   correctWordsPoints: () => number;
   goalPoints: number;
   level: number;
 }
 
-export default function ScoreContainer({ correctWords, possibleWords, correctWordsPoints, goalPoints, level }: ScoreContainerProps) {
+export default function ScoreContainer({ guessedWords, possibleWords, correctWordsPoints, goalPoints, level }: ScoreContainerProps) {
   return (
     <div className='score__container'>
-      <div className={`score__container--box ${correctWords.length === possibleWords.length ? 'won' : ''}`}>
+      <div className={`score__container--box ${guessedWords.length === possibleWords.length ? 'won' : ''}`}>
         <div className="h-section">
           <p>PALABRAS</p>
-          <h3>{correctWords.length}/{possibleWords.length}</h3>
+          <h3>{guessedWords.length}/{possibleWords.length}</h3>
         </div>
       </div>
       <GameLogo />

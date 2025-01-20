@@ -5,7 +5,7 @@ import { LETTERS, FAKE_LETTER_LEVEL_START } from '../constant';
 import shuffleSound from '../assets/shuffle.mp3';
 
 const createLetterObject = (word: string, level: number, fakeLetter: string, hiddenLetterIndex: number) => {
-  let letterObject = word.split('').map((letter, index) => ({
+  const letterObject = word.split('').map((letter, index) => ({
     letter,
     isFake: false,
     isHidden: index === hiddenLetterIndex
@@ -36,7 +36,9 @@ const useShuffledWord = (word: string, intervalTime: number, shouldShuffle: bool
       const shuffledArray = word.split('').sort(() => Math.random() - 0.5);
       setInitialShuffledWord(shuffledArray);
     }
+  }, [word]);
 
+  useEffect(() => {
     if (fakeLetter === '') {
       let newFakeLetter;
       do {
@@ -44,7 +46,9 @@ const useShuffledWord = (word: string, intervalTime: number, shouldShuffle: bool
       } while (newFakeLetter === word[hiddenLetterIndex]);
       setFakeLetter(newFakeLetter);
     }
+  }, [fakeLetter, hiddenLetterIndex, word]);
 
+  useEffect(() => {
     const initialLetterObject = createLetterObject(word, level, fakeLetter, hiddenLetterIndex);
     setShuffledWordObject(initialLetterObject);
 
@@ -61,7 +65,7 @@ const useShuffledWord = (word: string, intervalTime: number, shouldShuffle: bool
 
     const interval = setInterval(shuffleAndAddLetter, intervalTime);
     return () => clearInterval(interval);
-  }, [word, intervalTime, shouldShuffle, initialShuffledWord, fakeLetter, level, hiddenLetterIndex]);
+  }, [word, level, fakeLetter, hiddenLetterIndex, intervalTime, shouldShuffle]);
 
   return shuffledWordObject;
 };

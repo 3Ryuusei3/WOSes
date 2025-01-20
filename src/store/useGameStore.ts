@@ -13,8 +13,8 @@ interface GameState {
   setPlayer: (player: Player) => void;
   randomWord: string;
   setRandomWord: (word: string) => void;
-  possibleWords: string[];
-  setPossibleWords: (words: string[]) => void;
+  possibleWords: Word[];
+  setPossibleWords: (words: Word[]) => void;
   gameTime: number;
   setGameTime: (time: number | ((prev: number) => number)) => void;
   lastRoundPoints: number;

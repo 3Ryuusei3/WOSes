@@ -88,7 +88,7 @@ export default function GameLost() {
                 <p>ÚLTIMAS PALABRAS</p>
                 <div className="h-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
                   {lastLevelWords.map((word, index) => (
-                    <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>{word.word.toUpperCase()}</h4>
+                    <h4 className={`${word.guessed_by ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>{word.word.toUpperCase()}</h4>
                   ))}
                 </div>
               </div>

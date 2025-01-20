@@ -57,7 +57,10 @@ const useRandomWords = () => {
       words.sort((a, b) => a.length - b.length || a.localeCompare(b));
 
       setRandomWord(word);
-      setPossibleWords(words);
+      setPossibleWords(words.map((word: string) => ({
+        word,
+        guessed_by: false,
+      })));
       setHiddenLetterIndex(Math.floor(Math.random() * word.length));
 
       const updateRoomRandomWord = async () => {

@@ -703,6 +703,46 @@ main {
       }
     }
   }
+
+  &.guessed {
+    background-color: var(--clr-accent-primary);
+    border: 2px solid var(--clr-accent-primary);
+    justify-content: space-between;
+    animation: guessedWord 1s ease;
+
+    .letter {
+      background-color: var(--clr-text-secondary);
+      border: 2px solid var(--clr-border-secondary);
+      box-shadow: 0 0 0 2px var(--clr-border-primary);
+      transform: rotateX(0);
+      animation: guessedLetter 0.3s ease;
+
+      span {
+        opacity: 1;
+      }
+    }
+  }
+
+  &.unguessed {
+    background-color: var(--clr-bg-secondary);
+    border: 2px solid var(--clr-bg-terciary);
+    justify-content: space-between;
+    animation: unguessedWord 1s ease;
+
+    .letter {
+      background-color: var(--clr-text-secondary);
+      border: 2px solid var(--clr-border-secondary);
+      box-shadow: 0 0 0 2px var(--clr-border-primary);
+      text-shadow: none;
+      transform: rotateX(0);
+      animation: unguessedLetter 0.3s ease;
+
+      span {
+        opacity: 1;
+      }
+    }
+  }
+
 }
 
 .wordLetters {
@@ -735,6 +775,54 @@ main {
 }
 
 @keyframes correctLetter {
+  0% {
+    color: var(--clr-text-primary);
+  }
+  100% {
+    color: var(--clr-text-primary);
+  }
+}
+
+@keyframes guessedWord {
+  0% {
+    background-color: var(--clr-accent-primary-highlight);
+  }
+  40% {
+    background-color: var(--clr-accent-primary);
+  }
+  80% {
+    background-color: var(--clr-accent-primary);
+  }
+  100% {
+    background-color: var(--clr-accent-primary);
+  }
+}
+
+@keyframes guessedLetter {
+  0% {
+    color: var(--clr-text-primary);
+  }
+  100% {
+    color: var(--clr-text-primary);
+  }
+}
+
+@keyframes unguessedWord {
+  0% {
+    background-color: var(--clr-bg-secondary);
+  }
+  40% {
+    background-color: var(--clr-bg-secondary);
+  }
+  80% {
+    background-color: var(--clr-bg-secondary);
+  }
+  100% {
+    background-color: var(--clr-bg-secondary);
+  }
+}
+
+@keyframes unguessedLetter {
   0% {
     color: var(--clr-text-primary);
   }

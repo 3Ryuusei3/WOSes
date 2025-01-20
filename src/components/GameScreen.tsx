@@ -1,67 +1,56 @@
-import { useRef, useEffect, useState } from 'react';
-
-import ScoreContainer from '../atoms/ScoreContainer';
+import { useRef, useState, useEffect } from 'react';
 import WarningMessage from '../atoms/WarningMessage';
+import ScoreContainer from '../atoms/ScoreContainer';
 import GameInput from '../atoms/GameInput';
-
-import useShuffledWord from './../hooks/useShuffledWord';
-import useInputWords from './../hooks/useInputWords';
+import useGameStore from '../store/useGameStore';
 import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
-import useInputResponse from './../hooks/useInputResponse';
-
-import useGameStore from '../store/useGameStore';
-
+import useShuffledWord from './../hooks/useShuffledWord';
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
+import Word from '../types/Word';
 import {
-  THRESHHOLD,
-  LEVELS_TO_ADVANCE,
   RUNNING_OUT_OF_TIME_PERCENTAGE,
+  HIDDEN_LETTER_LEVEL_START,
+  FAKE_LETTER_LEVEL_START,
+  HIDDEN_WORDS_LEVEL_START,
   SHUFFLE_INTERVAL,
   POINTS_PER_LETTER,
-  FAKE_LETTER_LEVEL_START,
-  HIDDEN_LETTER_LEVEL_START,
-  HIDDEN_WORDS_LEVEL_START,
+  LEVELS_TO_ADVANCE,
+  THRESHHOLD
 } from '../constant';
-
+import { getRoomIdFromURL } from '../utils/index';
+import supabase from './../config/supabaseClient';
 import goalSound from '../assets/goal.mp3';
 
 export default function GameScreen() {
+  const roomId = getRoomIdFromURL();
   const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);
-  const [guessedWords, setGuessedWords] = useState<string[]>([]);
+  const [guessedWords, setGuessedWords] = useState<Word[]>([]);
+
   const {
-    player,
-    setMode,
     gameTime,
+    player,
+    level,
     randomWord,
     possibleWords,
     setTotalPoints,
-    setLastRoundPoints,
-    level,
+    setPossibleWords,
+    setLastLevelWords,
     setLevel,
     setLevelsToAdvance,
-    setLastLevelWords
+    setLastRoundPoints,
   } = useGameStore();
   const { percentage, timeLeft } = useProgressBar(gameTime);
+  const { correctWordsPoints, goalPoints, totalLevelPoints } = useCalculatePoints(possibleWords);
   const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
-  const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
-  const { correctWordsPoints, goalPoints, totalPoints } = useCalculatePoints(possibleWords, correctWords);
-  const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown, guessedWords, setGuessedWords);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const updateLastLevelWordsAndPoints = () => {
-    setTotalPoints(prev => prev + correctWordsPoints());
-    setLastLevelWords(possibleWords.map(word => ({
-      word,
-      guessed: correctWords.includes(word)
-    })));
-  };
-
-  const handleEndOfLevel = () => {
-    if (correctWordsPoints() >= goalPoints || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
+  const handleEndOfLevel = async () => {
+    const correctWords = possibleWords.filter(word => word.guessed_by !== null);
+    if (correctWordsPoints() >= goalPoints || (totalLevelPoints > 0 && totalLevelPoints === correctWordsPoints() && correctWords.length === correctWords.length)) {
       let levelsAdded = 0;
-      const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
+      const completionPercentage = (correctWordsPoints() / totalLevelPoints) * 100;
 
       if (completionPercentage === THRESHHOLD.FIVE_STAR) {
         levelsAdded = LEVELS_TO_ADVANCE.FIVE_STAR;
@@ -75,51 +64,85 @@ export default function GameScreen() {
       setLevelsToAdvance(levelsAdded);
       setLevel((prev: number) => prev + levelsAdded);
       setLastRoundPoints(correctWordsPoints());
-      updateLastLevelWordsAndPoints();
-      setMode('lobby');
+      setTotalPoints(prev => prev + correctWordsPoints());
+      const { error } = await supabase
+        .from('room')
+        .update({ mode: 'lobby', level: level })
+        .eq('room', roomId)
+
+      if (error) {
+        console.error('Error updating word:', error);
+      }
     } else {
-      updateLastLevelWordsAndPoints();
-      setMode('lost');
+      setTotalPoints(prev => prev + correctWordsPoints());
+      const { error } = await supabase
+        .from('room')
+        .update({ mode: 'lost' })
+        .eq('room', roomId)
+
+      if (error) {
+        console.error('Error updating word:', error);
+      }
     }
-  };
+  }
 
   useEffect(() => {
-    if (percentage === 0 ||
-      totalPoints > 0 && correctWords.length === possibleWords.length) {
-      handleEndOfLevel();
-    }
+    if (roomId && randomWord) {
+      const channel = supabase
+        .channel(`realtime words`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'words',
+          }, (payload) => {
+            console.log(payload);
+            setGuessedWords([...guessedWords, { word: payload.new.word, guessed_by: payload.new.guessed_by }]);
+            setPossibleWords(possibleWords.map((word) => {
+              if (word.word === payload.new.word) {
+                return { ...word, guessed_by: payload.new.guessed_by };
+              }
+              return word;
+            }));
 
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+            setLastLevelWords(possibleWords.map(word => ({
+              word: word.word,
+              guessed_by: word.guessed_by,
+            })));
+            console.log(possibleWords);
 
-    if (totalPoints > 0 && correctWordsPoints() >= goalPoints && !hasPlayedGoalSound) {
-      const audio = new Audio(goalSound);
-      audio.play();
-      setHasPlayedGoalSound(true);
+          }).subscribe()
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
-  }, [percentage, totalPoints, correctWordsPoints, goalPoints, hasPlayedGoalSound]);
+  }, [supabase, roomId, randomWord, level, setPossibleWords]);
+
+
 
   return (
     <>
       {(player && player.role === 'screen') ? (
-      <>
-        <ScoreContainer
-          correctWords={correctWords}
-          possibleWords={possibleWords}
-          correctWordsPoints={correctWordsPoints}
-          goalPoints={goalPoints}
-          level={level}
-        />
-        <div className='game__container'>
-          <div className="h-section gap-xs">
-            <div className="h-section gap-sm">
-              <WarningMessage
-                level={level}
-                HIDDEN_LETTER_LEVEL_START={HIDDEN_LETTER_LEVEL_START}
-                FAKE_LETTER_LEVEL_START={FAKE_LETTER_LEVEL_START}
-                HIDDEN_WORDS_LEVEL_START={HIDDEN_WORDS_LEVEL_START}
-              />
+        <>
+          <ScoreContainer
+            guessedWords={guessedWords}
+            possibleWords={possibleWords}
+            goalPoints={goalPoints}
+            correctWordsPoints={correctWordsPoints}
+            level={level}
+          />
+          <div className='game__container'>
+            <div className="h-section gap-xs">
+              <div className="h-section gap-sm">
+                <WarningMessage
+                  level={level}
+                  HIDDEN_LETTER_LEVEL_START={HIDDEN_LETTER_LEVEL_START}
+                  FAKE_LETTER_LEVEL_START={FAKE_LETTER_LEVEL_START}
+                  HIDDEN_WORDS_LEVEL_START={HIDDEN_WORDS_LEVEL_START}
+                />
+              </div>
               <div key={shuffledWordObject.map((letter: ShuffledWordObjectType) => letter.letter).join('')} className="selectedWord">
                 {shuffledWordObject.map((letter: ShuffledWordObjectType, index: number) => (
                   <span
@@ -131,56 +154,55 @@ export default function GameScreen() {
                   </span>
                 ))}
               </div>
-            </div>
-            <div className="h-section">
-              <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
-              <div
-                className="progress__container"
-                style={{
-                '--remaining-percentage': `${percentage}%`,
-                '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
-                } as React.CSSProperties}
-              >
+              <div className="h-section">
+                <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
+                <div
+                  className="progress__container"
+                  style={{
+                  '--remaining-percentage': `${percentage}%`,
+                  '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
+                  } as React.CSSProperties}
+                >
+                </div>
               </div>
             </div>
-          </div>
-          <ul className='wordlist' style={{ '--wordlist-rows': Math.ceil(possibleWords.length / 3) } as React.CSSProperties}>
-            {possibleWords.map((word, index) => (
-              <li
-                key={`${index}-${word}`}
-                className={`word ${inputtedWords.includes(word) ? 'active' : ''}`}
-                ref={el => wordRefs.current[index] = el}
-              >
-                {inputtedWords.includes(word) && (
-                  <span className='player'>{player.name}</span>
-                )}
-                <span className='wordLetters'>
-                  {word.split('').map((letter, letterIndex) => (
-                    <span key={`${index}-${word}-${letter}-${letterIndex}`} className='letter'>
-                      <span>
-                        {(level >= HIDDEN_WORDS_LEVEL_START && percentage > RUNNING_OUT_OF_TIME_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
+            <ul className='wordlist' style={{ '--wordlist-rows': Math.ceil(possibleWords.length / 3) } as React.CSSProperties}>
+              {possibleWords.map((word, index) => (
+                <li
+                  key={`${index}-${word.word}`}
+                  className={`word ${guessedWords.some(gw => gw.word === word.word) ? 'active' : ''}`}
+                  ref={el => wordRefs.current[index] = el}
+                >
+                  {guessedWords.some(gw => gw.word === word.word) && (
+                    <span className='player'>{word.guessed_by.toUpperCase()}</span>
+                  )}
+                  <span className='wordLetters'>
+                    {word.word.split('').map((letter, letterIndex) => (
+                      <span key={`${index}-${word.word}-${letter}-${letterIndex}`} className='letter'>
+                        <span>
+                          {(level >= HIDDEN_WORDS_LEVEL_START && percentage > RUNNING_OUT_OF_TIME_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
+                        </span>
                       </span>
-                    </span>
-                  ))}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </>
+                    ))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       ) : (
-        <GameInput
-          guessedWords={guessedWords}
-          inputtedWords={inputtedWords}
-          inputWord={inputWord}
-          handleChange={handleChange}
-          handleKeyDownWithShake={handleKeyDownWithShake}
-          animateError={animateError}
-          animateSuccess={animateSuccess}
-          animateRepeated={animateRepeated}
-          percentage={percentage}
-        />
+        <>
+          <GameInput
+            guessedWords={guessedWords}
+            possibleWords={possibleWords}
+            percentage={percentage}
+            player={player}
+            level={level}
+            randomWord={randomWord}
+            inputRef={inputRef}
+          />
+        </>
       )}
     </>
   )
-}
+};
