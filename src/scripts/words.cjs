@@ -1,8 +1,5 @@
 const fs = require('fs');
 const wordsData = require('./../data/words1.json');
-const normalize = (str) => {
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/Ñ/g, 'Ñ');
-};
 
 const canFormWord = (word, letters) => {
   const lettersCount = letters.split('').reduce((acc, letter) => {
@@ -20,8 +17,7 @@ const canFormWord = (word, letters) => {
 };
 
 const words = wordsData.words;
-const normalizedWords = words.map(normalize);
-const filteredWords = normalizedWords.filter(word => word.length >= 4 && word.length <= 9);
+const filteredWords = words.filter(word => word.length >= 4 && word.length <= 9);
 const finalArray = [];
 let wordsChecked = 0;
 
@@ -31,6 +27,7 @@ filteredWords.forEach(word => {
   const possibleWords = filteredWords.filter(w => canFormWord(w, word));
   if (possibleWords.length >= 12 && possibleWords.length <= 27) {
     finalArray.push(...new Set([word, ...possibleWords]));
+    console.log(`Al array final se le agregaron las palabras ${word} y ${possibleWords.join(', ')}`);
   }
 });
 
