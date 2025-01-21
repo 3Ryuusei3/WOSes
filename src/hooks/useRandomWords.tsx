@@ -7,6 +7,7 @@ import useGameStore from '../store/useGameStore';
 import supabase from './../config/supabaseClient';
 
 import { getRoomIdFromURL } from '../utils/index';
+import Word from '../types/Word';
 
 const normalize = (str: string) => {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/Ñ/g, 'Ñ');
@@ -57,9 +58,9 @@ const useRandomWords = () => {
       words.sort((a, b) => a.length - b.length || a.localeCompare(b));
 
       setRandomWord(word);
-      setPossibleWords(words.map((word: string) => ({
+      setPossibleWords(words.map((word: string): Word => ({
         word,
-        guessed_by: false,
+        guessed_by: '',
       })));
       setHiddenLetterIndex(Math.floor(Math.random() * word.length));
 

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import WarningMessage from '../atoms/WarningMessage';
 import ScoreContainer from '../atoms/ScoreContainer';
 import GameInput from '../atoms/GameInput';
@@ -7,7 +7,7 @@ import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
 import useShuffledWord from './../hooks/useShuffledWord';
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
-import Word from '../types/Word';
+
 import {
   RUNNING_OUT_OF_TIME_PERCENTAGE,
   HIDDEN_LETTER_LEVEL_START,
@@ -24,8 +24,6 @@ import goalSound from '../assets/goal.mp3';
 
 export default function GameScreen() {
   const roomId = getRoomIdFromURL();
-  const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);
-  const [guessedWords, setGuessedWords] = useState<Word[]>([]);
 
   const {
     gameTime,
@@ -40,14 +38,13 @@ export default function GameScreen() {
     setLevelsToAdvance,
     setLastRoundPoints,
   } = useGameStore();
+  const correctWords = possibleWords.filter(word => word.guessed_by);
   const { percentage, timeLeft } = useProgressBar(gameTime);
   const { correctWordsPoints, goalPoints, totalLevelPoints } = useCalculatePoints(possibleWords);
   const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleEndOfLevel = async () => {
-    const correctWords = possibleWords.filter(word => word.guessed_by !== null);
     if (correctWordsPoints() >= goalPoints || (totalLevelPoints > 0 && totalLevelPoints === correctWordsPoints() && correctWords.length === correctWords.length)) {
       let levelsAdded = 0;
       const completionPercentage = (correctWordsPoints() / totalLevelPoints) * 100;
@@ -97,20 +94,17 @@ export default function GameScreen() {
             schema: 'public',
             table: 'words',
           }, (payload) => {
-            console.log(payload);
-            setGuessedWords([...guessedWords, { word: payload.new.word, guessed_by: payload.new.guessed_by }]);
-            setPossibleWords(possibleWords.map((word) => {
-              if (word.word === payload.new.word) {
-                return { ...word, guessed_by: payload.new.guessed_by };
-              }
-              return word;
-            }));
+            const updatedWords = [...possibleWords];
+            const wordToUpdate = updatedWords.find(word => word.word === payload.new.word);
+            if (wordToUpdate) {
+              wordToUpdate.guessed_by = payload.new.guessed_by;
+            }
+            setPossibleWords(updatedWords);
 
             setLastLevelWords(possibleWords.map(word => ({
               word: word.word,
               guessed_by: word.guessed_by,
             })));
-            console.log(possibleWords);
 
           }).subscribe()
 
@@ -120,14 +114,22 @@ export default function GameScreen() {
     }
   }, [supabase, roomId, randomWord, level, setPossibleWords]);
 
+  useEffect(() => {
+    if (percentage === 0 || totalLevelPoints > 0 && possibleWords.length === correctWords.length) {
+      handleEndOfLevel();
+    }
 
+    if (totalLevelPoints > 0 && correctWordsPoints() >= goalPoints) {
+      const audio = new Audio(goalSound);
+      audio.play();
+    }
+  }, [percentage, correctWordsPoints]);
 
   return (
     <>
       {(player && player.role === 'screen') ? (
         <>
           <ScoreContainer
-            guessedWords={guessedWords}
             possibleWords={possibleWords}
             goalPoints={goalPoints}
             correctWordsPoints={correctWordsPoints}
@@ -170,11 +172,11 @@ export default function GameScreen() {
               {possibleWords.map((word, index) => (
                 <li
                   key={`${index}-${word.word}`}
-                  className={`word ${guessedWords.some(gw => gw.word === word.word) ? 'active' : ''}`}
+                  className={`word ${word.guessed_by ? 'active' : ''}`}
                   ref={el => wordRefs.current[index] = el}
                 >
-                  {guessedWords.some(gw => gw.word === word.word) && (
-                    <span className='player'>{word.guessed_by.toUpperCase()}</span>
+                  {possibleWords.some(gw => gw.word === word.word && word.guessed_by !== null) && (
+                    <span className='player'>{word?.guessed_by}</span>
                   )}
                   <span className='wordLetters'>
                     {word.word.split('').map((letter, letterIndex) => (
@@ -193,13 +195,11 @@ export default function GameScreen() {
       ) : (
         <>
           <GameInput
-            guessedWords={guessedWords}
             possibleWords={possibleWords}
             percentage={percentage}
             player={player}
             level={level}
             randomWord={randomWord}
-            inputRef={inputRef}
           />
         </>
       )}

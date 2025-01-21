@@ -2,7 +2,7 @@ import Word from '../types/Word';
 import { THRESHHOLD, POINTS_PER_LETTER } from '../constant';
 
 const useCalculatePoints = (possibleWords: Word[]) => {
-  const correctWords = possibleWords.filter((word: Word) => word.guessed_by !== null);
+  const correctWords = possibleWords.filter((word: Word) => word.guessed_by);
 
   const correctWordsPoints = () => {
     return correctWords.reduce((acc: number, word: Word) => {
