@@ -3,12 +3,14 @@ import { useEffect } from 'react';
 import GameLogo from '../atoms/GameLogo';
 
 import useGameStore from '../store/useGameStore';
+import useCalculatePoints from '../hooks/useCalculatePoints';
 
 import gameOverSound from '../assets/gameover.mp3';
 
 import supabase from './../config/supabaseClient';
 
 import { getRoomIdFromURL } from '../utils/index';
+
 
 export default function GameLost() {
   const roomId = getRoomIdFromURL();
@@ -23,6 +25,8 @@ export default function GameLost() {
     setHighestScore,
     lastLevelWords
   } = useGameStore();
+
+  const { ranking } = useCalculatePoints(lastLevelWords);
 
   const handleGameStart = async () => {
     const { data } = await supabase
@@ -73,15 +77,26 @@ export default function GameLost() {
             <h1 className='lost'>HAS PERDIDO...</h1>
             <h3>HAS ALCANZADO EL NIVEL <span className='highlight'>{level}</span></h3>
             <div className="v-section gap-md mx-auto">
-              <div className="h-section gap-md">
-                <div className='score__container--box'>
-                  <p>TUS PUNTOS TOTALES</p>
-                  <h3>{totalPoints}</h3>
-                </div>
-                <div className='score__container--box'>
-                  <p>LA PUNTUACIÓN MÁS ALTA</p>
-                  <h3>{highestScore.score}</h3>
-                  <h3>{highestScore.name}</h3>
+              <div className="h-section score__container--box">
+                <p>RANKING</p>
+                <div className="ranking__container">
+                  {ranking.map((entry, index) => (
+                    <table key={index} className="ranking__entry">
+                      <tbody>
+                        <tr>
+                          <td>
+                            <span className={
+                            `${index === 0 ? 'won'
+                              : index === 1 ? 'highlight'
+                              : index === 2 ? 'unguessed' : 'lost'}`}>
+                                {index + 1}
+                            </span></td>
+                          <td>{entry.player}</td>
+                          <td>{entry.points}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  ))}
                 </div>
               </div>
               <div className="h-section score__container--box">

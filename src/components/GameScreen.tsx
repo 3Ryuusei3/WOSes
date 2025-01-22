@@ -72,14 +72,15 @@ export default function GameScreen() {
       }
     } else {
       setTotalPoints(prev => prev + correctWordsPoints());
-      const { error } = await supabase
-        .from('room')
+      supabase
+        .from('rooms')
         .update({ mode: 'lost' })
         .eq('room', roomId)
-
-      if (error) {
-        console.error('Error updating word:', error);
-      }
+        .then(({ error }) => {
+          if (error) {
+            console.error('Error updating word:', error);
+          }
+        });
     }
   }
 
@@ -112,7 +113,7 @@ export default function GameScreen() {
         supabase.removeChannel(channel);
       };
     }
-  }, [supabase, roomId, randomWord, level, setPossibleWords]);
+  }, [supabase]);
 
   useEffect(() => {
     if (percentage === 0 || totalLevelPoints > 0 && possibleWords.length === correctWords.length) {
@@ -123,7 +124,7 @@ export default function GameScreen() {
       const audio = new Audio(goalSound);
       audio.play();
     }
-  }, [percentage, correctWordsPoints]);
+  }, [percentage, correctWordsPoints()]);
 
   return (
     <>

@@ -851,3 +851,25 @@ main {
     }
   }
 }
+
+.ranking__container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .ranking__entry {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    td {
+      text-align: left;
+      padding-inline: 0.5rem;
+
+      &:nth-child(2) {
+        min-width: 200px;
+      }
+    }
+  }
+}

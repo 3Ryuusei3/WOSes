@@ -30,7 +30,7 @@ const GamePage = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, roomId, mode, setMode]);
+  }, [supabase]);
 
   return (
     <main style={{ zoom: player && player.role === 'screen' ? zoom : 1 }}>

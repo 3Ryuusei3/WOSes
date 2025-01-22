@@ -1,20 +1,15 @@
 import { useEffect } from 'react';
-
 import GameLogo from '../atoms/GameLogo';
-
 import useRemoveSeconds from '../hooks/useRemoveSeconds';
 import useRandomWords from '../hooks/useRandomWords';
-
+import useCalculatePoints from '../hooks/useCalculatePoints';
 import useGameStore from '../store/useGameStore';
-
 import levelPassedSound from '../assets/win.mp3';
 
 export default function GameLobby() {
   const {
     setMode,
-    totalPoints,
     level,
-    lastRoundPoints,
     levelsToAdvance,
     lastLevelWords,
     player
@@ -31,6 +26,8 @@ export default function GameLobby() {
       audio.currentTime = 0;
     };
   }, []);
+
+  const { ranking } = useCalculatePoints(lastLevelWords);
 
   const allWordsGuessed = lastLevelWords.every(word => word.guessed_by !== null);
 
@@ -55,14 +52,26 @@ export default function GameLobby() {
               NIVEL{levelsToAdvance > 1 ? 'ES': ''}
             </h3>
             <div className="v-section gap-md mx-auto">
-              <div className="h-section gap-md">
-                <div className='score__container--box'>
-                  <p>PUNTOS DEL NIVEL {level - levelsToAdvance}</p>
-                  <h3>{lastRoundPoints}</h3>
-                </div>
-                <div className='score__container--box'>
-                  <p>TUS PUNTOS TOTALES</p>
-                  <h3>{totalPoints}</h3>
+              <div className="h-section score__container--box">
+                <p>RANKING</p>
+                <div className="ranking__container">
+                  {ranking.map((entry, index) => (
+                    <table key={index} className="ranking__entry">
+                      <tbody>
+                        <tr>
+                          <td>
+                            <span className={
+                            `${index === 0 ? 'won'
+                              : index === 1 ? 'highlight'
+                              : index === 2 ? 'unguessed' : 'lost'}`}>
+                                {index + 1}
+                            </span></td>
+                          <td>{entry.player}</td>
+                          <td>{entry.points}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  ))}
                 </div>
               </div>
               <div className="h-section score__container--box">
@@ -94,7 +103,6 @@ export default function GameLobby() {
           <button disabled>ESPERANDO AL ANFITRIÓN</button>
         </>
       )}
-
     </>
   )
 }
