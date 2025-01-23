@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+/* import { QRCodeSVG } from 'qrcode.react'; */
 
 import GameLogo from '../atoms/GameLogo';
 
@@ -7,7 +7,7 @@ import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
 
 import useGameStore from '../store/useGameStore';
-import { Link } from 'react-router-dom';
+/* import { Link } from 'react-router-dom'; */
 
 export default function GameStart() {
   const { playerName, setPlayerName, setMode } = useGameStore();
@@ -41,7 +41,7 @@ export default function GameStart() {
       <GameLogo />
       <div className='game__container f-jc-c'>
         <div className="v-section gap-md">
-          <div className='qr__container'>
+          {/* <div className='qr__container'>
             <h4 className='highlight ws-nw'>ACCEDE A ESTE QR Y<br/>ÚNETE A LA PARTIDA</h4>
             <Link to={window.location.href}>
               <QRCodeSVG
@@ -51,7 +51,7 @@ export default function GameStart() {
                 fgColor='#ddccff'
               />
             </Link>
-          </div>
+          </div> */}
           <div className='h-section gap-md w100 f-jc-c'>
             <h2 className='highlight'>INTRODUCE TU NOMBRE<br/>PARA JUGAR</h2>
             <div className="h-section gap-xs">

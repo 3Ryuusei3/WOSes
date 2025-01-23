@@ -1,50 +1,53 @@
-# React + TypeScript + Vite
+# Words on Stream en Español
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+¡Este proyecto está basado en el popular juego [Words on Stream](https://wos.gg/) pero completamente rehecho en español!
 
-Currently, two official plugins are available:
+Prepárate para:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Encontrar las palabras usando las letras de la parte superior de la pantalla en un tiempo limitado
+- Cada nivel tendrá su tiempo reducido
+- A partir del nivel 7, aparecerá una letra falsa, haciendo el juego más desafiante
+- ¡Pero espera, hay más! A partir del nivel 14, aparecerá una letra oculta, los jugadores tendrán que intentar encontrar la letra que falta
+- ¡Y aún más! Si logras llegar al nivel 21, cada palabra ingresada tendrá todas sus letras menos la primera oculta
 
-## Expanding the ESLint configuration
+¿Listo para intentarlo? Entra ya en [wo-ses.vercel.app](wo-ses.vercel.app)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Tecnologías
 
-- Configure the top-level `parserOptions` property like this:
+Este proyecto usa las siguientes tecnologías:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- Frontend: Vite + React + TypeScript
+- Backend: Supabase sin necesidad de autenticación
+- Base de datos en español recuperada y limpiada usando este increíble [repositorio](https://github.com/words/an-array-of-spanish-words)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Próximamente
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+¡El modo multijugador llegará muy pronto!
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+---
+
+# Words on Stream en Español
+
+This project is based on popular game [Words on Stream](https://wos.gg/) but completely redone in Spanish!
+
+Prepare to:
+
+- Find the words using the letters from the top screen under a limited time
+- Each level will have its time reduced
+- Starting at level 7, a fake letter will appear, making it more challenging
+- But wait, there is more! From level 14 onwards, a hidden letter will appear, players will have to try and find the letter missing
+- And even more! If you manage to reach level 21, every word inputted will have all its letters but the first hidden
+
+Ready to give it a go? Try it in [wo-ses.vercel.app](wo-ses.vercel.app)
+
+## Technologies
+
+This project was made using:
+
+- Frontend: Vite + React + TypeScript
+- Backend: Supabase with no auth necessary
+- Spanish DDBB retrieved and cleaned up using this amazing [repository](https://github.com/words/an-array-of-spanish-words)
+
+## Coming-up
+
+Multiplayer is coming very soon!
