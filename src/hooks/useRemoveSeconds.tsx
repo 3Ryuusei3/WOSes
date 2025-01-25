@@ -6,8 +6,8 @@ const useRemoveSeconds = () => {
 
   const getRandomSeconds = () => {
     const rand = Math.random();
-    if (rand < 0.50) return 0;
-    if (rand < 0.80) return 1;
+    if (rand < 0.60) return 0;
+    if (rand < 0.85) return 1;
     if (rand < 0.95) return 2;
     return 3;
   };

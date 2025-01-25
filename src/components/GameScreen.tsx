@@ -61,7 +61,9 @@ export default function GameScreen() {
       let levelsAdded = 0;
       const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
 
-      if (completionPercentage >= THRESHHOLD.THREE_STAR) {
+      if (completionPercentage === THRESHHOLD.FIVE_STAR) {
+        levelsAdded = LEVELS_TO_ADVANCE.FIVE_STAR;
+      } else if (completionPercentage >= THRESHHOLD.THREE_STAR) {
         levelsAdded = LEVELS_TO_ADVANCE.THREE_STAR;
       } else if (completionPercentage >= THRESHHOLD.TWO_STAR) {
         levelsAdded = LEVELS_TO_ADVANCE.TWO_STAR;
@@ -74,7 +76,6 @@ export default function GameScreen() {
       updateLastLevelWordsAndPoints();
       setMode('lobby');
     } else {
-      console.log(possibleWords);
       updateLastLevelWordsAndPoints();
       setMode('lost');
     }

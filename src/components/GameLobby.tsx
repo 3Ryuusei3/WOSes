@@ -37,8 +37,20 @@ export default function GameLobby() {
     <>
       <GameLogo />
       <div className='game__container f-jc-c'>
-        <h1 className='highlight'>{allWordsGuessed ? '¡PERFECTO!' : '¡ENHORABUENA!'}</h1>
-        <h3>HAS AVANZADO <span className='highlight'>{levelsToAdvance}</span> NIVEL{levelsToAdvance > 1 ? 'ES': ''}</h3>
+        {allWordsGuessed ? (
+          <h1 className='won'>¡PERFECTO!</h1>
+        ) : (
+          <h1 className='highlight'>¡ENHORABUENA!</h1>
+        )}
+        <h3>
+          HAS AVANZADO
+          {allWordsGuessed ? (
+            <span className='won'> {levelsToAdvance} </span>
+          ) : (
+            <span className='highlight'> {levelsToAdvance} </span>
+          )}
+          NIVEL{levelsToAdvance > 1 ? 'ES': ''}
+        </h3>
         <div className="v-section gap-md mx-auto">
           <div className="h-section gap-md">
             <div className='score__container--box'>
