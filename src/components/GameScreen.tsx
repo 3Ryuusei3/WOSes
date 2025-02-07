@@ -16,6 +16,7 @@ import {
   THRESHHOLD,
   LEVELS_TO_ADVANCE,
   RUNNING_OUT_OF_TIME_PERCENTAGE,
+  SHOW_LETTERS_PERCENTAGE,
   SHUFFLE_INTERVAL,
   POINTS_PER_LETTER,
   FAKE_LETTER_LEVEL_START,
@@ -120,9 +121,9 @@ export default function GameScreen() {
               {shuffledWordObject.map((letter: ShuffledWordObjectType, index: number) => (
                 <span
                   key={`${index}-${letter.letter}`}
-                  className={`selectedLetter${letter.isFake && percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? ' fake' : ''}${letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START ? ' hidden' : ''}`}
+                  className={`selectedLetter${letter.isFake && percentage < SHOW_LETTERS_PERCENTAGE ? ' fake' : ''}${letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START ? ' hidden' : ''}`}
                 >
-                  {letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START && percentage > RUNNING_OUT_OF_TIME_PERCENTAGE ? '?' : letter.letter}
+                  {letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START && percentage > SHOW_LETTERS_PERCENTAGE ? '?' : letter.letter}
                   <span className='letterPoints'>{POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER]}</span>
                 </span>
               ))}
@@ -154,7 +155,7 @@ export default function GameScreen() {
                 {word.split('').map((letter, letterIndex) => (
                   <span key={`${index}-${word}-${letter}-${letterIndex}`} className='letter'>
                     <span>
-                      {(level >= HIDDEN_WORDS_LEVEL_START && percentage > RUNNING_OUT_OF_TIME_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
+                      {(level >= HIDDEN_WORDS_LEVEL_START && percentage > SHOW_LETTERS_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
                     </span>
                   </span>
                 ))}
