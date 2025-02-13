@@ -14,9 +14,9 @@ const useCalculatePoints = (possibleWords: string[], correctWords: string[]) => 
   };
 
   const goalPoints = Math.ceil(possibleWordsPoints() * THRESHHOLD.ONE_STAR / 100);
-  const totalPoints = possibleWordsPoints();
+  const levelPoints = possibleWordsPoints();
 
-  return { correctWordsPoints, possibleWordsPoints, goalPoints, totalPoints };
+  return { correctWordsPoints, possibleWordsPoints, goalPoints, levelPoints };
 }
 
 export default useCalculatePoints;

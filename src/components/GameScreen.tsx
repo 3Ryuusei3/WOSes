@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import ScoreContainer from '../atoms/ScoreContainer';
 import WarningMessage from '../atoms/WarningMessage';
@@ -24,6 +25,8 @@ import {
   HIDDEN_WORDS_LEVEL_START,
 } from '../constant';
 
+import sql from '../utils/db';
+
 import goalSound from '../assets/goal.mp3';
 
 export default function GameScreen() {
@@ -33,6 +36,7 @@ export default function GameScreen() {
     gameTime,
     randomWord,
     possibleWords,
+    totalPoints,
     setTotalPoints,
     setLastRoundPoints,
     level,
@@ -43,7 +47,7 @@ export default function GameScreen() {
   const { percentage, timeLeft } = useProgressBar(gameTime);
   const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
   const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
-  const { correctWordsPoints, goalPoints, totalPoints } = useCalculatePoints(possibleWords, correctWords);
+  const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
   const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -57,10 +61,20 @@ export default function GameScreen() {
     })));
   };
 
+  const updateHighscoreDB = async () => {
+    try {
+      const id = uuidv4();
+      const createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      await sql`INSERT INTO scores (id, name, score, level, created_at) VALUES (${id}, ${playerName}, ${totalPoints}, ${level}, ${createdAt})`;
+    } catch (error) {
+      console.error('Error inserting highscore:', error);
+    }
+  }
+
   const handleEndOfLevel = () => {
-    if (correctWordsPoints() >= goalPoints || (totalPoints > 0 && totalPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
+    if (correctWordsPoints() >= goalPoints || (levelPoints > 0 && levelPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
       let levelsAdded = 0;
-      const completionPercentage = (correctWordsPoints() / totalPoints) * 100;
+      const completionPercentage = (correctWordsPoints() / levelPoints) * 100;
 
       if (completionPercentage === THRESHHOLD.FIVE_STAR) {
         levelsAdded = LEVELS_TO_ADVANCE.FIVE_STAR;
@@ -78,13 +92,14 @@ export default function GameScreen() {
       setMode('lobby');
     } else {
       updateLastLevelWordsAndPoints();
+      updateHighscoreDB();
       setMode('lost');
     }
   };
 
   useEffect(() => {
     if (percentage === 0 ||
-      totalPoints > 0 && correctWords.length === possibleWords.length) {
+      levelPoints > 0 && correctWords.length === possibleWords.length) {
       handleEndOfLevel();
     }
 
@@ -92,12 +107,12 @@ export default function GameScreen() {
       inputRef.current.focus();
     }
 
-    if (totalPoints > 0 && correctWordsPoints() >= goalPoints && !hasPlayedGoalSound) {
+    if (levelPoints > 0 && correctWordsPoints() >= goalPoints && !hasPlayedGoalSound) {
       const audio = new Audio(goalSound);
       audio.play();
       setHasPlayedGoalSound(true);
     }
-  }, [percentage, totalPoints, correctWordsPoints, goalPoints, hasPlayedGoalSound]);
+  }, [percentage, levelPoints, correctWordsPoints, goalPoints, hasPlayedGoalSound]);
 
   return (
     <>
@@ -109,8 +124,8 @@ export default function GameScreen() {
         level={level}
       />
       <div className='game__container'>
-        <div className="h-section gap-xs">
-          <div className="h-section gap-sm">
+        <div className="v-section gap-xs">
+          <div className="v-section gap-sm">
             <WarningMessage
               level={level}
               HIDDEN_LETTER_LEVEL_START={HIDDEN_LETTER_LEVEL_START}
@@ -129,7 +144,7 @@ export default function GameScreen() {
               ))}
             </div>
           </div>
-          <div className="h-section">
+          <div className="v-section">
             <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
             <div
               className="progress__container"
