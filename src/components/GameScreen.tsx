@@ -61,17 +61,18 @@ export default function GameScreen() {
     })));
   };
 
-  const updateHighscoreDB = async () => {
+  const updateHighscoreDB = async (finalPoints: number) => {
     try {
       const id = uuidv4();
-      const createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-      await sql`INSERT INTO scores (id, name, score, level, created_at) VALUES (${id}, ${playerName}, ${totalPoints}, ${level}, ${createdAt})`;
+      const createdAt = new Date().toISOString();
+      await sql`INSERT INTO scores (id, name, score, level, created_at) VALUES (${id}, ${playerName}, ${finalPoints}, ${level}, ${createdAt})`;
     } catch (error) {
       console.error('Error inserting highscore:', error);
     }
   }
 
   const handleEndOfLevel = () => {
+    const finalPoints = totalPoints + correctWordsPoints();
     if (correctWordsPoints() >= goalPoints || (levelPoints > 0 && levelPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
       let levelsAdded = 0;
       const completionPercentage = (correctWordsPoints() / levelPoints) * 100;
@@ -92,7 +93,7 @@ export default function GameScreen() {
       setMode('lobby');
     } else {
       updateLastLevelWordsAndPoints();
-      updateHighscoreDB();
+      updateHighscoreDB(finalPoints);
       setMode('lost');
     }
   };
