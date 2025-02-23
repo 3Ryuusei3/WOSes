@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
-import Highscores from '../atoms/Highscores';
+import TopScores from '../atoms/TopScores';
 
 import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
@@ -61,7 +61,7 @@ export default function GameStart() {
             <div className="score__container--box dark">
               <div className="v-section gap-md">
                 <h2>TOP 5</h2>
-                <Highscores />
+                <TopScores />
               </div>
             </div>
           </div>

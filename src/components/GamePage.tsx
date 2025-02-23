@@ -5,6 +5,7 @@ import GameLobby from './GameLobby';
 import GameLoading from './GameLoading';
 
 import useZoom from '../hooks/useZoom';
+
 import useGameStore from '../store/useGameStore';
 
 const GamePage = () => {

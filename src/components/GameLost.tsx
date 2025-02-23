@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
-import Highscores from '../atoms/Highscores';
+import TopScores from '../atoms/TopScores';
 
 import useGameStore from '../store/useGameStore';
 
@@ -65,7 +65,7 @@ export default function GameLost() {
           </div>
           <div className="score__container--box">
             <p>TOP 5</p>
-            <Highscores />
+            <TopScores />
           </div>
         </div>
         <button onClick={() => {

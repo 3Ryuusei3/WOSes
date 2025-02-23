@@ -13,9 +13,10 @@ import useInputWords from './../hooks/useInputWords';
 import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
 
-import { calculateLevelsToAdvance } from '../utils';
-
 import useGameStore from '../store/useGameStore';
+
+import { calculateLevelsToAdvance } from '../utils';
+import sql from '../utils/db';
 
 import {
   RUNNING_OUT_OF_TIME_PERCENTAGE,
@@ -26,7 +27,6 @@ import {
   HIDDEN_WORDS_LEVEL_START,
 } from '../constant';
 
-import sql from '../utils/db';
 
 import goalSound from '../assets/goal.mp3';
 

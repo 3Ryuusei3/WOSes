@@ -31,17 +31,6 @@ export default function GameLobby() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        setMode('loading');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setMode]);
-
   const allWordsGuessed = lastLevelWords.every(word => word.guessed);
 
   return (

@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
 
-import countdownMusic from '../assets/countdown.mp3';
 import useCountdown from '../hooks/useCountdown';
+
+import countdownMusic from '../assets/countdown.mp3';
 
 export default function GameLoading() {
   const countdown = useCountdown();
