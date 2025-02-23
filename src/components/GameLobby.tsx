@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import GameLogo from '../atoms/GameLogo';
 
@@ -8,6 +9,7 @@ import useRandomWords from '../hooks/useRandomWords';
 import useGameStore from '../store/useGameStore';
 
 import levelPassedSound from '../assets/win.mp3';
+import Tooltip from './Tooltip';
 
 export default function GameLobby() {
   const {
@@ -18,6 +20,7 @@ export default function GameLobby() {
     levelsToAdvance,
     lastLevelWords
   } = useGameStore();
+  const [canAdvance, setCanAdvance] = useState(false);
   useRandomWords();
   const secondsToRemove = useRemoveSeconds();
 
@@ -25,11 +28,27 @@ export default function GameLobby() {
     const audio = new Audio(levelPassedSound);
     audio.play();
 
+    const timer = setTimeout(() => {
+      setCanAdvance(true);
+    }, 2000);
+
     return () => {
       audio.pause();
       audio.currentTime = 0;
+      clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && canAdvance) {
+        setMode('loading');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setMode, canAdvance]);
 
   const allWordsGuessed = lastLevelWords.every(word => word.guessed);
 
@@ -63,10 +82,17 @@ export default function GameLobby() {
             </div>
           </div>
           <div className="v-section score__container--box">
+            <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
+              <div className='info-icon'>𝑖</div>
+            </Tooltip>
             <p>ÚLTIMAS PALABRAS</p>
             <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
               {lastLevelWords.map((word, index) => (
-                <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>{word.word.toUpperCase()}</h4>
+                <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
+                  <Link to={`https://dle.rae.es/${word.word}`} target='_blank' rel='noreferrer'>
+                    {word.word.toUpperCase()}
+                  </Link>
+                </h4>
               ))}
             </div>
           </div>
@@ -74,9 +100,13 @@ export default function GameLobby() {
         {secondsToRemove > 0 && (
           <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
         )}
-        <button onClick={() => {
-          setMode('loading');
-        } }>JUGAR AL NIVEL {level}</button>
+        <button
+          onClick={() => setMode('loading')}
+          disabled={!canAdvance}
+          className={!canAdvance ? 'button-disabled' : ''}
+        >
+          {canAdvance ? `JUGAR AL NIVEL ${level}` : 'CARGANDO...'}
+        </button>
       </div>
     </>
   )
