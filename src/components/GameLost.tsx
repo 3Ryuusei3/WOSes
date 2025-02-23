@@ -35,7 +35,7 @@ export default function GameLost() {
       audio.pause();
       audio.currentTime = 0;
     };
-  }, [totalPoints, highestScore, setHighestScore]);
+  }, [totalPoints, highestScore]);
 
   return (
     <>

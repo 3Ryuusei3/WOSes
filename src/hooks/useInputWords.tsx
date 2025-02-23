@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import Word from '../types/Word';
 
-const useInputWords = (possibleWords: string[]) => {
+const useInputWords = (initialWords: string[]) => {
   const [inputWord, setInputWord] = useState('');
-  const [inputtedWords, setInputtedWords] = useState<string[]>([]);
-  const [correctWords, setCorrectWords] = useState<string[]>([]);
+  const [words, setWords] = useState<Word[]>(
+    initialWords.map(word => ({ word, guessed: false }))
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputWord(e.target.value.toLowerCase());
@@ -12,17 +14,18 @@ const useInputWords = (possibleWords: string[]) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && inputWord.trim() !== '') {
       const trimmedWord = inputWord.trim();
-      if (possibleWords.includes(trimmedWord) && !correctWords.includes(trimmedWord)) {
-        setCorrectWords([...correctWords, trimmedWord]);
-      }
-      setInputtedWords([...inputtedWords, trimmedWord]);
+      setWords(prevWords => prevWords.map(wordObj =>
+        wordObj.word === trimmedWord ? { ...wordObj, guessed: true } : wordObj
+      ));
       setInputWord('');
     }
   };
 
+  const correctWords = words.filter(w => w.guessed).map(w => w.word);
+
   return {
     inputWord,
-    inputtedWords,
+    words,
     correctWords,
     handleChange,
     handleKeyDown,

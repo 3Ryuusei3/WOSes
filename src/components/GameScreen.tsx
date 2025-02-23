@@ -1,25 +1,26 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ScoreContainer from '../atoms/ScoreContainer';
 import WordInput from '../atoms/WordInput';
 import WarningMessage from '../atoms/WarningMessage';
+import WordList from '../atoms/WordList';
+import ProgressBar from '../atoms/ProgressBar';
+import SelectedWord from '../atoms/SelectedWord';
 
 import useShuffledWord from './../hooks/useShuffledWord';
 import useInputWords from './../hooks/useInputWords';
 import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
 
+import { calculateLevelsToAdvance } from '../utils';
+
 import useGameStore from '../store/useGameStore';
 
-import ShuffledWordObjectType from '../types/ShuffledWordObject';
 import {
-  THRESHHOLD,
-  LEVELS_TO_ADVANCE,
   RUNNING_OUT_OF_TIME_PERCENTAGE,
   SHOW_LETTERS_PERCENTAGE,
   SHUFFLE_INTERVAL,
-  POINTS_PER_LETTER,
   FAKE_LETTER_LEVEL_START,
   HIDDEN_LETTER_LEVEL_START,
   HIDDEN_WORDS_LEVEL_START,
@@ -46,17 +47,13 @@ export default function GameScreen() {
   } = useGameStore();
   const { percentage, timeLeft } = useProgressBar(gameTime);
   const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
-  const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
+  const { inputWord, words, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
-  const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
   const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);
 
   const updateLastLevelWordsAndPoints = () => {
     setTotalPoints(prev => prev + correctWordsPoints());
-    setLastLevelWords(possibleWords.map(word => ({
-      word,
-      guessed: correctWords.includes(word)
-    })));
+    setLastLevelWords(words);
   };
 
   const updateHighscoreDB = async (finalPoints: number) => {
@@ -69,30 +66,36 @@ export default function GameScreen() {
     }
   }
 
+  const hasCompletedLevel = () => {
+    return correctWordsPoints() >= goalPoints ||
+           (levelPoints > 0 &&
+            levelPoints === correctWordsPoints() &&
+            correctWords.length === possibleWords.length);
+  };
+
+  const advanceToNextLevel = (levelsAdded: number) => {
+    setLevelsToAdvance(levelsAdded);
+    setLevel((prev: number) => prev + levelsAdded);
+    setLastRoundPoints(correctWordsPoints());
+    updateLastLevelWordsAndPoints();
+    setMode('lobby');
+  };
+
+  const endGameAndSaveScore = (finalPoints: number) => {
+    updateLastLevelWordsAndPoints();
+    updateHighscoreDB(finalPoints);
+    setMode('lost');
+  };
+
   const handleEndOfLevel = () => {
     const finalPoints = totalPoints + correctWordsPoints();
-    if (correctWordsPoints() >= goalPoints || (levelPoints > 0 && levelPoints === correctWordsPoints() && correctWords.length === possibleWords.length)) {
-      let levelsAdded = 0;
-      const completionPercentage = (correctWordsPoints() / levelPoints) * 100;
 
-      if (completionPercentage === THRESHHOLD.FIVE_STAR) {
-        levelsAdded = LEVELS_TO_ADVANCE.FIVE_STAR;
-      } else if (completionPercentage >= THRESHHOLD.THREE_STAR) {
-        levelsAdded = LEVELS_TO_ADVANCE.THREE_STAR;
-      } else if (completionPercentage >= THRESHHOLD.TWO_STAR) {
-        levelsAdded = LEVELS_TO_ADVANCE.TWO_STAR;
-      } else if (completionPercentage >= THRESHHOLD.ONE_STAR) {
-        levelsAdded = LEVELS_TO_ADVANCE.ONE_STAR;
-      }
-      setLevelsToAdvance(levelsAdded);
-      setLevel((prev: number) => prev + levelsAdded);
-      setLastRoundPoints(correctWordsPoints());
-      updateLastLevelWordsAndPoints();
-      setMode('lobby');
+    if (hasCompletedLevel()) {
+      const completionPercentage = (correctWordsPoints() / levelPoints) * 100;
+      const levelsAdded = calculateLevelsToAdvance(completionPercentage);
+      advanceToNextLevel(levelsAdded);
     } else {
-      updateLastLevelWordsAndPoints();
-      updateHighscoreDB(finalPoints);
-      setMode('lost');
+      endGameAndSaveScore(finalPoints);
     }
   };
 
@@ -112,8 +115,7 @@ export default function GameScreen() {
   return (
     <>
       <ScoreContainer
-        correctWords={correctWords}
-        possibleWords={possibleWords}
+        words={words}
         correctWordsPoints={correctWordsPoints}
         goalPoints={goalPoints}
         level={level}
@@ -127,52 +129,28 @@ export default function GameScreen() {
               FAKE_LETTER_LEVEL_START={FAKE_LETTER_LEVEL_START}
               HIDDEN_WORDS_LEVEL_START={HIDDEN_WORDS_LEVEL_START}
             />
-            <div key={shuffledWordObject.map((letter: ShuffledWordObjectType) => letter.letter).join('')} className="selectedWord">
-              {shuffledWordObject.map((letter: ShuffledWordObjectType, index: number) => (
-                <span
-                  key={`${index}-${letter.letter}`}
-                  className={`selectedLetter${letter.isFake && percentage < SHOW_LETTERS_PERCENTAGE ? ' fake' : ''}${letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START ? ' hidden' : ''}`}
-                >
-                  {letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START && percentage > SHOW_LETTERS_PERCENTAGE ? '?' : letter.letter}
-                  <span className='letterPoints'>{POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER]}</span>
-                </span>
-              ))}
-            </div>
+            <SelectedWord
+              shuffledWordObject={shuffledWordObject}
+              level={level}
+              percentage={percentage}
+              SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
+              HIDDEN_LETTER_LEVEL_START={HIDDEN_LETTER_LEVEL_START}
+            />
           </div>
-          <div className="v-section">
-            <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
-            <div
-              className="progress__container"
-              style={{
-              '--remaining-percentage': `${percentage}%`,
-              '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? 'var(--clr-progress-late)' : 'var(--clr-progress-on-time)'
-              } as React.CSSProperties}
-            >
-            </div>
-          </div>
+          <ProgressBar
+            timeLeft={timeLeft}
+            percentage={percentage}
+            RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
+          />
         </div>
-        <ul className='wordlist' style={{ '--wordlist-rows': Math.ceil(possibleWords.length / 3) } as React.CSSProperties}>
-          {possibleWords.map((word, index) => (
-            <li
-              key={`${index}-${word}`}
-              className={`word ${inputtedWords.includes(word) ? 'active' : ''}`}
-              ref={el => wordRefs.current[index] = el}
-            >
-              {inputtedWords.includes(word) && (
-                <span className='playerName'>{playerName}</span>
-              )}
-              <span className='wordLetters'>
-                {word.split('').map((letter, letterIndex) => (
-                  <span key={`${index}-${word}-${letter}-${letterIndex}`} className='letter'>
-                    <span>
-                      {(level >= HIDDEN_WORDS_LEVEL_START && percentage > SHOW_LETTERS_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
-                    </span>
-                  </span>
-                ))}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <WordList
+          words={words}
+          playerName={playerName}
+          level={level}
+          percentage={percentage}
+          HIDDEN_WORDS_LEVEL_START={HIDDEN_WORDS_LEVEL_START}
+          SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
+        />
         <WordInput
           inputWord={inputWord}
           handleChange={handleChange}
