@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import backgroundMusic from '../assets/background.mp3';
 
-const useBackgroundAudio = (volume: number = 0.5, delay: number = 1000) => {
+const useBackgroundAudio = (volume: number = 0.5) => {
   useEffect(() => {
     const audio = new Audio(backgroundMusic);
     audio.loop = true;
@@ -11,7 +11,7 @@ const useBackgroundAudio = (volume: number = 0.5, delay: number = 1000) => {
     const playAudio = () => {
       setTimeout(() => {
         audio.play().catch(() => {});
-      }, delay);
+      });
     };
 
     document.addEventListener('click', playAudio, { once: true });
@@ -21,7 +21,7 @@ const useBackgroundAudio = (volume: number = 0.5, delay: number = 1000) => {
       audio.pause();
       audio.currentTime = 0;
     };
-  }, [volume, delay]);
+  }, [volume]);
 };
 
 export default useBackgroundAudio;

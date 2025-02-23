@@ -2,13 +2,13 @@ import { useRef, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ScoreContainer from '../atoms/ScoreContainer';
+import WordInput from '../atoms/WordInput';
 import WarningMessage from '../atoms/WarningMessage';
 
 import useShuffledWord from './../hooks/useShuffledWord';
 import useInputWords from './../hooks/useInputWords';
 import useProgressBar from './../hooks/useProgressBar';
 import useCalculatePoints from './../hooks/useCalculatePoints';
-import useInputResponse from './../hooks/useInputResponse';
 
 import useGameStore from '../store/useGameStore';
 
@@ -48,9 +48,7 @@ export default function GameScreen() {
   const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
   const { inputWord, inputtedWords, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
-  const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } = useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);
 
   const updateLastLevelWordsAndPoints = () => {
@@ -102,10 +100,6 @@ export default function GameScreen() {
     if (percentage === 0 ||
       levelPoints > 0 && correctWords.length === possibleWords.length) {
       handleEndOfLevel();
-    }
-
-    if (inputRef.current) {
-      inputRef.current.focus();
     }
 
     if (levelPoints > 0 && correctWordsPoints() >= goalPoints && !hasPlayedGoalSound) {
@@ -179,15 +173,13 @@ export default function GameScreen() {
             </li>
           ))}
         </ul>
-        <input
-          type="text"
-          className={`mx-auto mt-auto ${animateError ? 'animate-error' : ''} ${animateSuccess ? 'animate-success' : ''} ${animateRepeated ? 'animate-repeated' : ''}`}
-          placeholder='INTRODUCE LA PALABRA...'
-          value={inputWord}
-          onChange={handleChange}
-          onKeyDown={handleKeyDownWithShake}
-          disabled={percentage === 0}
-          ref={inputRef}
+        <WordInput
+          inputWord={inputWord}
+          handleChange={handleChange}
+          handleKeyDown={handleKeyDown}
+          possibleWords={possibleWords}
+          correctWords={correctWords}
+          percentage={percentage}
         />
       </div>
     </>

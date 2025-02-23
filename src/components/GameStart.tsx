@@ -13,7 +13,7 @@ export default function GameStart() {
   const [error, setError] = useState(false);
   useRandomWords();
 
-  useBackgroundAudio(0.5, 1000);
+  useBackgroundAudio(0.5);
 
   const handleSubmit = () => {
     if (playerName.length >= 3 && playerName.length <= 10) {
