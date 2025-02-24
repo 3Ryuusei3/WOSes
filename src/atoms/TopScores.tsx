@@ -23,7 +23,6 @@ export default function TopScores() {
           created_at: item.created_at,
         }));
         setTopScores(ddbbTopScores);
-        console.log('ey');
       } catch (error) {
         console.error('Error fetching top scores:', error);
       }

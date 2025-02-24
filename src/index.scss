@@ -508,7 +508,6 @@ main {
   display: grid;
   grid-template: repeat(var(--wordlist-rows), 1fr) / repeat(3, 1fr);
   column-gap: 16px;
-  row-gap: 1.5px;
   grid-auto-flow: column dense;
 
   h4 {

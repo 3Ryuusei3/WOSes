@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import GameLogo from '../atoms/GameLogo';
+import Tooltip from '../atoms/Tooltip';
 
 import useRemoveSeconds from '../hooks/useRemoveSeconds';
 import useRandomWords from '../hooks/useRandomWords';
@@ -9,7 +10,6 @@ import useRandomWords from '../hooks/useRandomWords';
 import useGameStore from '../store/useGameStore';
 
 import levelPassedSound from '../assets/win.mp3';
-import Tooltip from './Tooltip';
 
 export default function GameLobby() {
   const {
@@ -20,42 +20,28 @@ export default function GameLobby() {
     levelsToAdvance,
     lastLevelWords
   } = useGameStore();
-  const [canAdvance, setCanAdvance] = useState(false);
+
+  const [canAdvance, setCanAdvance] = useState(() => {
+    setTimeout(() => setCanAdvance(true), 2000);
+    new Audio(levelPassedSound).play();
+    return false;
+  });
+
   useRandomWords();
   const secondsToRemove = useRemoveSeconds();
 
-  useEffect(() => {
-    const audio = new Audio(levelPassedSound);
-    audio.play();
-
-    const timer = setTimeout(() => {
-      setCanAdvance(true);
-    }, 2000);
-
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-      clearTimeout(timer);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && canAdvance) {
-        setMode('loading');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setMode, canAdvance]);
+  const handleAdvance = useCallback(() => {
+    if (canAdvance) {
+      setMode('loading');
+    }
+  }, [canAdvance, setMode]);
 
   const allWordsGuessed = lastLevelWords.every(word => word.guessed);
 
   return (
     <>
       <GameLogo />
-      <div className='game__container f-jc-c'>
+      <div className='game__container f-jc-c' onKeyDown={(e) => e.key === 'Enter' && handleAdvance()}>
         {allWordsGuessed ? (
           <h1 className='won'>¡PERFECTO!</h1>
         ) : (
@@ -70,7 +56,7 @@ export default function GameLobby() {
           )}
           NIVEL{levelsToAdvance > 1 ? 'ES': ''}
         </h3>
-        <div className="h-section gap-md mx-auto">
+        <div className="h-section gap-lg mx-auto">
           <div className="v-section gap-md">
             <div className='score__container--box'>
               <p>PUNTOS DEL NIVEL {level - levelsToAdvance}</p>
@@ -101,11 +87,11 @@ export default function GameLobby() {
           <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
         )}
         <button
-          onClick={() => setMode('loading')}
+          onClick={handleAdvance}
           disabled={!canAdvance}
           className={!canAdvance ? 'button-disabled' : ''}
         >
-          {canAdvance ? `JUGAR AL NIVEL ${level}` : 'CARGANDO...'}
+          JUGAR AL NIVEL {level}
         </button>
       </div>
     </>

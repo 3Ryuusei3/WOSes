@@ -20,7 +20,19 @@ export default function GameLost() {
     lastLevelWords
   } = useGameStore();
 
+  const handlePlayAgain = () => {
+    setMode('start');
+    setTotalPoints(0);
+    setLevel(1);
+  };
+
   useEffect(() => {
+    const audio = new Audio(gameOverSound);
+
+    audio.addEventListener('canplaythrough', () => {
+      audio.play().catch(err => console.log('Audio playback failed:', err));
+    }, { once: true });
+
     if (totalPoints > highestScore.score) {
       setHighestScore({
         name: playerName,
@@ -28,14 +40,11 @@ export default function GameLost() {
       });
     }
 
-    const audio = new Audio(gameOverSound);
-    audio.play();
-
     return () => {
       audio.pause();
       audio.currentTime = 0;
     };
-  }, [totalPoints, highestScore]);
+  }, [totalPoints, highestScore.score, playerName, setHighestScore]);
 
   return (
     <>
@@ -43,7 +52,7 @@ export default function GameLost() {
       <div className='game__container f-jc-c'>
         <h1 className='lost'>HAS PERDIDO...</h1>
         <h3>HAS ALCANZADO EL NIVEL <span className='highlight'>{level}</span></h3>
-        <div className="h-section gap-md mx-auto">
+        <div className="h-section gap-lg mx-auto">
           <div className="v-section gap-md">
             <div className='score__container--box'>
               <p>TUS PUNTOS TOTALES</p>
@@ -68,11 +77,7 @@ export default function GameLost() {
             <TopScores />
           </div>
         </div>
-        <button onClick={() => {
-          setMode('start');
-          setTotalPoints(0);
-          setLevel(1);
-        } }>JUGAR DE NUEVO</button>
+        <button onClick={handlePlayAgain}>JUGAR DE NUEVO</button>
       </div>
     </>
   )
