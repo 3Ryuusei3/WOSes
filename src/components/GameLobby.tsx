@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import GameLogo from '../atoms/GameLogo';
@@ -18,17 +18,21 @@ export default function GameLobby() {
     level,
     lastRoundPoints,
     levelsToAdvance,
-    lastLevelWords
+    lastLevelWords,
+    gameTime
   } = useGameStore();
 
-  const [canAdvance, setCanAdvance] = useState(() => {
-    setTimeout(() => setCanAdvance(true), 2000);
+  const [canAdvance, setCanAdvance] = useState(false);
+
+  useEffect(() => {
     new Audio(levelPassedSound).play();
-    return false;
-  });
+    const timer = setTimeout(() => setCanAdvance(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useRandomWords();
   const secondsToRemove = useRemoveSeconds();
+  console.log(gameTime);
 
   const handleAdvance = useCallback(() => {
     if (canAdvance) {

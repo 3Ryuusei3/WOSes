@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useGameStore from '../store/useGameStore';
 
 const useRemoveSeconds = () => {
   const { gameTime, setGameTime } = useGameStore();
+  const [secondsRemoved, setSecondsRemoved] = useState(0);
 
   const getRandomSeconds = () => {
     const rand = Math.random();
@@ -12,15 +13,17 @@ const useRemoveSeconds = () => {
     return 3;
   };
 
-  const secondsToRemove = getRandomSeconds();
-
   useEffect(() => {
+    const secondsToRemove = getRandomSeconds();
+    console.log(secondsToRemove);
     if (gameTime - secondsToRemove > 5) {
       setGameTime(prev => prev - secondsToRemove);
+      setSecondsRemoved(secondsToRemove);
     }
+    return () => {};
   }, []);
 
-  return secondsToRemove;
+  return secondsRemoved;
 };
 
 export default useRemoveSeconds;
