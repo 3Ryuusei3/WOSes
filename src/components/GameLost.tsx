@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import GameLogo from '../atoms/GameLogo';
 import TopScores from '../atoms/TopScores';
+import Tooltip from '../atoms/Tooltip';
 
 import useGameStore from '../store/useGameStore';
 
@@ -65,16 +67,23 @@ export default function GameLost() {
             </div>
           </div>
           <div className="v-section score__container--box">
+            <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
+              <div className='info-icon'>𝑖</div>
+            </Tooltip>
             <p>ÚLTIMAS PALABRAS</p>
             <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
               {lastLevelWords.map((word, index) => (
-                <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>{word.word.toUpperCase()}</h4>
+                <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
+                <Link to={`https://dle.rae.es/${word.word}`} target='_blank' rel='noreferrer'>
+                  {word.word.toUpperCase()}
+                </Link>
+              </h4>
               ))}
             </div>
           </div>
           <div className="score__container--box">
-            <p>TOP 5</p>
-            <TopScores />
+            <p>TOP 8</p>
+            <TopScores hasTooltip />
           </div>
         </div>
         <button onClick={handlePlayAgain}>JUGAR DE NUEVO</button>

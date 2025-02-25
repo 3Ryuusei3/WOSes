@@ -39,7 +39,7 @@ export default function GameStart() {
     <>
       <GameLogo />
       <div className='game__container f-jc-c'>
-        <div className="h-section gap-md">
+        <div className="h-section gap-sm">
           <div className='v-section gap-md w100 f-jc-c'>
             <h2 className='highlight'>INTRODUCE TU NOMBRE<br/>PARA JUGAR</h2>
             <div className="v-section gap-xs">
@@ -60,7 +60,7 @@ export default function GameStart() {
           <div className="ranking v-section gap-md">
             <div className="score__container--box dark">
               <div className="v-section gap-md">
-                <h2>TOP 5</h2>
+                <h2>TOP 8</h2>
                 <TopScores />
               </div>
             </div>

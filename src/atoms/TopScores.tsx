@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
 
+import Tooltip from './Tooltip';
+
 import useGameStore from '../store/useGameStore';
 
 import TopScore from '../types/TopScore';
 
 import sql from '../utils/db';
 
-export default function TopScores() {
+interface TopScoresProps {
+  hasTooltip?: boolean;
+}
+
+export default function TopScores({ hasTooltip = false }: TopScoresProps) {
   const [topScores, setTopScores] = useState<TopScore[]>([]);
   const { highestScore } = useGameStore();
 
@@ -14,7 +20,7 @@ export default function TopScores() {
     async function fetchTopScores() {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data: any[] = await sql`SELECT * FROM scores ORDER BY level DESC, score DESC LIMIT 5`;
+        const data: any[] = await sql`SELECT * FROM scores ORDER BY level DESC, score DESC LIMIT 8`;
         const ddbbTopScores: TopScore[] = data.map((item) => ({
           id: item.id,
           name: item.name,
@@ -34,6 +40,11 @@ export default function TopScores() {
   return (
     <>
       <div className="ranking__container">
+        {hasTooltip && (
+          <Tooltip message="El ranking puede tardar en actualizarse">
+            <div className='info-icon'>𝑖</div>
+          </Tooltip>
+        )}
         {topScores.length === 0 ? <p>CARGANDO...</p> : (
           <table className="ranking__entry">
             <tbody>

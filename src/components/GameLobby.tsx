@@ -61,14 +61,20 @@ export default function GameLobby() {
           NIVEL{levelsToAdvance > 1 ? 'ES': ''}
         </h3>
         <div className="h-section gap-lg mx-auto">
-          <div className="v-section gap-md">
-            <div className='score__container--box'>
-              <p>PUNTOS DEL NIVEL {level - levelsToAdvance}</p>
-              <h3>{lastRoundPoints}</h3>
-            </div>
-            <div className='score__container--box'>
-              <p>TUS PUNTOS TOTALES</p>
-              <h3>{totalPoints}</h3>
+          <div className='score__container--box f-jc-c'>
+            <div className="v-section gap-md">
+              <div className="h-section gap-lg f-jc-sb f-ai-c ">
+                <p>PUNTOS DEL NIVEL {level - levelsToAdvance}</p>
+                <h3>{lastRoundPoints}</h3>
+              </div>
+              <div className="h-section gap-lg f-jc-sb f-ai-c ">
+                <p>TUS PUNTOS TOTALES</p>
+                <h3>{totalPoints}</h3>
+              </div>
+              <div className="h-section gap-lg f-jc-sb f-ai-c ">
+                <p>TIEMPO RESTANTE</p>
+                <h3><span className={`${allWordsGuessed ? 'won' : 'highlight'}`}>{gameTime}s</span></h3>
+              </div>
             </div>
           </div>
           <div className="v-section score__container--box">
