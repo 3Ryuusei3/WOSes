@@ -2,15 +2,33 @@ import { useEffect, useState } from 'react';
 import useGameStore from '../store/useGameStore';
 
 const useRemoveSeconds = () => {
-  const { gameTime, setGameTime, lastLevelWords } = useGameStore();
+  const { gameTime, setGameTime, lastLevelWords, levelsToAdvance } = useGameStore();
   const [secondsRemoved, setSecondsRemoved] = useState(0);
 
   const getRandomSeconds = () => {
     const rand = Math.random();
-    if (rand < 0.60) return 0;
-    if (rand < 0.85) return 1;
-    if (rand < 0.95) return 2;
-    return 3;
+
+    switch (levelsToAdvance) {
+      case 1:
+        if (rand < 0.50) return 0;
+        if (rand < 0.75) return 1;
+        if (rand < 0.90) return 2;
+        return 3;
+      case 2:
+        if (rand < 0.60) return 0;
+        if (rand < 0.80) return 1;
+        if (rand < 0.95) return 2;
+        return 3;
+      case 3:
+        if (rand < 0.75) return 0;
+        if (rand < 0.90) return 1;
+        return 2;
+      default:
+        if (rand < 0.60) return 0;
+        if (rand < 0.85) return 1;
+        if (rand < 0.95) return 2;
+        return 3;
+    }
   };
 
   useEffect(() => {
