@@ -8,6 +8,7 @@ import Tooltip from '../atoms/Tooltip';
 import useGameStore from '../store/useGameStore';
 
 import gameOverSound from '../assets/gameover.mp3';
+import { START_TIME } from '../constant';
 
 export default function GameLost() {
   const {
@@ -19,13 +20,15 @@ export default function GameLost() {
     playerName,
     highestScore,
     setHighestScore,
-    lastLevelWords
+    lastLevelWords,
+    setGameTime
   } = useGameStore();
 
   const handlePlayAgain = () => {
     setMode('start');
     setTotalPoints(0);
     setLevel(1);
+    setGameTime(START_TIME);
   };
 
   useEffect(() => {
