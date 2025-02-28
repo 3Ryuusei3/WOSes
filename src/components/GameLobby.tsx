@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import GameLogo from '../atoms/GameLogo';
@@ -23,16 +23,19 @@ export default function GameLobby() {
   } = useGameStore();
 
   const [canAdvance, setCanAdvance] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     new Audio(levelPassedSound).play();
-    const timer = setTimeout(() => setCanAdvance(true), 2000);
+    const timer = setTimeout(() => {
+      setCanAdvance(true);
+      containerRef.current?.focus();
+    }, 2000);
     return () => clearTimeout(timer);
   }, []);
 
   useRandomWords();
   const secondsToRemove = useRemoveSeconds();
-  console.log(gameTime);
 
   const handleAdvance = useCallback(() => {
     if (canAdvance) {
@@ -45,7 +48,14 @@ export default function GameLobby() {
   return (
     <>
       <GameLogo />
-      <div className='game__container f-jc-c' onKeyDown={(e) => e.key === 'Enter' && handleAdvance()}>
+      <div
+        ref={containerRef}
+        className='game__container f-jc-c'
+        onKeyDown={(e) => e.key === 'Enter' && handleAdvance()}
+        tabIndex={0}
+        role="button"
+        aria-label="Avanzar al siguiente nivel"
+      >
         {allWordsGuessed ? (
           <h1 className='won'>¡PERFECTO!</h1>
         ) : (

@@ -10,8 +10,8 @@ const useRemoveSeconds = () => {
 
     switch (levelsToAdvance) {
       case 1:
-        if (rand < 0.50) return 0;
-        if (rand < 0.75) return 1;
+        if (rand < 0.40) return 0;
+        if (rand < 0.70) return 1;
         if (rand < 0.90) return 2;
         return 3;
       case 2:
