@@ -4,10 +4,6 @@ import wordsData from '../data/words.json';
 
 import useGameStore from '../store/useGameStore';
 
-const normalize = (str: string) => {
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/Ñ/g, 'Ñ');
-};
-
 const getRandomWord = (words: string[]) => {
   return words[Math.floor(Math.random() * words.length)];
 };
@@ -34,8 +30,7 @@ const useRandomWords = () => {
   const setPossibleWords = useGameStore(state => state.setPossibleWords);
 
   useEffect(() => {
-    const normalizedWords = Array.from(new Set(wordsData.words.map(normalize)));
-    const filteredWords = normalizedWords.filter(word => word.length >= 4 && word.length <= 9);
+    const filteredWords = wordsData.words.filter(word => word.length >= 4 && word.length <= 9);
 
     let word = getRandomWord(filteredWords);
     let wordCount = countLetters(word);
