@@ -135,6 +135,7 @@ export default function GameScreen() {
             timeLeft={timeLeft}
             percentage={percentage}
             RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
+            SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
           />
         </div>
         <WordList

@@ -15,6 +15,28 @@ export default function SelectedWord({
   gameDifficulty,
   SHOW_LETTERS_PERCENTAGE,
 }: SelectedWordProps) {
+  const getLetterClasses = (letter: ShuffledWordObjectType) => {
+    const classes = ['selectedLetter'];
+
+    if (letter.isDark && gameDifficulty.dark) {
+      if (percentage < SHOW_LETTERS_PERCENTAGE) {
+        classes.push('dark-outline');
+      } else {
+        classes.push('dark');
+      }
+    }
+
+    if (letter.isFake && percentage < SHOW_LETTERS_PERCENTAGE) {
+      classes.push('fake');
+    }
+
+    if (letter.isHidden && gameDifficulty.hidden) {
+      classes.push('hidden');
+    }
+
+    return classes.join(' ');
+  };
+
   return (
     <div
       key={shuffledWordObject.map(letter => letter.letter).join('')}
@@ -23,11 +45,7 @@ export default function SelectedWord({
       {shuffledWordObject.map((letter, index) => (
         <span
           key={`${index}-${letter.letter}`}
-          className={`selectedLetter${
-            letter.isFake && percentage < SHOW_LETTERS_PERCENTAGE ? ' fake' : ''
-          }${
-            letter.isHidden && gameDifficulty.hidden ? ' hidden' : ''
-          }`}
+          className={getLetterClasses(letter)}
         >
           {letter.isHidden && gameDifficulty.hidden && percentage > SHOW_LETTERS_PERCENTAGE
             ? '?'

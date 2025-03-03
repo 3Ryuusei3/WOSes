@@ -51,17 +51,21 @@ const POINTS_PER_LETTER = {
 }
 
 const LEVEL_RANGES = {
-  FAKE_LETTER: {
+  DARK_LETTER: {
     START: 6,
-    END: 16
+    END: 30
+  },
+  FAKE_LETTER: {
+    START: 10,
+    END: 20
   },
   HIDDEN_LETTER: {
-    START: 12,
-    END: 22
+    START: 16,
+    END: 26
   },
   HIDDEN_WORDS: {
-    START: 24,
-    END: 34
+    START: 30,
+    END: 44
   }
 };
 

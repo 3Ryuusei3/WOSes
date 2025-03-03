@@ -5,12 +5,14 @@ import TopScores from '../atoms/TopScores';
 
 import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
+import useSetDifficulty from '../hooks/useSetDifficulty';
 
 import useGameStore from '../store/useGameStore';
 
 export default function GameStart() {
-  const { playerName, setPlayerName, setMode } = useGameStore();
+  const { playerName, setPlayerName, setMode, gameDifficulty, level } = useGameStore();
   const [error, setError] = useState(false);
+  useSetDifficulty(gameDifficulty, level);
   useRandomWords();
 
   useBackgroundAudio(0.5);

@@ -32,7 +32,7 @@ interface GameState {
   lastLevelWords: Word[];
   setLastLevelWords: (words: Word[]) => void;
   gameDifficulty: Difficulty;
-  setGameDifficulty: (difficulty: { fake: boolean; hidden: boolean; hiddenWords: boolean }) => void;
+  setGameDifficulty: (difficulty: Difficulty) => void;
 }
 
 const useGameStore = create<GameState>((set) => ({
@@ -67,6 +67,7 @@ const useGameStore = create<GameState>((set) => ({
   lastLevelWords: [],
   setLastLevelWords: (words) => set({ lastLevelWords: words }),
   gameDifficulty: {
+    dark: false,
     fake: false,
     hidden: false,
     hiddenWords: false

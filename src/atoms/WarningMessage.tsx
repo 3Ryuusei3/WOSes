@@ -13,10 +13,14 @@ export default function WarningMessage({ gameDifficulty }: WarningMessageProps) 
     if (gameDifficulty.hidden) {
       letters.push("OCULTA");
     }
+    if (gameDifficulty.dark) {
+      letters.push("OSCURA");
+    }
 
     if (letters.length === 0) return null;
     if (letters.length === 1) return `HAY UNA LETRA ${letters[0]}`;
-    return `HAY UNA LETRA ${letters[0]} Y ${letters[1]}`;
+    if (letters.length === 2) return `HAY UNA LETRA ${letters[0]} Y ${letters[1]}`;
+    return `HAY UNA LETRA ${letters[0]}, ${letters[1]} Y ${letters[2]}`;
   };
 
   const conditions: string[] = [];
@@ -51,6 +55,7 @@ export default function WarningMessage({ gameDifficulty }: WarningMessageProps) 
       .map((word, index) => {
         if (word === "FALSA") return <span key={index} className="lost">{word}</span>;
         if (word === "OCULTA") return <span key={index} className="highlight">{word}</span>;
+        if (word === "OSCURA") return <span key={index} className="dark">{word}</span>;
         if (word === "OCULTAN") return <span key={index} className="won">{word}</span>;
         return word + " ";
       });

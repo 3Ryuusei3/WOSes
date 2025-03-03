@@ -20,7 +20,7 @@ export default function TopScores({ hasTooltip = false }: TopScoresProps) {
     async function fetchTopScores() {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data: any[] = await sql`SELECT * FROM scores ORDER BY level DESC, score DESC LIMIT 8`;
+        const data: any[] = await sql`SELECT * FROM scores ORDER BY level DESC, score ASC LIMIT 8`;
         const ddbbTopScores: TopScore[] = data.map((item) => ({
           id: item.id,
           name: item.name,
