@@ -22,9 +22,6 @@ import {
   RUNNING_OUT_OF_TIME_PERCENTAGE,
   SHOW_LETTERS_PERCENTAGE,
   SHUFFLE_INTERVAL,
-  FAKE_LETTER_LEVEL_START,
-  HIDDEN_LETTER_LEVEL_START,
-  HIDDEN_WORDS_LEVEL_START,
 } from '../constant';
 
 
@@ -43,10 +40,11 @@ export default function GameScreen() {
     level,
     setLevel,
     setLevelsToAdvance,
-    setLastLevelWords
+    setLastLevelWords,
+    gameDifficulty
   } = useGameStore();
   const { percentage, timeLeft } = useProgressBar(gameTime);
-  const shuffledWordObject = useShuffledWord(randomWord, SHUFFLE_INTERVAL, percentage > 0);
+  const shuffledWordObject = useShuffledWord(randomWord, gameDifficulty, SHUFFLE_INTERVAL, percentage > 0);
   const { inputWord, words, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
   const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);
@@ -124,17 +122,13 @@ export default function GameScreen() {
         <div className="v-section gap-xs">
           <div className="v-section gap-sm">
             <WarningMessage
-              level={level}
-              HIDDEN_LETTER_LEVEL_START={HIDDEN_LETTER_LEVEL_START}
-              FAKE_LETTER_LEVEL_START={FAKE_LETTER_LEVEL_START}
-              HIDDEN_WORDS_LEVEL_START={HIDDEN_WORDS_LEVEL_START}
+              gameDifficulty={gameDifficulty}
             />
             <SelectedWord
               shuffledWordObject={shuffledWordObject}
-              level={level}
               percentage={percentage}
+              gameDifficulty={gameDifficulty}
               SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
-              HIDDEN_LETTER_LEVEL_START={HIDDEN_LETTER_LEVEL_START}
             />
           </div>
           <ProgressBar
@@ -146,9 +140,8 @@ export default function GameScreen() {
         <WordList
           words={words}
           playerName={playerName}
-          level={level}
           percentage={percentage}
-          HIDDEN_WORDS_LEVEL_START={HIDDEN_WORDS_LEVEL_START}
+          gameDifficulty={gameDifficulty}
           SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
         />
         <WordInput

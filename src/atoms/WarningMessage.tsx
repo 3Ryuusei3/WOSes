@@ -1,30 +1,66 @@
+import Difficulty from "../types/Difficulty";
+
 interface WarningMessageProps {
-  level: number;
-  HIDDEN_LETTER_LEVEL_START: number;
-  FAKE_LETTER_LEVEL_START: number;
-  HIDDEN_WORDS_LEVEL_START: number;
+  gameDifficulty: Difficulty;
 }
 
-export default function WarningMessage({ level, HIDDEN_LETTER_LEVEL_START, FAKE_LETTER_LEVEL_START, HIDDEN_WORDS_LEVEL_START }: WarningMessageProps) {
+export default function WarningMessage({ gameDifficulty }: WarningMessageProps) {
+  const getLetterConditions = () => {
+    const letters = [];
+    if (gameDifficulty.fake) {
+      letters.push("FALSA");
+    }
+    if (gameDifficulty.hidden) {
+      letters.push("OCULTA");
+    }
+
+    if (letters.length === 0) return null;
+    if (letters.length === 1) return `HAY UNA LETRA ${letters[0]}`;
+    return `HAY UNA LETRA ${letters[0]} Y ${letters[1]}`;
+  };
+
+  const conditions: string[] = [];
+  const letterCondition = getLetterConditions();
+  if (letterCondition) {
+    conditions.push(letterCondition);
+  }
+
+  if (gameDifficulty.hiddenWords) {
+    conditions.push("LAS PALABRAS SE OCULTAN");
+  }
+
+  const getFormattedText = () => {
+    if (conditions.length === 0) {
+      return "ENCUENTRA ANAGRAMAS";
+    }
+
+    if (conditions.length === 1) {
+      return conditions[0];
+    }
+
+    if (conditions.length === 2) {
+      return `${conditions[0]} Y ${conditions[1]}`;
+    }
+
+    return conditions.slice(0, -1).join(", ") + " Y " + conditions[conditions.length - 1];
+  };
+
+  const formatWithStyles = (text: string) => {
+    return text
+      .split(" ")
+      .map((word, index) => {
+        if (word === "FALSA") return <span key={index} className="lost">{word}</span>;
+        if (word === "OCULTA") return <span key={index} className="highlight">{word}</span>;
+        if (word === "OCULTAN") return <span key={index} className="won">{word}</span>;
+        return word + " ";
+      });
+  };
+
   return (
     <>
-      {level >= HIDDEN_LETTER_LEVEL_START && level >= FAKE_LETTER_LEVEL_START && level >= HIDDEN_WORDS_LEVEL_START ? (
-        <h4>¡CUIDADO! LAS PALABRAS SE <span className='won'>OCULTAN</span>, HAY UNA LETRA <span className="lost">FALSA</span> Y OTRA <span className="highlight">OCULTA</span></h4>
-      ) : level >= HIDDEN_WORDS_LEVEL_START && level >= HIDDEN_LETTER_LEVEL_START ? (
-        <h4>¡CUIDADO! LAS PALABRAS SE <span className='won'>OCULTAN</span> Y HAY UNA LETRA <span className="highlight">OCULTA</span></h4>
-      ) : level >= HIDDEN_WORDS_LEVEL_START && level >= FAKE_LETTER_LEVEL_START ? (
-        <h4>¡CUIDADO! LAS PALABRAS SE <span className='won'>OCULTAN</span> Y HAY UNA LETRA <span className="lost">FALSA</span></h4>
-      ) : level >= HIDDEN_WORDS_LEVEL_START ? (
-        <h4>¡CUIDADO! LAS PALABRAS SE <span className='won'>OCULTAN</span></h4>
-      ) : level >= HIDDEN_LETTER_LEVEL_START && level >= FAKE_LETTER_LEVEL_START ? (
-        <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span> Y OTRA <span className="highlight">OCULTA</span></h4>
-      ) : level >= HIDDEN_LETTER_LEVEL_START ? (
-        <h4>¡CUIDADO! HAY UNA LETRA <span className="highlight">OCULTA</span></h4>
-      ) : level >= FAKE_LETTER_LEVEL_START ? (
-        <h4>¡CUIDADO! HAY UNA LETRA <span className="lost">FALSA</span></h4>
-      ) : (
-        <h4>ENCUENTRA ANAGRAMAS</h4>
-      )}
+      <h4>
+        ¡CUIDADO! {formatWithStyles(getFormattedText())}
+      </h4>
     </>
   );
 }

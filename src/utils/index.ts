@@ -18,4 +18,10 @@ const calculateLevelsToAdvance = (completionPercentage: number): number => {
   return 0;
 };
 
-export { generateRandomRoom, calculateLevelsToAdvance };
+const calculateProbability = (level: number, start: number, end: number): number => {
+  if (level < start) return 0;
+  if (level > end) return 100;
+  return Math.floor(((level - start) / (end - start)) * 100);
+};
+
+export { generateRandomRoom, calculateLevelsToAdvance, calculateProbability };

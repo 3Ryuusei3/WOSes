@@ -6,6 +6,7 @@ import Tooltip from '../atoms/Tooltip';
 
 import useRemoveSeconds from '../hooks/useRemoveSeconds';
 import useRandomWords from '../hooks/useRandomWords';
+import useSetDifficulty from '../hooks/useSetDifficulty';
 
 import useGameStore from '../store/useGameStore';
 
@@ -19,7 +20,8 @@ export default function GameLobby() {
     lastRoundPoints,
     levelsToAdvance,
     lastLevelWords,
-    gameTime
+    gameTime,
+    gameDifficulty
   } = useGameStore();
 
   const [canAdvance, setCanAdvance] = useState(false);
@@ -34,6 +36,7 @@ export default function GameLobby() {
     return () => clearTimeout(timer);
   }, []);
 
+  useSetDifficulty(gameDifficulty, level);
   useRandomWords();
   const secondsToRemove = useRemoveSeconds();
 

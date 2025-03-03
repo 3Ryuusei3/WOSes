@@ -21,6 +21,7 @@ export default function GameLost() {
     highestScore,
     setHighestScore,
     lastLevelWords,
+    setGameDifficulty,
     setGameTime
   } = useGameStore();
 
@@ -28,6 +29,7 @@ export default function GameLost() {
     setMode('start');
     setTotalPoints(0);
     setLevel(1);
+    setGameDifficulty({ fake: false, hidden: false, hiddenWords: false });
     setGameTime(START_TIME);
   };
 
@@ -35,7 +37,7 @@ export default function GameLost() {
     const audio = new Audio(gameOverSound);
 
     audio.addEventListener('canplaythrough', () => {
-      audio.play().catch(err => console.log('Audio playback failed:', err));
+      audio.play().catch(err => console.error('Audio playback failed:', err));
     }, { once: true });
 
     if (totalPoints > highestScore.score) {

@@ -1,16 +1,17 @@
 import { useRef } from 'react';
+
 import Word from '../types/Word';
+import Difficulty from '../types/Difficulty';
 
 interface WordListProps {
   words: Word[];
   playerName: string;
-  level: number;
   percentage: number;
-  HIDDEN_WORDS_LEVEL_START: number;
+  gameDifficulty: Difficulty;
   SHOW_LETTERS_PERCENTAGE: number;
 }
 
-export default function WordList({ words, playerName, level, percentage, HIDDEN_WORDS_LEVEL_START, SHOW_LETTERS_PERCENTAGE }: WordListProps) {
+export default function WordList({ words, playerName, percentage, gameDifficulty, SHOW_LETTERS_PERCENTAGE }: WordListProps) {
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
 
   return (
@@ -28,7 +29,7 @@ export default function WordList({ words, playerName, level, percentage, HIDDEN_
             {wordObj.word.split('').map((letter, letterIndex) => (
               <span key={`${index}-${wordObj.word}-${letter}-${letterIndex}`} className='letter'>
                 <span>
-                  {(level >= HIDDEN_WORDS_LEVEL_START && percentage > SHOW_LETTERS_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
+                  {(gameDifficulty.hiddenWords && percentage > SHOW_LETTERS_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
                 </span>
               </span>
             ))}

@@ -1,20 +1,19 @@
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
+import Difficulty from '../types/Difficulty';
 import { POINTS_PER_LETTER } from '../constant';
 
 interface SelectedWordProps {
   shuffledWordObject: ShuffledWordObjectType[];
-  level: number;
   percentage: number;
+  gameDifficulty: Difficulty
   SHOW_LETTERS_PERCENTAGE: number;
-  HIDDEN_LETTER_LEVEL_START: number;
 }
 
 export default function SelectedWord({
   shuffledWordObject,
-  level,
   percentage,
+  gameDifficulty,
   SHOW_LETTERS_PERCENTAGE,
-  HIDDEN_LETTER_LEVEL_START
 }: SelectedWordProps) {
   return (
     <div
@@ -27,10 +26,10 @@ export default function SelectedWord({
           className={`selectedLetter${
             letter.isFake && percentage < SHOW_LETTERS_PERCENTAGE ? ' fake' : ''
           }${
-            letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START ? ' hidden' : ''
+            letter.isHidden && gameDifficulty.hidden ? ' hidden' : ''
           }`}
         >
-          {letter.isHidden && level >= HIDDEN_LETTER_LEVEL_START && percentage > SHOW_LETTERS_PERCENTAGE
+          {letter.isHidden && gameDifficulty.hidden && percentage > SHOW_LETTERS_PERCENTAGE
             ? '?'
             : letter.letter
           }

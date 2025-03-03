@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import Mode from '../types/Mode';
 import Word from '../types/Word';
+import Difficulty from '../types/Difficulty';
 
 import { START_TIME } from '../constant';
 
@@ -30,6 +31,8 @@ interface GameState {
   setHiddenLetterIndex: (letter: number) => void;
   lastLevelWords: Word[];
   setLastLevelWords: (words: Word[]) => void;
+  gameDifficulty: Difficulty;
+  setGameDifficulty: (difficulty: { fake: boolean; hidden: boolean; hiddenWords: boolean }) => void;
 }
 
 const useGameStore = create<GameState>((set) => ({
@@ -63,6 +66,12 @@ const useGameStore = create<GameState>((set) => ({
   setHiddenLetterIndex: (letter) => set({ hiddenLetterIndex: letter }),
   lastLevelWords: [],
   setLastLevelWords: (words) => set({ lastLevelWords: words }),
+  gameDifficulty: {
+    fake: false,
+    hidden: false,
+    hiddenWords: false
+  },
+  setGameDifficulty: (difficulty) => set({ gameDifficulty: difficulty }),
 }));
 
 export default useGameStore;
