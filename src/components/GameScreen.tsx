@@ -15,12 +15,12 @@ import useCalculatePoints from './../hooks/useCalculatePoints';
 
 import useGameStore from '../store/useGameStore';
 
-import { calculateLevelsToAdvance } from '../utils';
+import { calculateLevelsToAdvance, calculateProbability } from '../utils';
 import sql from '../utils/db';
 
 import {
   RUNNING_OUT_OF_TIME_PERCENTAGE,
-  SHOW_LETTERS_PERCENTAGE,
+  SHOW_LETTERS_RANGE,
   SHUFFLE_INTERVAL,
 } from '../constant';
 
@@ -43,6 +43,12 @@ export default function GameScreen() {
     setLastLevelWords,
     gameDifficulty
   } = useGameStore();
+
+  const showLettersPercentage = calculateProbability(
+    level,
+    SHOW_LETTERS_RANGE
+  );
+
   const { percentage, timeLeft } = useProgressBar(gameTime);
   const shuffledWordObject = useShuffledWord(randomWord, gameDifficulty, SHUFFLE_INTERVAL, percentage > 0);
   const { inputWord, words, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
@@ -128,14 +134,14 @@ export default function GameScreen() {
               shuffledWordObject={shuffledWordObject}
               percentage={percentage}
               gameDifficulty={gameDifficulty}
-              SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
+              SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
             />
           </div>
           <ProgressBar
             timeLeft={timeLeft}
             percentage={percentage}
             RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
-            SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
+            SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
           />
         </div>
         <WordList
@@ -143,7 +149,7 @@ export default function GameScreen() {
           playerName={playerName}
           percentage={percentage}
           gameDifficulty={gameDifficulty}
-          SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
+          SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
         />
         <WordInput
           inputWord={inputWord}

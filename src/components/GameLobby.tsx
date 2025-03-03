@@ -86,7 +86,7 @@ export default function GameLobby() {
               </div>
               <div className="h-section gap-lg f-jc-sb f-ai-c ">
                 <p>TIEMPO RESTANTE</p>
-                <h3><span className={`${allWordsGuessed ? 'won' : 'highlight'}`}>{gameTime}s</span></h3>
+                <h3><span className={`${allWordsGuessed ? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}s</span></h3>
               </div>
             </div>
           </div>

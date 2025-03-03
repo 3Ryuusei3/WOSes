@@ -19,8 +19,8 @@ export default function WarningMessage({ gameDifficulty }: WarningMessageProps) 
 
     if (letters.length === 0) return null;
     if (letters.length === 1) return `HAY UNA LETRA ${letters[0]}`;
-    if (letters.length === 2) return `HAY UNA LETRA ${letters[0]} Y ${letters[1]}`;
-    return `HAY UNA LETRA ${letters[0]}, ${letters[1]} Y ${letters[2]}`;
+    if (letters.length === 2) return `HAY UNA LETRA ${letters[0]} ${' '}Y ${' '}${letters[1]}`;
+    return `HAY UNA LETRA ${letters[0]}, ${letters[1]} ${' '}Y ${' '}${letters[2]}`;
   };
 
   const conditions: string[] = [];
@@ -43,7 +43,7 @@ export default function WarningMessage({ gameDifficulty }: WarningMessageProps) 
     }
 
     if (conditions.length === 2) {
-      return `${conditions[0]} Y ${conditions[1]}`;
+      return `${conditions[0]} ${' '}Y ${' '}${conditions[1]}`;
     }
 
     return conditions.slice(0, -1).join(", ") + " Y " + conditions[conditions.length - 1];

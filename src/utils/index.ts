@@ -18,10 +18,25 @@ const calculateLevelsToAdvance = (completionPercentage: number): number => {
   return 0;
 };
 
-const calculateProbability = (level: number, start: number, end: number): number => {
-  if (level < start) return 0;
-  if (level > end) return 100;
-  return Math.floor(((level - start) / (end - start)) * 100);
+const calculateProbability = (
+  level: number,
+  range: {
+    START: {
+      LEVEL: number;
+      PERCENTAGE: number;
+    },
+    END: {
+      LEVEL: number;
+      PERCENTAGE: number;
+    }
+  }
+): number => {
+  if (level < range.START.LEVEL) return range.START.PERCENTAGE;
+  if (level > range.END.LEVEL) return range.END.PERCENTAGE;
+
+  const levelProgress = (level - range.START.LEVEL) / (range.END.LEVEL - range.START.LEVEL);
+  const percentageRange = range.END.PERCENTAGE - range.START.PERCENTAGE;
+  return Math.floor(range.START.PERCENTAGE + (levelProgress * percentageRange));
 };
 
 export { generateRandomRoom, calculateLevelsToAdvance, calculateProbability };
