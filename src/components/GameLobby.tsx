@@ -109,6 +109,9 @@ export default function GameLobby() {
         {secondsToRemove > 0 && (
           <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
         )}
+        {allWordsGuessed && (
+          <h3>EN LA SIGUIENTE RONDA TENDRÁS LA LETRA MÁS USADA <span className="tip">RESALTADA</span></h3>
+        )}
         <button
           onClick={handleAdvance}
           disabled={!canAdvance}

@@ -24,7 +24,6 @@ import {
   SHUFFLE_INTERVAL,
 } from '../constant';
 
-
 import goalSound from '../assets/goal.mp3';
 
 export default function GameScreen() {
@@ -41,6 +40,7 @@ export default function GameScreen() {
     setLevel,
     setLevelsToAdvance,
     setLastLevelWords,
+    lastLevelWords,
     gameDifficulty
   } = useGameStore();
 
@@ -50,7 +50,7 @@ export default function GameScreen() {
   );
 
   const { percentage, timeLeft } = useProgressBar(gameTime);
-  const shuffledWordObject = useShuffledWord(randomWord, gameDifficulty, SHUFFLE_INTERVAL, percentage > 0);
+  const shuffledWordObject = useShuffledWord(randomWord, gameDifficulty, SHUFFLE_INTERVAL, percentage > 0, possibleWords, lastLevelWords);
   const { inputWord, words, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
   const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);

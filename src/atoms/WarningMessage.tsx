@@ -29,7 +29,7 @@ export default function WarningMessage({ gameDifficulty }: WarningMessageProps) 
     conditions.push(letterCondition);
   }
 
-  if (gameDifficulty.first) {
+  if (gameDifficulty.hiddenWords) {
     conditions.push("LAS PALABRAS SE OCULTAN");
   }
 
@@ -64,7 +64,7 @@ export default function WarningMessage({ gameDifficulty }: WarningMessageProps) 
   return (
     <>
       <h4>
-        ¡CUIDADO! {formatWithStyles(getFormattedText())}
+        {conditions.length > 0 && "¡CUIDADO! "}{formatWithStyles(getFormattedText())}
       </h4>
     </>
   );

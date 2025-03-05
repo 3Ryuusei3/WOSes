@@ -34,6 +34,10 @@ export default function SelectedWord({
       classes.push('hidden');
     }
 
+    if (letter.isCommon && !letter.isDark) {
+      classes.push('common');
+    }
+
     return classes.join(' ');
   };
 

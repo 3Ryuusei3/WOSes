@@ -1,17 +1,38 @@
 import { useState, useEffect } from 'react';
-import useGameStore from '../store/useGameStore';
-import ShuffledWordObjectType from '../types/ShuffledWordObject';
-import { LETTERS } from '../constant';
-import shuffleSound from '../assets/shuffle.mp3';
-import Difficulty from '../types/Difficulty';
 
-const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter: string, hiddenLetterIndex: number, darkLetterIndex: number) => {
-  const letterObject = word.split('').map((letter, index) => ({
-    letter,
-    isFake: false,
-    isHidden: index === hiddenLetterIndex,
-    isDark: gameDifficulty.dark && index === darkLetterIndex
-  }));
+import useGameStore from '../store/useGameStore';
+
+import { getMostCommonLetter } from '../utils';
+
+import { LETTERS } from '../constant';
+
+import ShuffledWordObjectType from '../types/ShuffledWordObject';
+import Difficulty from '../types/Difficulty';
+import Word from '../types/Word';
+
+import shuffleSound from '../assets/shuffle.mp3';
+
+const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter: string, hiddenLetterIndex: number, darkLetterIndex: number, possibleWords: string[], lastLevelWords: Word[]) => {
+  const mostCommonLetter = getMostCommonLetter(possibleWords, lastLevelWords);
+  let hasCommonLetter = false;
+
+  const letterObject = word.split('').map((letter, index) => {
+    const shouldBeCommon = !hasCommonLetter &&
+                          mostCommonLetter.includes(letter) &&
+                          index !== hiddenLetterIndex;
+
+    if (shouldBeCommon) {
+      hasCommonLetter = true;
+    }
+
+    return {
+      letter,
+      isFake: false,
+      isHidden: index === hiddenLetterIndex,
+      isDark: gameDifficulty.dark && index === darkLetterIndex,
+      isCommon: shouldBeCommon
+    };
+  });
 
   if (gameDifficulty.fake) {
     const randomIndex = Math.floor(Math.random() * letterObject.length);
@@ -19,7 +40,8 @@ const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter
       letter: fakeLetter,
       isFake: true,
       isHidden: false,
-      isDark: gameDifficulty.dark && letterObject.length === darkLetterIndex
+      isDark: gameDifficulty.dark && letterObject.length === darkLetterIndex,
+      isCommon: false
     });
   }
 
@@ -31,7 +53,7 @@ const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter
   return letterObject;
 };
 
-const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime: number, shouldShuffle: boolean) => {
+const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[]) => {
   const { level, hiddenLetterIndex } = useGameStore();
 
   const [shuffledWordObject, setShuffledWordObject] = useState<ShuffledWordObjectType[]>([]);
@@ -53,7 +75,7 @@ const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime:
       setFakeLetter(newFakeLetter);
     }
 
-    const initialLetterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex);
+    const initialLetterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords);
     setShuffledWordObject(initialLetterObject);
 
     if (!shouldShuffle) return;
@@ -66,7 +88,7 @@ const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime:
         });
       }
 
-      let letterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex);
+      let letterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords);
       letterObject = letterObject.sort(() => Math.random() - 0.5);
       setShuffledWordObject(letterObject);
 

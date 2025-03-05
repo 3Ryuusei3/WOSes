@@ -1,3 +1,5 @@
+import Word from "../types/Word";
+
 import { LEVELS_TO_ADVANCE, THRESHHOLD  } from "../constant";
 
 const generateRandomRoom = () =>{
@@ -39,4 +41,34 @@ const calculateProbability = (
   return Math.floor(range.START.PERCENTAGE + (levelProgress * percentageRange));
 };
 
-export { generateRandomRoom, calculateLevelsToAdvance, calculateProbability };
+const calculatePercentageOfGuessedWords = (lastLevelWords: Word[]) => {
+  const guessedWords = lastLevelWords.filter(word => word.guessed);
+  return (guessedWords.length / lastLevelWords.length) * 100;
+}
+
+const getMostCommonLetter = (possibleWords: string[], lastLevelWords: Word[]) => {
+  const wasLastLevelPerfect = calculatePercentageOfGuessedWords(lastLevelWords) === 100;
+  if (!wasLastLevelPerfect || lastLevelWords.length <= 1) return [];
+
+  const letterFrequency: { [key: string]: number } = {};
+  possibleWords.forEach(word => {
+    word.split('').forEach(letter => {
+      letterFrequency[letter] = (letterFrequency[letter] || 0) + 1;
+    });
+  });
+
+  const mostCommonLetters = Object.entries(letterFrequency)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(entry => entry[0]);
+
+  return mostCommonLetters;
+}
+
+export {
+  generateRandomRoom,
+  calculateLevelsToAdvance,
+  calculateProbability,
+  calculatePercentageOfGuessedWords,
+  getMostCommonLetter
+};
