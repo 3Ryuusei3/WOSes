@@ -29,7 +29,7 @@ export default function WarningMessage({ gameDifficulty }: WarningMessageProps) 
     conditions.push(letterCondition);
   }
 
-  if (gameDifficulty.hiddenWords) {
+  if (gameDifficulty.first) {
     conditions.push("LAS PALABRAS SE OCULTAN");
   }
 

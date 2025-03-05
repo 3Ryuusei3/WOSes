@@ -29,7 +29,7 @@ export default function WordList({ words, playerName, percentage, gameDifficulty
             {wordObj.word.split('').map((letter, letterIndex) => (
               <span key={`${index}-${wordObj.word}-${letter}-${letterIndex}`} className='letter'>
                 <span>
-                  {(gameDifficulty.hiddenWords && percentage > SHOW_LETTERS_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
+                  {(gameDifficulty.first && percentage > SHOW_LETTERS_PERCENTAGE && letterIndex >= 1) ? '?' : letter}
                 </span>
               </span>
             ))}

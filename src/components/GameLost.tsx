@@ -29,7 +29,7 @@ export default function GameLost() {
     setMode('start');
     setTotalPoints(0);
     setLevel(1);
-    setGameDifficulty({ fake: false, hidden: false, hiddenWords: false, dark: false });
+    setGameDifficulty({ fake: false, hidden: false, first: false, dark: false });
     setGameTime(START_TIME);
   };
 

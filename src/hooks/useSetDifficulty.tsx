@@ -27,14 +27,13 @@ const useSetDifficulty = (gameDifficulty: Difficulty, level: number) => {
   const setGameDifficulty = useGameStore(state => state.setGameDifficulty);
 
   useEffect(() => {
-    const difficulties: DifficultyType[] = ['DARK_LETTER', 'FAKE_LETTER', 'HIDDEN_LETTER', 'HIDDEN_WORDS'];
+    const difficulties: DifficultyType[] = ['DARK_LETTER', 'FAKE_LETTER', 'HIDDEN_LETTER', 'FIRST_LETTER'];
     const newDifficulty = difficulties.reduce((acc, type) => {
       const probability = calculateDifficultyProbability(level, type);
       const random = Math.floor(Math.random() * 100);
       const key = type.split('_')[0].toLowerCase() as keyof Difficulty;
       return { ...acc, [key]: random < probability };
     }, {} as Difficulty);
-
     setGameDifficulty({ ...gameDifficulty, ...newDifficulty });
   }, []);
 };

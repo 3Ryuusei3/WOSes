@@ -70,7 +70,7 @@ const useGameStore = create<GameState>((set) => ({
     dark: false,
     fake: false,
     hidden: false,
-    hiddenWords: false
+    first: false
   },
   setGameDifficulty: (difficulty) => set({ gameDifficulty: difficulty }),
 }));
