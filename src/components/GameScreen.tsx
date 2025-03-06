@@ -25,6 +25,8 @@ import {
 } from '../constant';
 
 import goalSound from '../assets/goal.mp3';
+import revealSound from '../assets/reveal.mp3';
+import endSound from '../assets/end.mp3';
 
 export default function GameScreen() {
   const {
@@ -53,7 +55,10 @@ export default function GameScreen() {
   const shuffledWordObject = useShuffledWord(randomWord, gameDifficulty, SHUFFLE_INTERVAL, percentage > 0, possibleWords, lastLevelWords);
   const { inputWord, words, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
+
   const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);
+  const [hasPlayedRevealSound, setHasPlayedRevealSound] = useState(false);
+  const [hasPlayedEndSound, setHasPlayedEndSound] = useState(false);
 
   const updateLastLevelWordsAndPoints = () => {
     setTotalPoints(prev => prev + correctWordsPoints());
@@ -110,11 +115,24 @@ export default function GameScreen() {
     }
 
     if (levelPoints > 0 && correctWordsPoints() >= goalPoints && !hasPlayedGoalSound) {
-      const audio = new Audio(goalSound);
-      audio.play();
+      const goalAudio = new Audio(goalSound);
+      goalAudio.play();
       setHasPlayedGoalSound(true);
     }
-  }, [percentage, levelPoints, correctWordsPoints, goalPoints, hasPlayedGoalSound]);
+
+    const anyDifficultyActive = Object.values(gameDifficulty).some(value => value);
+    if (anyDifficultyActive && percentage <= showLettersPercentage && !hasPlayedRevealSound) {
+      const revealAudio = new Audio(revealSound);
+      revealAudio.play();
+      setHasPlayedRevealSound(true);
+    }
+
+    if (timeLeft <= 3000 && !hasPlayedEndSound) {
+      const endAudio = new Audio(endSound);
+      endAudio.play();
+      setHasPlayedEndSound(true);
+    }
+  }, [percentage, levelPoints, correctWordsPoints, goalPoints, hasPlayedGoalSound, hasPlayedRevealSound, hasPlayedEndSound]);
 
   return (
     <>

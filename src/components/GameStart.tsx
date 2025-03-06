@@ -15,7 +15,7 @@ export default function GameStart() {
   useSetDifficulty(gameDifficulty, level);
   useRandomWords();
 
-  useBackgroundAudio(0.5);
+  useBackgroundAudio(0.3);
 
   const handleSubmit = () => {
     if (playerName.length >= 3 && playerName.length <= 10) {
