@@ -33,6 +33,8 @@ interface GameState {
   setLastLevelWords: (words: Word[]) => void;
   gameDifficulty: Difficulty;
   setGameDifficulty: (difficulty: Difficulty) => void;
+  numberOfPerfectRounds: number;
+  setNumberOfPerfectRounds: (rounds: number | ((prev: number) => number)) => void;
 }
 
 const useGameStore = create<GameState>((set) => ({
@@ -73,6 +75,10 @@ const useGameStore = create<GameState>((set) => ({
     first: false
   },
   setGameDifficulty: (difficulty) => set({ gameDifficulty: difficulty }),
+  numberOfPerfectRounds: 0,
+  setNumberOfPerfectRounds: (rounds) => set((state) => ({
+    numberOfPerfectRounds: typeof rounds === 'function' ? rounds(state.numberOfPerfectRounds) : rounds
+  })),
 }));
 
 export default useGameStore;

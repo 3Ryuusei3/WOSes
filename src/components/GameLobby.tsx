@@ -21,7 +21,8 @@ export default function GameLobby() {
     levelsToAdvance,
     lastLevelWords,
     gameTime,
-    gameDifficulty
+    gameDifficulty,
+    numberOfPerfectRounds
   } = useGameStore();
 
   const [canAdvance, setCanAdvance] = useState(false);
@@ -75,7 +76,7 @@ export default function GameLobby() {
         </h3>
         <div className="h-section gap-lg mx-auto">
           <div className='score__container--box f-jc-c'>
-            <div className="v-section gap-md">
+            <div className="v-section gap-sm">
               <div className="h-section gap-lg f-jc-sb f-ai-c ">
                 <p>PUNTOS DEL NIVEL {level - levelsToAdvance}</p>
                 <h3>{lastRoundPoints}</h3>
@@ -87,6 +88,10 @@ export default function GameLobby() {
               <div className="h-section gap-lg f-jc-sb f-ai-c ">
                 <p>TIEMPO RESTANTE</p>
                 <h3><span className={`${allWordsGuessed ? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}s</span></h3>
+              </div>
+              <div className="h-section gap-lg f-jc-sb f-ai-c ">
+                <p>RONDAS PERFECTAS</p>
+                <h3><span className={`${allWordsGuessed ? 'won' : 'highlight'}`}>{numberOfPerfectRounds}</span></h3>
               </div>
             </div>
           </div>
@@ -110,7 +115,7 @@ export default function GameLobby() {
           <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
         )}
         {allWordsGuessed && (
-          <h3>EN LA SIGUIENTE RONDA TENDRÁS LA LETRA MÁS USADA <span className="tip">RESALTADA</span></h3>
+          <h3>LA LETRA MÁS USADA ESTARÁ <span className="tip">RESALTADA</span> y TENDRÁS <span className='won'>1s EXTRA</span></h3>
         )}
         <button
           onClick={handleAdvance}

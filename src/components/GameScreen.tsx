@@ -43,7 +43,7 @@ export default function GameScreen() {
     setLevelsToAdvance,
     setLastLevelWords,
     lastLevelWords,
-    gameDifficulty
+    gameDifficulty,
   } = useGameStore();
 
   const showLettersPercentage = calculateProbability(
