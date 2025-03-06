@@ -121,13 +121,13 @@ a {
 button, .btn {
   width: fit-content;
   margin: 1rem auto;
-  padding: 16px 32px;
+  padding: 12px 36px;
   color: var(--clr-text-primary) !important;
-  font-size: 20px;
+  font-size: 18px;
   border: 1px solid var(--clr-accent-primary);
   background-color: var(--clr-accent-primary);
-  box-shadow: 0 3px 0 0 var(--clr-accent-secondary), 0 -3px 0 0 var(--clr-accent-terciary);
-  border-radius: 16px;
+  box-shadow: 0 3px 0 0 var(--clr-accent-secondary), 0 -3px 0 0 var(--clr-accent-terciary), 0 6px 0 0 var(--clr-text-primary);
+  border-radius: 4px;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -162,7 +162,7 @@ input {
   border: 3px solid var(--clr-border-primary);
   box-shadow: 0 0 0px 2px var(--clr-bg-quaternary);
   font-size: 18px;
-  border-radius: 8px;
+  border-radius: 4px;
   text-transform: uppercase;
   width: 500px;
 
@@ -509,7 +509,7 @@ main {
   background-color: var(--clr-bg-secondary);
   border: 2px solid var(--clr-accent-primary);
   box-shadow: 0 0 0 4px var(--clr-progress-bg);
-  border-radius: 8px;
+  border-radius: 4px;
   text-align: center;
 
   &.dark {
@@ -554,7 +554,7 @@ main {
   padding: 32px;
   background-color: var(--clr-bg-secondary);
   border: 10px solid var(--clr-text-secondary);
-  border-radius: 16px;
+  border-radius: 8px;
   filter: drop-shadow(0px 0px 10px var(--clr-bg-terciary));
 }
 
