@@ -47,8 +47,8 @@ const calculatePercentageOfGuessedWords = (lastLevelWords: Word[]) => {
 }
 
 const getMostCommonLetter = (possibleWords: string[], lastLevelWords: Word[]) => {
-  const wasLastLevelPerfect = calculatePercentageOfGuessedWords(lastLevelWords) === 100;
-  if (!wasLastLevelPerfect || lastLevelWords.length <= 1) return [];
+  const doesHighlightCommonLetters = calculatePercentageOfGuessedWords(lastLevelWords) >= 90;
+  if (!doesHighlightCommonLetters || lastLevelWords.length <= 1) return [];
 
   const letterFrequency: { [key: string]: number } = {};
   possibleWords.forEach(word => {

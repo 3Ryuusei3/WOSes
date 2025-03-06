@@ -1,7 +1,7 @@
 const START_TIME = 90;
 
 const THRESHHOLD = {
-  ONE_STAR: 40,
+  ONE_STAR: 45,
   TWO_STAR: 70,
   THREE_STAR: 90,
   FIVE_STAR: 100,

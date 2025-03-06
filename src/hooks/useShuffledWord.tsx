@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import useGameStore from '../store/useGameStore';
 
-import { getMostCommonLetter } from '../utils';
+import { getMostCommonLetter, calculatePercentageOfGuessedWords } from '../utils';
 
 import { LETTERS } from '../constant';
 
@@ -14,15 +14,18 @@ import shuffleSound from '../assets/shuffle.mp3';
 
 const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter: string, hiddenLetterIndex: number, darkLetterIndex: number, possibleWords: string[], lastLevelWords: Word[]) => {
   const mostCommonLetter = getMostCommonLetter(possibleWords, lastLevelWords);
-  let hasCommonLetter = false;
+  const lastLevelPercentageOfGuessedWords = calculatePercentageOfGuessedWords(lastLevelWords);
+
+  let commonLetterFlags = lastLevelPercentageOfGuessedWords === 100 ? 2 : (lastLevelPercentageOfGuessedWords >= 90 ? 1 : 0);
+  console.log('commonLetterFlags', commonLetterFlags);
 
   const letterObject = word.split('').map((letter, index) => {
-    const shouldBeCommon = !hasCommonLetter &&
-                          mostCommonLetter.includes(letter) &&
-                          index !== hiddenLetterIndex;
+    const shouldBeCommon = commonLetterFlags > 0 &&
+                           mostCommonLetter.includes(letter) &&
+                           index !== hiddenLetterIndex;
 
     if (shouldBeCommon) {
-      hasCommonLetter = true;
+      commonLetterFlags--;
     }
 
     return {
@@ -89,6 +92,7 @@ const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime:
       }
 
       let letterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords);
+      console.log('letterObject', letterObject);
       letterObject = letterObject.sort(() => Math.random() - 0.5);
       setShuffledWordObject(letterObject);
 

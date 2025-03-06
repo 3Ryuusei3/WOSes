@@ -22,7 +22,8 @@ export default function GameLost() {
     setHighestScore,
     lastLevelWords,
     setGameDifficulty,
-    setGameTime
+    setGameTime,
+    setNumberOfPerfectRounds
   } = useGameStore();
 
   const handlePlayAgain = () => {
@@ -31,6 +32,7 @@ export default function GameLost() {
     setLevel(1);
     setGameDifficulty({ fake: false, hidden: false, first: false, dark: false });
     setGameTime(START_TIME);
+    setNumberOfPerfectRounds(0);
   };
 
   useEffect(() => {

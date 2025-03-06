@@ -11,6 +11,7 @@ import useSetDifficulty from '../hooks/useSetDifficulty';
 import useGameStore from '../store/useGameStore';
 
 import levelPassedSound from '../assets/win.mp3';
+import { calculatePercentageOfGuessedWords } from '../utils';
 
 export default function GameLobby() {
   const {
@@ -47,7 +48,7 @@ export default function GameLobby() {
     }
   }, [canAdvance, setMode]);
 
-  const allWordsGuessed = lastLevelWords.every(word => word.guessed);
+  const percentageOfGuessedWords = calculatePercentageOfGuessedWords(lastLevelWords);
 
   return (
     <>
@@ -60,14 +61,14 @@ export default function GameLobby() {
         role="button"
         aria-label="Avanzar al siguiente nivel"
       >
-        {allWordsGuessed ? (
+        {percentageOfGuessedWords === 100 ? (
           <h1 className='won'>¡PERFECTO!</h1>
         ) : (
           <h1 className='highlight'>¡ENHORABUENA!</h1>
         )}
         <h3>
           HAS AVANZADO
-          {allWordsGuessed ? (
+          {percentageOfGuessedWords === 100 ? (
             <span className='won'> {levelsToAdvance} </span>
           ) : (
             <span className='highlight'> {levelsToAdvance} </span>
@@ -87,11 +88,11 @@ export default function GameLobby() {
               </div>
               <div className="h-section gap-lg f-jc-sb f-ai-c ">
                 <p>TIEMPO RESTANTE</p>
-                <h3><span className={`${allWordsGuessed ? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}s</span></h3>
+                <h3><span className={`${percentageOfGuessedWords === 100 ? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}s</span></h3>
               </div>
               <div className="h-section gap-lg f-jc-sb f-ai-c ">
                 <p>RONDAS PERFECTAS</p>
-                <h3><span className={`${allWordsGuessed ? 'won' : 'highlight'}`}>{numberOfPerfectRounds}</span></h3>
+                <h3><span className={`${percentageOfGuessedWords === 100 ? 'won' : 'highlight'}`}>{numberOfPerfectRounds}</span></h3>
               </div>
             </div>
           </div>
@@ -114,8 +115,11 @@ export default function GameLobby() {
         {secondsToRemove > 0 && (
           <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
         )}
-        {allWordsGuessed && (
-          <h3>LA LETRA MÁS USADA ESTARÁ <span className="tip">RESALTADA</span> y TENDRÁS <span className='won'>1s EXTRA</span></h3>
+        {percentageOfGuessedWords === 100 && (
+          <h3>LAS <span className="tip">2 LETRAS</span>  MÁS USADAS ESTARÁN <span className="tip">RESALTADAS</span> y TENDRÁS <span className="won">1s EXTRA</span></h3>
+        )}
+        {(percentageOfGuessedWords >= 90 && percentageOfGuessedWords <= 99) && (
+          <h3>LA LETRA MÁS USADA ESTARÁ <span className="tip">RESALTADA</span></h3>
         )}
         <button
           onClick={handleAdvance}
