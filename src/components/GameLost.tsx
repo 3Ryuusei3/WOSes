@@ -29,7 +29,7 @@ export default function GameLost() {
     setMode('start');
     setTotalPoints(0);
     setLevel(1);
-    setGameDifficulty({ fake: false, hidden: false, hiddenWords: false, dark: false });
+    setGameDifficulty({ fake: false, hidden: false, first: false, dark: false });
     setGameTime(START_TIME);
   };
 
@@ -71,23 +71,24 @@ export default function GameLost() {
               <h3>{highestScore.name}</h3>
             </div>
           </div>
-          <div className="v-section score__container--box">
-            <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
-              <div className='info-icon'>𝑖</div>
-            </Tooltip>
-            <p>ÚLTIMAS PALABRAS</p>
-            <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
-              {lastLevelWords.map((word, index) => (
-                <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
-                <Link to={`https://dle.rae.es/${word.word}`} target='_blank' rel='noreferrer'>
-                  {word.word.toUpperCase()}
-                </Link>
-              </h4>
-              ))}
+          <div className="v-section gap-md">
+            <div className="v-section score__container--box">
+              <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
+                <div className='info-icon'>𝑖</div>
+              </Tooltip>
+              <p>ÚLTIMAS PALABRAS</p>
+              <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
+                {lastLevelWords.map((word, index) => (
+                  <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
+                  <Link to={`https://dle.rae.es/${word.word}`} target='_blank' rel='noreferrer'>
+                    {word.word.toUpperCase()}
+                  </Link>
+                </h4>
+                ))}
+              </div>
             </div>
           </div>
-          <div className="score__container--box">
-            <p>TOP 8</p>
+          <div className="score__container--box pos-rel">
             <TopScores hasTooltip />
           </div>
         </div>

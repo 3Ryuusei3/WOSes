@@ -59,12 +59,9 @@ export default function GameStart() {
             </div>
             <button onClick={handleSubmit}>EMPEZAR PARTIDA</button>
           </div>
-          <div className="ranking v-section gap-md">
+          <div className="ranking v-section gap-md top-scores">
             <div className="score__container--box dark">
-              <div className="v-section gap-md">
-                <h2>TOP 8</h2>
-                <TopScores />
-              </div>
+              <TopScores />
             </div>
           </div>
         </div>
