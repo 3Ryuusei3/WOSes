@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 
 import useGameStore from '../store/useGameStore';
 
-import Difficulty from '../types/Difficulty';
+import { calculateProbability } from '../utils';
 
 import { LEVEL_RANGES } from '../constant';
-import { calculateProbability } from '../utils';
+
+import Difficulty from '../types/Difficulty';
 
 type DifficultyType = keyof typeof LEVEL_RANGES;
 
