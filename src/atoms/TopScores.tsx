@@ -93,9 +93,9 @@ export default function TopScores({ hasTooltip = false }: TopScoresProps) {
                         {String(index + 1).padStart(2, '0')}
                       </span>
                     </td>
-                    <td>{entry.name || '---------------'}</td>
-                    <td>{entry.score || '----' }</td>
-                    <td>{entry.level ? `LV${String(entry.level).padStart(2, '0')}` : '-----'}</td>
+                    <td>{entry.name || '.....................'}</td>
+                    <td>{entry.score || '........' }</td>
+                    <td>{entry.level ? `LV${String(entry.level).padStart(2, '0')}` : '......'}</td>
                   </tr>
                 );
               })}

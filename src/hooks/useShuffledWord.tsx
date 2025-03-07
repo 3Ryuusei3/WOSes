@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 
 import useGameStore from '../store/useGameStore';
 
-import { getMostCommonLetter, calculatePercentageOfGuessedWords } from '../utils';
+import { getMostCommonLetter } from '../utils';
 
-import { LETTERS } from '../constant';
+import { LETTERS, LEVELS_TO_ADVANCE } from '../constant';
 
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
 import Difficulty from '../types/Difficulty';
@@ -12,12 +12,10 @@ import Word from '../types/Word';
 
 import shuffleSound from '../assets/shuffle.mp3';
 
-const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter: string, hiddenLetterIndex: number, darkLetterIndex: number, possibleWords: string[], lastLevelWords: Word[]) => {
-  const mostCommonLetter = getMostCommonLetter(possibleWords, lastLevelWords);
-  const lastLevelPercentageOfGuessedWords = calculatePercentageOfGuessedWords(lastLevelWords);
+const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter: string, hiddenLetterIndex: number, darkLetterIndex: number, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number) => {
+  const mostCommonLetter = getMostCommonLetter(possibleWords, lastLevelWords, levelsToAdvance);
 
-  let commonLetterFlags = lastLevelPercentageOfGuessedWords === 100 ? 2 : (lastLevelPercentageOfGuessedWords >= 90 ? 1 : 0);
-  console.log('commonLetterFlags', commonLetterFlags);
+  let commonLetterFlags = levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? 2 : (levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR ? 1 : 0);
 
   const letterObject = word.split('').map((letter, index) => {
     const shouldBeCommon = commonLetterFlags > 0 &&
@@ -56,7 +54,7 @@ const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter
   return letterObject;
 };
 
-const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[]) => {
+const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number) => {
   const { level, hiddenLetterIndex } = useGameStore();
 
   const [shuffledWordObject, setShuffledWordObject] = useState<ShuffledWordObjectType[]>([]);
@@ -78,7 +76,7 @@ const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime:
       setFakeLetter(newFakeLetter);
     }
 
-    const initialLetterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords);
+    const initialLetterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords, levelsToAdvance);
     setShuffledWordObject(initialLetterObject);
 
     if (!shouldShuffle) return;
@@ -91,8 +89,7 @@ const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime:
         });
       }
 
-      let letterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords);
-      console.log('letterObject', letterObject);
+      let letterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords, levelsToAdvance);
       letterObject = letterObject.sort(() => Math.random() - 0.5);
       setShuffledWordObject(letterObject);
 

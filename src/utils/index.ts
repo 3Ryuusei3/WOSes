@@ -41,13 +41,8 @@ const calculateProbability = (
   return Math.floor(range.START.PERCENTAGE + (levelProgress * percentageRange));
 };
 
-const calculatePercentageOfGuessedWords = (lastLevelWords: Word[]) => {
-  const guessedWords = lastLevelWords.filter(word => word.guessed);
-  return (guessedWords.length / lastLevelWords.length) * 100;
-}
-
-const getMostCommonLetter = (possibleWords: string[], lastLevelWords: Word[]) => {
-  const doesHighlightCommonLetters = calculatePercentageOfGuessedWords(lastLevelWords) >= 90;
+const getMostCommonLetter = (possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number) => {
+  const doesHighlightCommonLetters = levelsToAdvance >= LEVELS_TO_ADVANCE.THREE_STAR;
   if (!doesHighlightCommonLetters || lastLevelWords.length <= 1) return [];
 
   const letterFrequency: { [key: string]: number } = {};
@@ -69,6 +64,5 @@ export {
   generateRandomRoom,
   calculateLevelsToAdvance,
   calculateProbability,
-  calculatePercentageOfGuessedWords,
   getMostCommonLetter
 };

@@ -40,6 +40,7 @@ export default function GameScreen() {
     setLastRoundPoints,
     level,
     setLevel,
+    levelsToAdvance,
     setLevelsToAdvance,
     setLastLevelWords,
     lastLevelWords,
@@ -52,7 +53,7 @@ export default function GameScreen() {
   );
 
   const { percentage, timeLeft } = useProgressBar(gameTime);
-  const shuffledWordObject = useShuffledWord(randomWord, gameDifficulty, SHUFFLE_INTERVAL, percentage > 0, possibleWords, lastLevelWords);
+  const shuffledWordObject = useShuffledWord(randomWord, gameDifficulty, SHUFFLE_INTERVAL, percentage > 0, possibleWords, lastLevelWords, levelsToAdvance);
   const { inputWord, words, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
 

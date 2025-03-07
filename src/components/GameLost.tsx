@@ -23,6 +23,7 @@ export default function GameLost() {
     lastLevelWords,
     setGameDifficulty,
     setGameTime,
+    setLevelsToAdvance,
     setNumberOfPerfectRounds
   } = useGameStore();
 
@@ -33,6 +34,7 @@ export default function GameLost() {
     setGameDifficulty({ fake: false, hidden: false, first: false, dark: false });
     setGameTime(START_TIME);
     setNumberOfPerfectRounds(0);
+    setLevelsToAdvance(0)
   };
 
   useEffect(() => {
