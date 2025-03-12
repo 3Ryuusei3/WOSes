@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
 import TopScores from '../atoms/TopScores';
+import VotingModal from '../atoms/VotingModal';
 
 import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
@@ -66,6 +67,7 @@ export default function GameStart() {
           </div>
         </div>
       </div>
+      <VotingModal />
     </>
   );
 }
