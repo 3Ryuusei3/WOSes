@@ -1,24 +1,24 @@
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
-import Difficulty from '../types/Difficulty';
+import Mechanics from '../types/Mechanics';
 import { POINTS_PER_LETTER } from '../constant';
 
 interface SelectedWordProps {
   shuffledWordObject: ShuffledWordObjectType[];
   percentage: number;
-  gameDifficulty: Difficulty
+  gameMechanics: Mechanics
   SHOW_LETTERS_PERCENTAGE: number;
 }
 
 export default function SelectedWord({
   shuffledWordObject,
   percentage,
-  gameDifficulty,
+  gameMechanics,
   SHOW_LETTERS_PERCENTAGE,
 }: SelectedWordProps) {
   const getLetterClasses = (letter: ShuffledWordObjectType) => {
     const classes = ['selectedLetter'];
 
-    if (letter.isDark && gameDifficulty.dark) {
+    if (letter.isDark && gameMechanics.dark) {
       if (percentage < SHOW_LETTERS_PERCENTAGE) {
         classes.push('dark-outline');
       } else {
@@ -30,7 +30,7 @@ export default function SelectedWord({
       classes.push('fake');
     }
 
-    if (letter.isHidden && gameDifficulty.hidden) {
+    if (letter.isHidden && gameMechanics.hidden) {
       classes.push('hidden');
     }
 
@@ -51,7 +51,7 @@ export default function SelectedWord({
           key={`${index}-${letter.letter}`}
           className={getLetterClasses(letter)}
         >
-          {letter.isHidden && gameDifficulty.hidden && percentage > SHOW_LETTERS_PERCENTAGE
+          {letter.isHidden && gameMechanics.hidden && percentage > SHOW_LETTERS_PERCENTAGE
             ? '?'
             : letter.letter
           }

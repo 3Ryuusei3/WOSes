@@ -12,9 +12,11 @@ const HomePage = () => {
           <h2 className='title'>DISFRUTA DE WORDS ON STREAM</h2>
           <h1 className='highlight'>EN ESPAÑOL</h1>
           <h4 className='highlight'>PRÓXIMAMENTE EN MULTIJUGADOR</h4>
-          <Link to="/game" className='btn'>
-            JUGAR
-          </Link>
+          <div className="h-section gap-xs f-jc-c mb-sm">
+            <Link to="/game" className='btn'>
+              JUGAR
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -21,7 +21,7 @@ export default function GameLost() {
     highestScore,
     setHighestScore,
     lastLevelWords,
-    setGameDifficulty,
+    setGameMechanics,
     setGameTime,
     setLevelsToAdvance,
     setNumberOfPerfectRounds
@@ -31,7 +31,7 @@ export default function GameLost() {
     setMode('start');
     setTotalPoints(0);
     setLevel(1);
-    setGameDifficulty({ fake: false, hidden: false, first: false, dark: false });
+    setGameMechanics({ fake: false, hidden: false, first: false, dark: false });
     setGameTime(START_TIME);
     setNumberOfPerfectRounds(0);
     setLevelsToAdvance(0)
@@ -96,7 +96,9 @@ export default function GameLost() {
             <TopScores hasTooltip />
           </div>
         </div>
-        <button onClick={handlePlayAgain}>JUGAR DE NUEVO</button>
+        <div className="h-section gap-xs f-jc-c mb-sm">
+          <button onClick={handlePlayAgain}>JUGAR DE NUEVO</button>
+        </div>
       </div>
     </>
   )

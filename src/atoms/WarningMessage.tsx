@@ -1,15 +1,15 @@
-import Difficulty from "../types/Difficulty";
+import Mechanics from "../types/Mechanics";
 
 interface WarningMessageProps {
-  gameDifficulty: Difficulty;
+  gameMechanics: Mechanics;
 }
 
-export default function WarningMessage({ gameDifficulty }: WarningMessageProps) {
+export default function WarningMessage({ gameMechanics }: WarningMessageProps) {
   const getLetterConditions = () => {
     const letters = [];
-    if (gameDifficulty.fake) letters.push("FALSA");
-    if (gameDifficulty.hidden) letters.push("OCULTA");
-    if (gameDifficulty.dark) letters.push("OSCURA");
+    if (gameMechanics.fake) letters.push("FALSA");
+    if (gameMechanics.hidden) letters.push("OCULTA");
+    if (gameMechanics.dark) letters.push("OSCURA");
 
     if (letters.length === 0) return null;
     if (letters.length === 1) return `HAY UNA LETRA ${letters[0]}`;
@@ -18,7 +18,7 @@ export default function WarningMessage({ gameDifficulty }: WarningMessageProps) 
   };
 
   const conditions: string[] = [];
-  if (gameDifficulty.first) conditions.push("LAS PALABRAS SE OCULTAN");
+  if (gameMechanics.first) conditions.push("LAS PALABRAS SE OCULTAN");
   const letterCondition = getLetterConditions();
   if (letterCondition) conditions.push(letterCondition);
 

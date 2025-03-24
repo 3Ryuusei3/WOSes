@@ -22,10 +22,12 @@
   --clr-accent-terciary: #f9d27f;
 
   --clr-lose: #F85091;
+  --clr-lose-dim: #fe70a6;
   --clr-lose-highlight: #c8316b;
   --clr-win: #1dffee;
+  --clr-win-dim: #74fef2;
   --clr-win-highlight: #0196b4;
-  --clr-win-dim: #b3d7fb;
+  --clr-tip: #b3d7fb;
 
   --clr-progress-bg: #1c0c2f;
   --clr-progress-on-time: var(--clr-win);
@@ -121,7 +123,6 @@ a {
 
 button, .btn {
   width: fit-content;
-  margin: 1rem auto;
   padding: 12px 36px;
   color: var(--clr-text-primary) !important;
   font-size: 18px;
@@ -143,6 +144,32 @@ button, .btn {
     border: 1px solid var(--clr-accent-primary-dim);
     box-shadow: 0 3px 0 0 var(--clr-accent-primary-dim), 0 -3px 0 0 var(--clr-accent-primary-dim);
     cursor: not-allowed;
+  }
+
+  &--win {
+    border: 1px solid var(--clr-win);
+    background-color: var(--clr-win);
+    box-shadow: 0 3px 0 0 var(--clr-win-highlight), 0 -3px 0 0 var(--clr-win-dim), 0 6px 0 0 var(--clr-text-primary);
+    transition: all 0.3s ease;
+
+    &:hover {
+      border: 1px solid var(--clr-win-dim);
+      background-color: var(--clr-win-dim);
+      box-shadow: 0 3px 0 0 var(--clr-win-highlight), 0 -3px 0 0 var(--clr-win-dim);
+    }
+  }
+
+  &--lose {
+    border: 1px solid var(--clr-lose);
+    background-color: var(--clr-lose);
+    box-shadow: 0 3px 0 0 var(--clr-lose-highlight), 0 -3px 0 0 var(--clr-lose-dim), 0 6px 0 0 var(--clr-text-primary);
+    transition: all 0.3s ease;
+
+    &:hover {
+      border: 1px solid var(--clr-lose-dim);
+      background-color: var(--clr-lose-dim);
+      box-shadow: 0 3px 0 0 var(--clr-lose-highlight), 0 -3px 0 0 var(--clr-lose-dim);
+    }
   }
 }
 
@@ -287,6 +314,10 @@ main {
   flex-direction: row;
 }
 
+.mb-sm {
+  margin-block: 16px;
+}
+
 .f-jc-c {
   justify-content: center;
 }
@@ -343,7 +374,7 @@ main {
 }
 
 .tip {
-  color: var(--clr-win-dim);
+  color: var(--clr-tip);
 }
 
 .gap-xs {
@@ -610,7 +641,7 @@ main {
   }
 
   &.common {
-    background-color: var(--clr-win-dim);
+    background-color: var(--clr-tip);
     text-shadow: 0px 2px 0 var(--clr-border-secondary);
     animation: commonSelectedLetter 0.5s linear forwards;
   }
@@ -712,7 +743,7 @@ main {
   }
   100% {
     color: var(--clr-text-primary);
-    background-color: var(--clr-win-dim);
+    background-color: var(--clr-tip);
     text-shadow: 0px 2px 0 var(--clr-border-secondary);
     transform: rotateX(0deg);
   }

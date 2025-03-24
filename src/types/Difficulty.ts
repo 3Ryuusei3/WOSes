@@ -1,8 +1,3 @@
-interface Difficulty {
-  dark: boolean;
-  fake: boolean;
-  hidden: boolean;
-  first: boolean;
-}
+type Difficulty = 'easy' | 'medium' | 'hard';
 
 export default Difficulty;

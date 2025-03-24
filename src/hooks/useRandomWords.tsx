@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
 
-import wordsData from '../data/words.json';
+import hardWordsData from '../data/words.json';
+import mediumWordsData from '../data/words1.json';
+import easyWordsData from '../data/words2.json';
 
 import useGameStore from '../store/useGameStore';
+
+import Difficulty from '../types/Difficulty';
 
 const getRandomWord = (words: string[]) => {
   return words[Math.floor(Math.random() * words.length)];
@@ -24,7 +28,8 @@ const canFormWord = (wordCount: { [key: string]: number }, lettersCount: { [key:
   return true;
 };
 
-const useRandomWords = () => {
+const useRandomWords = (difficulty: Difficulty = 'hard') => {
+  const wordsData = difficulty === 'easy' ? easyWordsData : difficulty === 'medium' ? mediumWordsData : hardWordsData;
   const setHiddenLetterIndex = useGameStore(state => state.setHiddenLetterIndex);
   const setRandomWord = useGameStore(state => state.setRandomWord);
   const setPossibleWords = useGameStore(state => state.setPossibleWords);

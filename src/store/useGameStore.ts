@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import Mode from '../types/Mode';
 import Word from '../types/Word';
+import Mechanics from '../types/Mechanics';
 import Difficulty from '../types/Difficulty';
 
 import { START_TIME } from '../constant';
@@ -31,6 +32,8 @@ interface GameState {
   setHiddenLetterIndex: (letter: number) => void;
   lastLevelWords: Word[];
   setLastLevelWords: (words: Word[]) => void;
+  gameMechanics: Mechanics;
+  setGameMechanics: (difficulty: Mechanics) => void;
   gameDifficulty: Difficulty;
   setGameDifficulty: (difficulty: Difficulty) => void;
   numberOfPerfectRounds: number;
@@ -68,12 +71,14 @@ const useGameStore = create<GameState>((set) => ({
   setHiddenLetterIndex: (letter) => set({ hiddenLetterIndex: letter }),
   lastLevelWords: [],
   setLastLevelWords: (words) => set({ lastLevelWords: words }),
-  gameDifficulty: {
+  gameMechanics: {
     dark: false,
     fake: false,
     hidden: false,
     first: false
   },
+  setGameMechanics: (difficulty) => set({ gameMechanics: difficulty }),
+  gameDifficulty: 'hard',
   setGameDifficulty: (difficulty) => set({ gameDifficulty: difficulty }),
   numberOfPerfectRounds: 0,
   setNumberOfPerfectRounds: (rounds) => set((state) => ({

@@ -7,12 +7,12 @@ import { getMostCommonLetter } from '../utils';
 import { LETTERS, LEVELS_TO_ADVANCE } from '../constant';
 
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
-import Difficulty from '../types/Difficulty';
+import Mechanics from '../types/Mechanics';
 import Word from '../types/Word';
 
 import shuffleSound from '../assets/shuffle.mp3';
 
-const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter: string, hiddenLetterIndex: number, darkLetterIndex: number, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number) => {
+const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: string, hiddenLetterIndex: number, darkLetterIndex: number, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number) => {
   const mostCommonLetter = getMostCommonLetter(possibleWords, lastLevelWords, levelsToAdvance);
 
   let commonLetterFlags = levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? 2 : (levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR ? 1 : 0);
@@ -30,18 +30,18 @@ const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter
       letter,
       isFake: false,
       isHidden: index === hiddenLetterIndex,
-      isDark: gameDifficulty.dark && index === darkLetterIndex,
+      isDark: gameMechanics.dark && index === darkLetterIndex,
       isCommon: shouldBeCommon
     };
   });
 
-  if (gameDifficulty.fake) {
+  if (gameMechanics.fake) {
     const randomIndex = Math.floor(Math.random() * letterObject.length);
     letterObject.splice(randomIndex, 0, {
       letter: fakeLetter,
       isFake: true,
       isHidden: false,
-      isDark: gameDifficulty.dark && letterObject.length === darkLetterIndex,
+      isDark: gameMechanics.dark && letterObject.length === darkLetterIndex,
       isCommon: false
     });
   }
@@ -54,7 +54,7 @@ const createLetterObject = (word: string, gameDifficulty: Difficulty, fakeLetter
   return letterObject;
 };
 
-const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number) => {
+const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number) => {
   const { level, hiddenLetterIndex } = useGameStore();
 
   const [shuffledWordObject, setShuffledWordObject] = useState<ShuffledWordObjectType[]>([]);
@@ -76,20 +76,20 @@ const useShuffledWord = (word: string, gameDifficulty: Difficulty, intervalTime:
       setFakeLetter(newFakeLetter);
     }
 
-    const initialLetterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords, levelsToAdvance);
+    const initialLetterObject = createLetterObject(word, gameMechanics, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords, levelsToAdvance);
     setShuffledWordObject(initialLetterObject);
 
     if (!shouldShuffle) return;
 
     const shuffleAndAddLetter = () => {
-      if (gameDifficulty.dark) {
+      if (gameMechanics.dark) {
         setDarkLetterIndex(() => {
-          const newIndex = Math.floor(Math.random() * (word.length + (gameDifficulty.fake ? 1 : 0)));
+          const newIndex = Math.floor(Math.random() * (word.length + (gameMechanics.fake ? 1 : 0)));
           return newIndex;
         });
       }
 
-      let letterObject = createLetterObject(word, gameDifficulty, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords, levelsToAdvance);
+      let letterObject = createLetterObject(word, gameMechanics, fakeLetter, hiddenLetterIndex, darkLetterIndex, possibleWords, lastLevelWords, levelsToAdvance);
       letterObject = letterObject.sort(() => Math.random() - 0.5);
       setShuffledWordObject(letterObject);
 

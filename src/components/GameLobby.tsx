@@ -6,7 +6,7 @@ import Tooltip from '../atoms/Tooltip';
 
 import useRemoveSeconds from '../hooks/useRemoveSeconds';
 import useRandomWords from '../hooks/useRandomWords';
-import useSetDifficulty from '../hooks/useSetDifficulty';
+import useSetMechanics from '../hooks/useSetMechanics';
 
 import useGameStore from '../store/useGameStore';
 
@@ -23,7 +23,7 @@ export default function GameLobby() {
     levelsToAdvance,
     lastLevelWords,
     gameTime,
-    gameDifficulty,
+    gameMechanics,
     numberOfPerfectRounds
   } = useGameStore();
 
@@ -39,7 +39,7 @@ export default function GameLobby() {
     return () => clearTimeout(timer);
   }, []);
 
-  useSetDifficulty(gameDifficulty, level);
+  useSetMechanics(gameMechanics, level);
   useRandomWords();
   const secondsToRemove = useRemoveSeconds();
 
@@ -120,13 +120,15 @@ export default function GameLobby() {
         {(levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR) && (
           <h3>LA LETRA MÁS USADA ESTARÁ <span className="tip">RESALTADA</span></h3>
         )}
-        <button
-          onClick={handleAdvance}
-          disabled={!canAdvance}
-          className={!canAdvance ? 'button-disabled' : ''}
-        >
-          JUGAR AL NIVEL {level}
-        </button>
+        <div className="h-section gap-xs f-jc-c mb-sm">
+          <button
+            onClick={handleAdvance}
+            disabled={!canAdvance}
+            className={!canAdvance ? 'button-disabled' : ''}
+          >
+            JUGAR AL NIVEL {level}
+          </button>
+        </div>
       </div>
     </>
   )

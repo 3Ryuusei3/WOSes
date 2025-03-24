@@ -44,6 +44,7 @@ export default function GameScreen() {
     setLevelsToAdvance,
     setLastLevelWords,
     lastLevelWords,
+    gameMechanics,
     gameDifficulty,
   } = useGameStore();
 
@@ -53,7 +54,7 @@ export default function GameScreen() {
   );
 
   const { percentage, timeLeft } = useProgressBar(gameTime);
-  const shuffledWordObject = useShuffledWord(randomWord, gameDifficulty, SHUFFLE_INTERVAL, percentage > 0, possibleWords, lastLevelWords, levelsToAdvance);
+  const shuffledWordObject = useShuffledWord(randomWord, gameMechanics, SHUFFLE_INTERVAL, percentage > 0, possibleWords, lastLevelWords, levelsToAdvance);
   const { inputWord, words, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
 
@@ -70,7 +71,7 @@ export default function GameScreen() {
     try {
       const id = uuidv4();
       const createdAt = new Date().toISOString();
-      await sql`INSERT INTO scores (id, name, score, level, created_at) VALUES (${id}, ${playerName}, ${finalPoints}, ${level}, ${createdAt})`;
+      await sql`INSERT INTO scores (id, name, score, level, difficulty, created_at) VALUES (${id}, ${playerName}, ${finalPoints}, ${level}, ${gameDifficulty}, ${createdAt})`;
     } catch (error) {
       console.error('Error inserting highscore:', error);
     }
@@ -121,8 +122,8 @@ export default function GameScreen() {
       setHasPlayedGoalSound(true);
     }
 
-    const anyDifficultyActive = Object.values(gameDifficulty).some(value => value);
-    if (anyDifficultyActive && percentage <= showLettersPercentage && !hasPlayedRevealSound) {
+    const anyMechanicsActive = Object.values(gameMechanics).some(value => value);
+    if (anyMechanicsActive && percentage <= showLettersPercentage && !hasPlayedRevealSound) {
       const revealAudio = new Audio(revealSound);
       revealAudio.play();
       setHasPlayedRevealSound(true);
@@ -147,12 +148,12 @@ export default function GameScreen() {
         <div className="v-section gap-xs">
           <div className="v-section gap-sm">
             <WarningMessage
-              gameDifficulty={gameDifficulty}
+              gameMechanics={gameMechanics}
             />
             <SelectedWord
               shuffledWordObject={shuffledWordObject}
               percentage={percentage}
-              gameDifficulty={gameDifficulty}
+              gameMechanics={gameMechanics}
               SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
             />
           </div>
@@ -167,7 +168,7 @@ export default function GameScreen() {
           words={words}
           playerName={playerName}
           percentage={percentage}
-          gameDifficulty={gameDifficulty}
+          gameMechanics={gameMechanics}
           SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
         />
         <WordInput
