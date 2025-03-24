@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
 
+const REFERENCE_WIDTH = 1350;
+const REFERENCE_HEIGHT = 850;
+
 function useZoom() {
   const [zoom, setZoom] = useState(1);
 
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width >= 1350) {
-        setZoom(1);
-      } else {
-        setZoom(width / 1350);
-      }
+      const height = window.innerHeight;
+      const widthZoom = width / REFERENCE_WIDTH;
+      const heightZoom = height / REFERENCE_HEIGHT;
+
+      const calculatedZoom = Math.min(widthZoom, heightZoom);
+      setZoom(calculatedZoom);
     };
 
     window.addEventListener('resize', handleResize);

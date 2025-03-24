@@ -99,6 +99,7 @@ h4 {
 
 p {
   margin: 0;
+  font-size: 18px;
   font-weight: 600;
 }
 
@@ -752,9 +753,12 @@ main {
 
 .letterPoints {
   position: absolute;
-  font-size: 12px;
+  font-size: 10px;
   bottom: 0;
   right: 2px;
+  @media (max-width: 576px) {
+    font-size: 8px;
+  }
 }
 
 .progress__container {
@@ -769,6 +773,7 @@ main {
 }
 
 .progress__time {
+  font-size: 16px;
   padding-block: 4px;
   margin-left: auto;
 }
