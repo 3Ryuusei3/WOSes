@@ -1,4 +1,6 @@
 // New component: DifficultySelector.tsx
+import { getDifficultyLabel } from '../utils';
+
 import Difficulty from '../types/Difficulty';
 
 interface DifficultySelectorProps {
@@ -11,17 +13,6 @@ export default function DifficultySelector({ gameDifficulty, onDifficultyChange 
     onDifficultyChange(difficulty);
   };
 
-  const translateDifficulty = (difficulty: Difficulty) => {
-    switch (difficulty) {
-      case 'easy':
-        return 'FÁCIL';
-      case 'medium':
-        return 'MEDIO';
-      case 'hard':
-        return 'DIFÍCIL';
-    }
-  };
-
   return (
     <>
       <div className="h-section gap-xs f-jc-c">
@@ -30,7 +21,7 @@ export default function DifficultySelector({ gameDifficulty, onDifficultyChange 
         <button className='btn btn--lose' onClick={() => handleDifficulty('hard')}>DIFÍCIL</button>
       </div>
       <div className="h-section gap-xs f-jc-c">
-        <button onClick={() => {}}>EMPEZAR PARTIDA {translateDifficulty(gameDifficulty)}</button>
+        <button onClick={() => {}}>EMPEZAR PARTIDA {getDifficultyLabel(gameDifficulty)}</button>
       </div>
     </>
   );

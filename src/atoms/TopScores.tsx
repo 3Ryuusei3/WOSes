@@ -5,19 +5,21 @@ import Tooltip from './Tooltip';
 import useGameStore from '../store/useGameStore';
 
 import TopScore from '../types/TopScore';
+import Difficulty from '../types/Difficulty';
 
 import sql from '../utils/db';
 
-import { getThisWeekDateRange } from '../utils';
+import { getThisWeekDateRange, /* getDifficultyLabel */ } from '../utils';
 
 import arrowLeft from '../assets/arrow-left.svg';
 import arrowRight from '../assets/arrow-right.svg';
 
 interface TopScoresProps {
   hasTooltip?: boolean;
+  difficulty?: Difficulty;
 }
 
-export default function TopScores({ hasTooltip = false }: TopScoresProps) {
+export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: TopScoresProps) {
   const { highestScore } = useGameStore();
   const [allTimeScores, setAllTimeScores] = useState<TopScore[]>([]);
   const [weeklyScores, setWeeklyScores] = useState<TopScore[]>([]);
@@ -30,13 +32,15 @@ export default function TopScores({ hasTooltip = false }: TopScoresProps) {
 
         const allTimeData = await sql`
           SELECT * FROM scores
+          WHERE difficulty = ${difficulty}
           ORDER BY level DESC, score ASC
           LIMIT 10
         ` as { id: string; name: string; score: number; level: number; created_at: string }[];
 
         const weeklyData = await sql`
           SELECT * FROM scores
-          WHERE created_at >= ${weekRange.start} AND created_at <= ${weekRange.end}
+          WHERE difficulty = ${difficulty}
+          AND created_at >= ${weekRange.start} AND created_at <= ${weekRange.end}
           ORDER BY level DESC, score ASC
           LIMIT 10
         ` as { id: string; name: string; score: number; level: number; created_at: string }[];
@@ -57,7 +61,7 @@ export default function TopScores({ hasTooltip = false }: TopScoresProps) {
     }
 
     fetchScores();
-  }, [highestScore]);
+  }, [highestScore, difficulty]);
 
   const toggleRanking = () => {
     setShowAllTime((prev) => !prev);
@@ -71,11 +75,19 @@ export default function TopScores({ hasTooltip = false }: TopScoresProps) {
         <img src={arrowLeft} alt="arrow-left" onClick={toggleRanking} />
         <img src={arrowRight} alt="arrow-right" onClick={toggleRanking} />
       </div>
-      {hasTooltip ? (
-        <p>{showAllTime ? "TOP TOTAL" : `TOP SEMANAL`}</p>
-      ) : (
-        <h2>{showAllTime ? "TOP TOTAL" : `TOP SEMANAL`}</h2>
-      )}
+      <div className="v-section gap-2xs">
+        {hasTooltip ? (
+          <>
+            <p>{showAllTime ? `TOP TOTAL` : `TOP SEMANAL`}</p>
+            {/* <p>{getDifficultyLabel(difficulty)}</p> */}
+          </>
+        ) : (
+          <>
+            <h2>{showAllTime ? `TOP TOTAL` : `TOP SEMANAL`}</h2>
+            {/* <p>{getDifficultyLabel(difficulty)}</p> */}
+          </>
+        )}
+      </div>
       <div className="ranking">
         {hasTooltip && (
           <Tooltip message="El ranking puede tardar en actualizarse">
