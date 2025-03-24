@@ -8,6 +8,8 @@ import TopScore from '../types/TopScore';
 
 import sql from '../utils/db';
 
+import { getThisWeekDateRange } from '../utils';
+
 import arrowLeft from '../assets/arrow-left.svg';
 import arrowRight from '../assets/arrow-right.svg';
 
@@ -16,23 +18,25 @@ interface TopScoresProps {
 }
 
 export default function TopScores({ hasTooltip = false }: TopScoresProps) {
-  const [allTimeScores, setAllTimeScores] = useState<TopScore[]>([]);
-  const [todayScores, setTodayScores] = useState<TopScore[]>([]);
   const { highestScore } = useGameStore();
+  const [allTimeScores, setAllTimeScores] = useState<TopScore[]>([]);
+  const [weeklyScores, setWeeklyScores] = useState<TopScore[]>([]);
   const [showAllTime, setShowAllTime] = useState(true);
 
   useEffect(() => {
     async function fetchScores() {
       try {
+        const weekRange = getThisWeekDateRange();
+
         const allTimeData = await sql`
           SELECT * FROM scores
           ORDER BY level DESC, score ASC
           LIMIT 10
         ` as { id: string; name: string; score: number; level: number; created_at: string }[];
 
-        const todayData = await sql`
+        const weeklyData = await sql`
           SELECT * FROM scores
-          WHERE DATE(created_at) = CURRENT_DATE
+          WHERE created_at >= ${weekRange.start} AND created_at <= ${weekRange.end}
           ORDER BY level DESC, score ASC
           LIMIT 10
         ` as { id: string; name: string; score: number; level: number; created_at: string }[];
@@ -46,7 +50,7 @@ export default function TopScores({ hasTooltip = false }: TopScoresProps) {
         }));
 
         setAllTimeScores(mapScores(allTimeData));
-        setTodayScores(mapScores(todayData));
+        setWeeklyScores(mapScores(weeklyData));
       } catch (error) {
         console.error('Error fetching scores:', error);
       }
@@ -59,7 +63,7 @@ export default function TopScores({ hasTooltip = false }: TopScoresProps) {
     setShowAllTime((prev) => !prev);
   };
 
-  const currentScores = showAllTime ? allTimeScores : todayScores;
+  const currentScores = showAllTime ? allTimeScores : weeklyScores;
 
   return (
     <div className={`v-section ${hasTooltip ? 'gap-xs' : 'gap-md'}`}>
@@ -68,9 +72,9 @@ export default function TopScores({ hasTooltip = false }: TopScoresProps) {
         <img src={arrowRight} alt="arrow-right" onClick={toggleRanking} />
       </div>
       {hasTooltip ? (
-        <p>{showAllTime ? "TOP 10 TOTAL" : "TOP 10 HOY"}</p>
+        <p>{showAllTime ? "TOP TOTAL" : `TOP SEMANAL`}</p>
       ) : (
-      <h2>{showAllTime ? "TOP 10 TOTAL" : "TOP 10 HOY"}</h2>
+        <h2>{showAllTime ? "TOP TOTAL" : `TOP SEMANAL`}</h2>
       )}
       <div className="ranking">
         {hasTooltip && (

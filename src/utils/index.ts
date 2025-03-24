@@ -60,9 +60,36 @@ const getMostCommonLetter = (possibleWords: string[], lastLevelWords: Word[], le
   return mostCommonLetters;
 }
 
+const getThisWeekDateRange = () => {
+  const now = new Date();
+  const currentDay = now.getDay()
+  const daysSinceMonday = currentDay === 0 ? 6 : currentDay - 1;
+
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - daysSinceMonday);
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}`;
+  };
+
+  return {
+    formatted: `${formatDate(monday)}-${formatDate(sunday)}`,
+    start: monday.toISOString(),
+    end: sunday.toISOString()
+  };
+}
+
 export {
   generateRandomRoom,
   calculateLevelsToAdvance,
   calculateProbability,
-  getMostCommonLetter
+  getMostCommonLetter,
+  getThisWeekDateRange
 };
