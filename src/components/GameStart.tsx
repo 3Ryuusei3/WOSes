@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import GameLogo from '../atoms/GameLogo';
 import TopScores from '../atoms/TopScores';
-import VotingModal from '../atoms/VotingModal';
-// import DifficultySelector from '../atoms/DifficultySelector';
+import DifficultySelector from '../atoms/DifficultySelector';
+import { getDifficultyLabel } from '../utils';
 
 import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
@@ -12,7 +12,7 @@ import useSetMechanics from '../hooks/useSetMechanics';
 import useGameStore from '../store/useGameStore';
 
 export default function GameStart() {
-  const { playerName, setPlayerName, setMode, gameMechanics, level, /* setGameDifficulty */ gameDifficulty } = useGameStore();
+  const { playerName, setPlayerName, setMode, gameMechanics, level, setGameDifficulty, gameDifficulty } = useGameStore();
   const [error, setError] = useState(false);
   useSetMechanics(gameMechanics, level);
   useRandomWords(gameDifficulty);
@@ -45,39 +45,35 @@ export default function GameStart() {
       <div className='game__container f-jc-c'>
         <div className="h-section gap-sm">
           <div className='v-section gap-lg w100 f-jc-c'>
-            <h2 className='highlight'>INTRODUCE TU NOMBRE {/* Y ELIGE */}<br/> {/* UNA DIFICULTAD */} PARA JUGAR</h2>
+            <h2 className='highlight'>INTRODUCE TU NOMBRE<br/>Y ELIGE LA DIFICULTAD</h2>
+            <DifficultySelector
+              gameDifficulty={gameDifficulty}
+              onDifficultyChange={setGameDifficulty}
+            />
             <div className="v-section gap-xs">
-              <small className={`txt-center ${error ? '' : 'op-0'}`}>
-                EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES
-              </small>
               <input
                 className='mx-auto'
                 type='text'
-                placeholder='NOMBRE'
+                placeholder='INTRODUCE TU NOMBRE...'
                 value={playerName}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
               />
+              <small className={`txt-center ${error ? '' : 'op-0'}`}>
+                EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES
+              </small>
             </div>
-
-            {/* <DifficultySelector
-              gameDifficulty={gameDifficulty}
-              onDifficultyChange={setGameDifficulty}
-            /> */}
-
             <div className="h-section gap-xs f-jc-c">
-              <button onClick={handleSubmit}>EMPEZAR PARTIDA</button>
+              <button className={`btn ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`} onClick={handleSubmit}>EMPEZAR PARTIDA EN {getDifficultyLabel(gameDifficulty)}</button>
             </div>
-
           </div>
           <div className="ranking v-section gap-md top-scores">
             <div className="score__container--box dark">
-              <TopScores />
+              <TopScores difficulty={gameDifficulty} />
             </div>
           </div>
         </div>
       </div>
-      <VotingModal />
     </>
   );
 }

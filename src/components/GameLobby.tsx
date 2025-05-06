@@ -24,6 +24,7 @@ export default function GameLobby() {
     lastLevelWords,
     gameTime,
     gameMechanics,
+    gameDifficulty,
     numberOfPerfectRounds
   } = useGameStore();
 
@@ -40,7 +41,7 @@ export default function GameLobby() {
   }, []);
 
   useSetMechanics(gameMechanics, level);
-  useRandomWords();
+  useRandomWords(gameDifficulty);
   const secondsToRemove = useRemoveSeconds();
 
   const handleAdvance = useCallback(() => {

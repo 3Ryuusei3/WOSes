@@ -78,7 +78,7 @@ const useGameStore = create<GameState>((set) => ({
     first: false
   },
   setGameMechanics: (difficulty) => set({ gameMechanics: difficulty }),
-  gameDifficulty: 'hard',
+  gameDifficulty: 'medium',
   setGameDifficulty: (difficulty) => set({ gameDifficulty: difficulty }),
   numberOfPerfectRounds: 0,
   setNumberOfPerfectRounds: (rounds) => set((state) => ({

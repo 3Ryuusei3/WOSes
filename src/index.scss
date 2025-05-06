@@ -135,7 +135,7 @@ button, .btn {
   cursor: pointer;
   transition: all 0.3s ease;
 
-  &:hover {
+  &:hover, &.selected {
     background-color: var(--clr-accent-primary-highlight);
     box-shadow: 0 3px 0 0 var(--clr-accent-secondary), 0 -3px 0 0 var(--clr-accent-terciary);
   }
@@ -147,13 +147,18 @@ button, .btn {
     cursor: not-allowed;
   }
 
+  &--sm {
+    font-size: 16px;
+    padding: 8px 20px;
+  }
+
   &--win {
     border: 1px solid var(--clr-win);
     background-color: var(--clr-win);
     box-shadow: 0 3px 0 0 var(--clr-win-highlight), 0 -3px 0 0 var(--clr-win-dim), 0 6px 0 0 var(--clr-text-primary);
     transition: all 0.3s ease;
 
-    &:hover {
+    &:hover, &.selected {
       border: 1px solid var(--clr-win-dim);
       background-color: var(--clr-win-dim);
       box-shadow: 0 3px 0 0 var(--clr-win-highlight), 0 -3px 0 0 var(--clr-win-dim);
@@ -166,7 +171,7 @@ button, .btn {
     box-shadow: 0 3px 0 0 var(--clr-lose-highlight), 0 -3px 0 0 var(--clr-lose-dim), 0 6px 0 0 var(--clr-text-primary);
     transition: all 0.3s ease;
 
-    &:hover {
+    &:hover, &.selected {
       border: 1px solid var(--clr-lose-dim);
       background-color: var(--clr-lose-dim);
       box-shadow: 0 3px 0 0 var(--clr-lose-highlight), 0 -3px 0 0 var(--clr-lose-dim);
@@ -193,7 +198,7 @@ input {
   font-size: 18px;
   border-radius: 4px;
   text-transform: uppercase;
-  width: 500px;
+  width: 400px;
 
   &::placeholder {
     color: var(--clr-text-terciary);
@@ -291,6 +296,10 @@ main {
 
 .w100 {
   width: 100%;
+}
+
+.w-fit {
+  width: fit-content;
 }
 
 .mx-auto {
@@ -967,31 +976,21 @@ main {
   bottom: 40px;
   left: -10px;
   width: max-content;
-  max-width: 150px;
+  max-width: 220px;
   padding: 8px;
   color: var(--clr-accent-primary);
   background-color: var(--clr-bg-primary);
   border: 2px solid var(--clr-accent-primary);
   box-shadow: 0 0 0 2px var(--clr-progress-bg);
   border-radius: 8px;
-  font-size: 12px;
   font-weight: 500;
   z-index: 1000;
   text-align: center;
 
   p {
     margin: 0;
+    font-size: 14px;
     text-shadow: none;
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: -16px;
-    left: 14px;
-    border-width: 8px 8px 8px 8px;
-    border-style: solid;
-    border-color: var(--clr-accent-primary) transparent transparent transparent;
   }
 }
 

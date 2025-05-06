@@ -9,7 +9,7 @@ import Difficulty from '../types/Difficulty';
 
 import sql from '../utils/db';
 
-import { getThisWeekDateRange, /* getDifficultyLabel */ } from '../utils';
+import { getThisWeekDateRange, getDifficultyLabel } from '../utils';
 
 import arrowLeft from '../assets/arrow-left.svg';
 import arrowRight from '../assets/arrow-right.svg';
@@ -79,12 +79,12 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
         {hasTooltip ? (
           <>
             <p>{showAllTime ? `TOP TOTAL` : `TOP SEMANAL`}</p>
-            {/* <p>{getDifficultyLabel(difficulty)}</p> */}
+            <p>{getDifficultyLabel(difficulty)}</p>
           </>
         ) : (
           <>
             <h2>{showAllTime ? `TOP TOTAL` : `TOP SEMANAL`}</h2>
-            {/* <p>{getDifficultyLabel(difficulty)}</p> */}
+            <p>{getDifficultyLabel(difficulty)}</p>
           </>
         )}
       </div>

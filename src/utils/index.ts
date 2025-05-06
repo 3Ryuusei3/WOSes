@@ -92,7 +92,7 @@ const getDifficultyLabel = (diff: Difficulty) => {
     case 'easy':
       return 'FÁCIL';
     case 'medium':
-      return 'MEDIO';
+      return 'ESTÁNDAR';
     case 'hard':
       return 'DIFÍCIL';
     default:

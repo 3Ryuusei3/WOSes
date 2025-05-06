@@ -1,12 +1,18 @@
 import { useEffect } from 'react';
 
-import hardWordsData from '../data/words.json';
-import mediumWordsData from '../data/words1.json';
-import easyWordsData from '../data/words2.json';
+import hardWordsData from '../data/hard.json';
+import mediumWordsData from '../data/medium.json';
+import easyWordsData from '../data/easy.json';
 
 import useGameStore from '../store/useGameStore';
 
 import Difficulty from '../types/Difficulty';
+
+const DIFFICULTY_WORDS = {
+  easy: easyWordsData,
+  medium: mediumWordsData,
+  hard: hardWordsData
+};
 
 const getRandomWord = (words: string[]) => {
   return words[Math.floor(Math.random() * words.length)];
@@ -29,7 +35,8 @@ const canFormWord = (wordCount: { [key: string]: number }, lettersCount: { [key:
 };
 
 const useRandomWords = (difficulty: Difficulty = 'hard') => {
-  const wordsData = difficulty === 'easy' ? easyWordsData : difficulty === 'medium' ? mediumWordsData : hardWordsData;
+  const wordsData = DIFFICULTY_WORDS[difficulty];
+
   const setHiddenLetterIndex = useGameStore(state => state.setHiddenLetterIndex);
   const setRandomWord = useGameStore(state => state.setRandomWord);
   const setPossibleWords = useGameStore(state => state.setPossibleWords);
@@ -56,7 +63,7 @@ const useRandomWords = (difficulty: Difficulty = 'hard') => {
     setRandomWord(word);
     setPossibleWords(words);
     setHiddenLetterIndex(Math.floor(Math.random() * word.length));
-  }, [setRandomWord, setPossibleWords, setHiddenLetterIndex]);
+  }, [setRandomWord, setPossibleWords, setHiddenLetterIndex, difficulty, wordsData]);
 
   return null;
 };

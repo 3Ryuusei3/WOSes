@@ -1,7 +1,6 @@
 // New component: DifficultySelector.tsx
-import { getDifficultyLabel } from '../utils';
-
 import Difficulty from '../types/Difficulty';
+import Tooltip from './Tooltip';
 
 interface DifficultySelectorProps {
   gameDifficulty: Difficulty;
@@ -14,15 +13,28 @@ export default function DifficultySelector({ gameDifficulty, onDifficultyChange 
   };
 
   return (
-    <>
-      <div className="h-section gap-xs f-jc-c">
-        <button className='btn btn--win' onClick={() => handleDifficulty('easy')}>FÁCIL</button>
-        <button className='btn' onClick={() => handleDifficulty('medium')}>MEDIO</button>
-        <button className='btn btn--lose' onClick={() => handleDifficulty('hard')}>DIFÍCIL</button>
-      </div>
-      <div className="h-section gap-xs f-jc-c">
-        <button onClick={() => {}}>EMPEZAR PARTIDA {getDifficultyLabel(gameDifficulty)}</button>
-      </div>
-    </>
+    <div className="h-section gap-xs f-jc-c pos-rel w-fit mx-auto">
+      <button
+        className={`btn ${gameDifficulty === 'easy' ? 'selected' : ''} btn--sm btn--win`}
+        onClick={() => handleDifficulty('easy')}
+      >
+        FÁCIL
+      </button>
+      <button
+        className={`btn ${gameDifficulty === 'medium' ? 'selected' : ''} btn--sm`}
+        onClick={() => handleDifficulty('medium')}
+      >
+        ESTÁNDAR
+      </button>
+      <button
+        className={`btn ${gameDifficulty === 'hard' ? 'selected' : ''} btn--sm btn--lose`}
+        onClick={() => handleDifficulty('hard')}
+      >
+        DIFÍCIL
+      </button>
+      <Tooltip message="Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad ''DIFÍCIL'' contiene todas las palabras que existen en la RAE.">
+        <div className='info-icon'>𝑖</div>
+      </Tooltip>
+    </div>
   );
 }
