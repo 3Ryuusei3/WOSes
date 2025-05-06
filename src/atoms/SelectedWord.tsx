@@ -34,7 +34,7 @@ export default function SelectedWord({
       classes.push('hidden');
     }
 
-    if (letter.isCommon && !letter.isDark) {
+    if (letter.isCommon && (!letter.isDark || percentage < SHOW_LETTERS_PERCENTAGE)) {
       classes.push('common');
     }
 
