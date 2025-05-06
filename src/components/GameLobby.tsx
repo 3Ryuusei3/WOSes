@@ -98,7 +98,7 @@ export default function GameLobby() {
           </div>
           <div className="v-section score__container--box">
             <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
-              <div className='info-icon'>𝑖</div>
+              <div className='info-icon'>i</div>
             </Tooltip>
             <p>ÚLTIMAS PALABRAS</p>
             <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>

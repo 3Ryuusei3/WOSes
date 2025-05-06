@@ -91,7 +91,7 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
       <div className="ranking">
         {hasTooltip && (
           <Tooltip message="El ranking puede tardar en actualizarse">
-            <div className='info-icon'>𝑖</div>
+            <div className='info-icon'>i</div>
           </Tooltip>
         )}
         <div>

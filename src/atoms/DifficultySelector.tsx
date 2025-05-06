@@ -33,7 +33,7 @@ export default function DifficultySelector({ gameDifficulty, onDifficultyChange 
         DIFÍCIL
       </button>
       <Tooltip message="Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad ''DIFÍCIL'' contiene todas las palabras que existen en la RAE.">
-        <div className='info-icon'>𝑖</div>
+        <div className='info-icon'>i</div>
       </Tooltip>
     </div>
   );

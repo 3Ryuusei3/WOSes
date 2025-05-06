@@ -952,15 +952,16 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   padding: 4px;
   border: 2px solid var(--clr-accent-primary);
   box-shadow: 0 0 0 3px var(--clr-progress-bg);
   border-radius: 16px;
   background-color: var(--clr-bg-primary);
-  font-style: italic;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  rotate: 5deg;
   cursor: help;
 }
 
