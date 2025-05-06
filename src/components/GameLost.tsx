@@ -24,7 +24,8 @@ export default function GameLost() {
     setGameMechanics,
     setGameTime,
     setLevelsToAdvance,
-    setNumberOfPerfectRounds
+    setNumberOfPerfectRounds,
+    gameDifficulty
   } = useGameStore();
 
   const handlePlayAgain = () => {
@@ -93,7 +94,7 @@ export default function GameLost() {
             </div>
           </div>
           <div className="score__container--box pos-rel">
-            <TopScores hasTooltip />
+            <TopScores hasTooltip difficulty={gameDifficulty} />
           </div>
         </div>
         <div className="h-section gap-xs f-jc-c mb-sm">
