@@ -65,7 +65,7 @@ export default function GameStart() {
                 EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES
               </small>
             </div>
-            <h4 className='highlight cursor' onClick={() => setHowToPlayModal(true)}><u>APRENDE A JUGAR AQUÍ</u></h4>
+            <h5 className='highlight cursor' onClick={() => setHowToPlayModal(true)}><u>APRENDE A JUGAR AQUÍ</u></h5>
             <div className="h-section gap-xs f-jc-c">
               <button className={`btn ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`} onClick={handleSubmit}>EMPEZAR PARTIDA EN {getDifficultyLabel(gameDifficulty)}</button>
             </div>

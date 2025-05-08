@@ -97,6 +97,13 @@ h4 {
   color: var(--clr-text-primary);
 }
 
+h5 {
+  font-size: 18px;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--clr-text-primary);
+}
+
 p {
   margin: 0;
   font-size: 18px;
@@ -1047,7 +1054,7 @@ main {
   align-items: center;
   gap: 24px;
   text-align: center;
-  min-height: 220px;
+  min-height: 230px;
   animation: fadeIn 0.5s ease;
 
   h4 {
