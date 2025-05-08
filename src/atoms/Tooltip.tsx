@@ -33,18 +33,15 @@ export default function Tooltip({ message, children }: TooltipProps) {
       right: 'auto'
     };
 
-    // Check if tooltip would overflow right edge
     if (rect.right + tooltipRect.width > window.innerWidth) {
       positions.left = 'auto';
       positions.right = '0';
     }
 
-    // Check if tooltip would overflow left edge
     if (rect.left - tooltipRect.width < 0) {
       positions.left = '0';
     }
 
-    // Check if tooltip would overflow bottom edge
     if (rect.top - tooltipRect.height < 0) {
       positions.top = '40px';
       positions.bottom = 'auto';

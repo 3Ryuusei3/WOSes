@@ -47,7 +47,7 @@ export default function GameStart() {
       <div className='game__container f-jc-c'>
         <div className="h-section gap-sm">
           <div className='v-section gap-lg w100 f-jc-c'>
-            <h2 className='highlight'>INTRODUCE TU NOMBRE<br/>Y ELIGE LA DIFICULTAD</h2>
+            <h2 className='highlight title-sm'>INTRODUCE TU NOMBRE Y ELIGE LA DIFICULTAD</h2>
             <DifficultySelector
               gameDifficulty={gameDifficulty}
               onDifficultyChange={setGameDifficulty}

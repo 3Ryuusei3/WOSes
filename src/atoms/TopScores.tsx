@@ -110,8 +110,8 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
                       </span>
                     </td>
                     <td>{entry.name || '.................'}</td>
-                    <td>{entry.score || '........' }</td>
-                    <td>{entry.level ? `LV${String(entry.level).padStart(2, '0')}` : '......'}</td>
+                    <td>{entry.score || '.......' }</td>
+                    <td>{entry.level ? `LV${String(entry.level).padStart(2, '0')}` : '.......'}</td>
                   </tr>
                 );
               })}
