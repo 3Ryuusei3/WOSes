@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 
 import GameLogo from '../atoms/GameLogo';
 import Tooltip from '../atoms/Tooltip';
+import GameSound from '../atoms/GameSound';
+import DifficultyTag from '../atoms/DifficultyTag';
 
 import useRemoveSeconds from '../hooks/useRemoveSeconds';
 import useRandomWords from '../hooks/useRandomWords';
@@ -25,14 +27,18 @@ export default function GameLobby() {
     gameTime,
     gameMechanics,
     gameDifficulty,
-    numberOfPerfectRounds
+    numberOfPerfectRounds,
+    volume
   } = useGameStore();
 
   const [canAdvance, setCanAdvance] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    new Audio(levelPassedSound).play();
+    const audio = new Audio(levelPassedSound);
+    audio.volume = volume;
+    audio.play();
+
     const timer = setTimeout(() => {
       setCanAdvance(true);
       containerRef.current?.focus();
@@ -61,6 +67,9 @@ export default function GameLobby() {
         role="button"
         aria-label="Avanzar al siguiente nivel"
       >
+        <div className="difficulty-tag">
+          <DifficultyTag gameDifficulty={gameDifficulty} />
+        </div>
         {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
           <h1 className='won'>¡PERFECTO!</h1>
         ) : (
@@ -130,6 +139,7 @@ export default function GameLobby() {
             JUGAR AL NIVEL {level}
           </button>
         </div>
+        <GameSound />
       </div>
     </>
   )

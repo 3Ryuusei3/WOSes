@@ -27,6 +27,7 @@ import {
 import goalSound from '../assets/goal.mp3';
 import revealSound from '../assets/reveal.mp3';
 import endSound from '../assets/end.mp3';
+import GameSound from '../atoms/GameSound';
 
 export default function GameScreen() {
   const {
@@ -46,6 +47,7 @@ export default function GameScreen() {
     lastLevelWords,
     gameMechanics,
     gameDifficulty,
+    volume
   } = useGameStore();
 
   const showLettersPercentage = calculateProbability(
@@ -54,7 +56,7 @@ export default function GameScreen() {
   );
 
   const { percentage, timeLeft } = useProgressBar(gameTime);
-  const shuffledWordObject = useShuffledWord(randomWord, gameMechanics, SHUFFLE_INTERVAL, percentage > 0, possibleWords, lastLevelWords, levelsToAdvance);
+  const shuffledWordObject = useShuffledWord(randomWord, gameMechanics, SHUFFLE_INTERVAL, percentage > 0, possibleWords, lastLevelWords, levelsToAdvance, volume);
   const { inputWord, words, correctWords, handleChange, handleKeyDown } = useInputWords(possibleWords);
   const { correctWordsPoints, goalPoints, levelPoints } = useCalculatePoints(possibleWords, correctWords);
 
@@ -118,6 +120,7 @@ export default function GameScreen() {
 
     if (levelPoints > 0 && correctWordsPoints() >= goalPoints && !hasPlayedGoalSound) {
       const goalAudio = new Audio(goalSound);
+      goalAudio.volume = volume;
       goalAudio.play();
       setHasPlayedGoalSound(true);
     }
@@ -126,12 +129,14 @@ export default function GameScreen() {
     if (anyMechanicsActive && percentage <= showLettersPercentage && !hasPlayedRevealSound) {
       const revealAudio = new Audio(revealSound);
       revealAudio.play();
+      revealAudio.volume = volume;
       setHasPlayedRevealSound(true);
     }
 
     if (timeLeft <= 3000 && !hasPlayedEndSound) {
       const endAudio = new Audio(endSound);
       endAudio.play();
+      endAudio.volume = volume;
       setHasPlayedEndSound(true);
     }
   }, [percentage, levelPoints, correctWordsPoints, goalPoints, hasPlayedGoalSound, hasPlayedRevealSound, hasPlayedEndSound]);
@@ -143,6 +148,7 @@ export default function GameScreen() {
         correctWordsPoints={correctWordsPoints}
         goalPoints={goalPoints}
         level={level}
+        gameDifficulty={gameDifficulty}
       />
       <div className='game__container'>
         <div className="v-section gap-xs">
@@ -178,7 +184,9 @@ export default function GameScreen() {
           possibleWords={possibleWords}
           correctWords={correctWords}
           percentage={percentage}
+          volume={volume}
         />
+        <GameSound />
       </div>
     </>
   )

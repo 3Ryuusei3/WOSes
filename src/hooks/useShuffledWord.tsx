@@ -54,7 +54,7 @@ const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: 
   return letterObject;
 };
 
-const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number) => {
+const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number, volume: number) => {
   const { level, hiddenLetterIndex } = useGameStore();
 
   const [shuffledWordObject, setShuffledWordObject] = useState<ShuffledWordObjectType[]>([]);
@@ -94,6 +94,7 @@ const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: n
       setShuffledWordObject(letterObject);
 
       const audio = new Audio(shuffleSound);
+      audio.volume = volume;
       audio.play();
     };
 

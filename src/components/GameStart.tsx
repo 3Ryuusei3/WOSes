@@ -11,15 +11,16 @@ import useBackgroundAudio from '../hooks/useBackgroundAudio';
 import useSetMechanics from '../hooks/useSetMechanics';
 
 import useGameStore from '../store/useGameStore';
+import GameSound from '../atoms/GameSound';
 
 export default function GameStart() {
-  const { playerName, setPlayerName, setMode, gameMechanics, level, setGameDifficulty, gameDifficulty } = useGameStore();
+  const { playerName, setPlayerName, setMode, gameMechanics, level, setGameDifficulty, gameDifficulty, volume } = useGameStore();
   const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
   useSetMechanics(gameMechanics, level);
   useRandomWords(gameDifficulty);
 
-  useBackgroundAudio(0.3);
+  useBackgroundAudio(volume);
 
   const handleSubmit = () => {
     if (playerName.length >= 3 && playerName.length <= 10) {
@@ -44,7 +45,7 @@ export default function GameStart() {
   return (
     <>
       <GameLogo />
-      <div className='game__container f-jc-c'>
+      <div className='game__container f-jc-c pos-rel'>
         <div className="h-section gap-sm">
           <div className='v-section gap-lg w100 f-jc-c'>
             <h2 className='highlight title-sm'>INTRODUCE TU NOMBRE Y ELIGE LA DIFICULTAD</h2>
@@ -70,12 +71,13 @@ export default function GameStart() {
               <button className={`btn ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`} onClick={handleSubmit}>EMPEZAR PARTIDA EN {getDifficultyLabel(gameDifficulty)}</button>
             </div>
           </div>
-          <div className="ranking v-section gap-md top-scores">
+          <div className="ranking ranking--lg v-section gap-md top-scores">
             <div className="score__container--box dark">
               <TopScores difficulty={gameDifficulty} />
             </div>
           </div>
         </div>
+        <GameSound />
       </div>
       <HowToPlayModal isOpen={howToPlayModal} setHowToPlayModal={setHowToPlayModal} />
     </>

@@ -1,22 +1,32 @@
 import GameLogo from './GameLogo';
+
 import Word from '../types/Word';
+import Difficulty from '../types/Difficulty';
+import DifficultyTag from './DifficultyTag';
 
 interface ScoreContainerProps {
   words: Word[];
   correctWordsPoints: () => number;
   goalPoints: number;
   level: number;
+  gameDifficulty: Difficulty;
 }
 
-export default function ScoreContainer({ words, correctWordsPoints, goalPoints, level }: ScoreContainerProps) {
+export default function ScoreContainer({ words, correctWordsPoints, goalPoints, level, gameDifficulty }: ScoreContainerProps) {
   const guessedCount = words.filter(w => w.guessed).length;
 
   return (
     <div className='score__container'>
       <div className={`score__container--box ${guessedCount === words.length ? 'won' : ''}`}>
-        <div className="v-section">
-          <p>PALABRAS</p>
-          <h3>{guessedCount}/{words.length}</h3>
+        <div className="h-section gap-md">
+          <div className="v-section">
+            <p>NIVEL</p>
+            <h3>{level}</h3>
+          </div>
+          <div className="v-section gap-2xs">
+            <p>DIFICULTAD</p>
+            <DifficultyTag gameDifficulty={gameDifficulty} />
+          </div>
         </div>
       </div>
       <GameLogo />
@@ -27,8 +37,8 @@ export default function ScoreContainer({ words, correctWordsPoints, goalPoints, 
             <h3>{correctWordsPoints()}/{goalPoints}</h3>
           </div>
           <div className="v-section">
-            <p>NIVEL</p>
-            <h3>{level}</h3>
+            <p>PALABRAS</p>
+            <h3>{guessedCount}/{words.length}</h3>
           </div>
         </div>
       </div>

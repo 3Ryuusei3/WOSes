@@ -177,11 +177,6 @@ button, .btn {
     cursor: not-allowed;
   }
 
-  &--sm {
-    font-size: 16px;
-    padding: 8px 20px;
-  }
-
   &--win {
     border: 1px solid var(--clr-win);
     background-color: var(--clr-win);
@@ -205,6 +200,26 @@ button, .btn {
       border: 1px solid var(--clr-lose-dim);
       background-color: var(--clr-lose-dim);
       box-shadow: 0 3px 0 0 var(--clr-lose-highlight), 0 -3px 0 0 var(--clr-lose-dim);
+    }
+  }
+
+
+  &--sm {
+    font-size: 16px;
+    padding: 8px 20px;
+  }
+
+  &--xs {
+    font-size: 12px;
+    padding: 2px 10px;
+    box-shadow: 0 3px 0 0 var(--clr-accent-secondary);
+
+    &--win {
+      box-shadow: 0 3px 0 0 var(--clr-win-highlight);
+    }
+
+    &--lose {
+      box-shadow: 0 3px 0 0 var(--clr-lose-highlight);
     }
   }
 }
@@ -421,6 +436,10 @@ main {
   color: var(--clr-tip);
 }
 
+.gap-2xs {
+  gap: 4px;
+}
+
 .gap-xs {
   gap: 8px;
 }
@@ -588,7 +607,6 @@ main {
   flex-direction: column;
   padding: 18px 32px;
   gap: 8px;
-
   color: var(--clr-accent-primary);
   text-shadow: 0px 2px 0 var(--clr-accent-secondary);
   background-color: var(--clr-bg-secondary);
@@ -660,11 +678,6 @@ main {
   background-color: var(--clr-text-secondary);
   border-radius: 4px;
   font-size: 53px;
-  @media screen and (max-width: 576px) {
-    width: 80px;
-    height: 80px;
-    font-size: 46px;
-  }
   font-weight: 900;
   text-transform: uppercase;
   text-align: center;
@@ -673,6 +686,12 @@ main {
   text-shadow: 0px 2px 0 var(--clr-border-secondary);
   transform: rotateX(0deg);
   animation: selectedLetter 0.5s linear forwards;
+
+  @media screen and (max-width: 576px) {
+    width: 80px;
+    height: 80px;
+    font-size: 46px;
+  }
 
   &.fake {
     background-color: var(--clr-lose);
@@ -812,7 +831,8 @@ main {
   font-size: 10px;
   bottom: 0;
   right: 2px;
-  @media (max-width: 576px) {
+
+  @media screen and (max-width: 576px) {
     bottom: -7px;
     right: 0px;
     font-size: 14px;
@@ -960,10 +980,11 @@ main {
 
   img {
     width: 44px;
+    filter: drop-shadow(0px 2px 0px var(--clr-accent-secondary));
+
     @media screen and (max-width: 576px) {
       width: 60px;
     }
-    filter: drop-shadow(0px 2px 0px var(--clr-accent-secondary));
   }
 
   &--tooltip {
@@ -983,7 +1004,11 @@ main {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 480px;
+  min-width: 410px;
+
+  &--lg {
+    min-width: 480px;
+  }
 
   .ranking__table {
     display: flex;
@@ -1151,10 +1176,10 @@ main {
 
     img {
       width: 40px;
+      filter: drop-shadow(0px 2px 0px var(--clr-accent-secondary));
       @media screen and (max-width: 576px) {
         width: 70px;
       }
-      filter: drop-shadow(0px 2px 0px var(--clr-accent-secondary));
     }
   }
 }
@@ -1167,5 +1192,27 @@ main {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.volume-control, .difficulty-tag {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 30px;
+  cursor: pointer;
+
+  @media screen and (max-width: 576px) {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+  }
+}
+
+.difficulty-tag {
+  left: 20px;
+
+  @media screen and (max-width: 576px) {
+    left: 10px;
   }
 }

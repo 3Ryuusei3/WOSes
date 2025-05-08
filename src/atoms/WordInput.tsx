@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+
 import useInputResponse from '../hooks/useInputResponse';
 
 interface WordInputProps {
@@ -8,6 +9,7 @@ interface WordInputProps {
   possibleWords: string[];
   correctWords: string[];
   percentage: number;
+  volume: number;
 }
 
 export default function WordInput({
@@ -16,11 +18,12 @@ export default function WordInput({
   handleKeyDown,
   possibleWords,
   correctWords,
-  percentage
+  percentage,
+  volume
 }: WordInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } =
-    useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown);
+    useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown, volume);
 
   useEffect(() => {
     if (percentage > 0) {

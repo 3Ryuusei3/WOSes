@@ -2,14 +2,14 @@ import { useState } from 'react';
 
 import hitMusic from '../assets/hit.mp3';
 
-export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void) {
+export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void, volume: number) {
   const [animateError, setAnimateError] = useState(false);
   const [animateSuccess, setAnimateSuccess] = useState(false);
   const [animateRepeated, setAnimateRepeated] = useState(false);
 
   const playHitAudio = () => {
     const audio = new Audio(hitMusic);
-    audio.volume = 0.5;
+    audio.volume = volume;
     audio.play();
     return audio;
   };
@@ -22,6 +22,7 @@ export default function useInputResponse(possibleWords: string[], inputWord: str
   const triggerAnimateSuccess = () => {
     setAnimateSuccess(true);
     const audio = playHitAudio();
+    audio.volume = volume;
     setTimeout(() => {
       setAnimateSuccess(false);
       audio.pause();

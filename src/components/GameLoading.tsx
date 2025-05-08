@@ -3,15 +3,17 @@ import { useEffect } from 'react';
 import GameLogo from '../atoms/GameLogo';
 
 import useCountdown from '../hooks/useCountdown';
+import useGameStore from '../store/useGameStore';
 
 import countdownMusic from '../assets/countdown.mp3';
 
 export default function GameLoading() {
   const countdown = useCountdown();
+  const { volume } = useGameStore();
 
   useEffect(() => {
     const audio = new Audio(countdownMusic);
-    audio.volume = 0.5;
+    audio.volume = volume;
 
     const playAudio = setTimeout(() => {
       audio.play();

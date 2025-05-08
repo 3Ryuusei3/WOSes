@@ -78,7 +78,7 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
       <div className="v-section gap-2xs">
         {hasTooltip ? (
           <>
-            <p>{showAllTime ? `TOP TOTAL` : `TOP SEMANAL`}</p>
+            <h4 className="highlight">{showAllTime ? `TOP TOTAL` : `TOP SEMANAL`}</h4>
             <p>{getDifficultyLabel(difficulty)}</p>
           </>
         ) : (

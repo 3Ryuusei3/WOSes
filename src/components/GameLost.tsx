@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import GameLogo from '../atoms/GameLogo';
 import TopScores from '../atoms/TopScores';
 import Tooltip from '../atoms/Tooltip';
+import GameSound from '../atoms/GameSound';
+import DifficultyTag from '../atoms/DifficultyTag';
 
 import useGameStore from '../store/useGameStore';
 
@@ -25,7 +27,8 @@ export default function GameLost() {
     setGameTime,
     setLevelsToAdvance,
     setNumberOfPerfectRounds,
-    gameDifficulty
+    gameDifficulty,
+    volume
   } = useGameStore();
 
   const handlePlayAgain = () => {
@@ -40,6 +43,7 @@ export default function GameLost() {
 
   useEffect(() => {
     const audio = new Audio(gameOverSound);
+    audio.volume = volume;
 
     audio.addEventListener('canplaythrough', () => {
       audio.play().catch(err => console.error('Audio playback failed:', err));
@@ -62,6 +66,9 @@ export default function GameLost() {
     <>
       <GameLogo />
       <div className='game__container f-jc-c'>
+        <div className="difficulty-tag">
+          <DifficultyTag gameDifficulty={gameDifficulty} />
+        </div>
         <h1 className='lost'>HAS PERDIDO...</h1>
         <h3>HAS ALCANZADO EL NIVEL <span className='highlight'>{level}</span></h3>
         <div className="h-section gap-lg mx-auto">
@@ -100,6 +107,7 @@ export default function GameLost() {
         <div className="h-section gap-xs f-jc-c mb-sm">
           <button onClick={handlePlayAgain}>JUGAR DE NUEVO</button>
         </div>
+        <GameSound />
       </div>
     </>
   )
