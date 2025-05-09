@@ -1,4 +1,4 @@
-import GameLogo from './GameLogo';
+import { useRef, useEffect } from 'react';
 
 import Word from '../types/Word';
 import Difficulty from '../types/Difficulty';
@@ -14,9 +14,16 @@ interface ScoreContainerProps {
 
 export default function ScoreContainer({ words, correctWordsPoints, goalPoints, level, gameDifficulty }: ScoreContainerProps) {
   const guessedCount = words.filter(w => w.guessed).length;
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.style.top = `${(containerRef.current.offsetHeight * - 1) - 20}px`;
+    }
+  }, []);
 
   return (
-    <div className='score__container'>
+    <div className='score__container score__container--abs' ref={containerRef}>
       <div className={`score__container--box ${guessedCount === words.length ? 'won' : ''}`}>
         <div className="h-section gap-md">
           <div className="v-section">
@@ -29,7 +36,6 @@ export default function ScoreContainer({ words, correctWordsPoints, goalPoints, 
           </div>
         </div>
       </div>
-      <GameLogo />
       <div className={`score__container--box ${correctWordsPoints() >= goalPoints ? 'won' : ''}`}>
         <div className="h-section gap-md">
           <div className="v-section">

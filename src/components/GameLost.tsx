@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import GameLogo from '../atoms/GameLogo';
 import TopScores from '../atoms/TopScores';
 import Tooltip from '../atoms/Tooltip';
 import GameSound from '../atoms/GameSound';
@@ -63,52 +62,49 @@ export default function GameLost() {
   }, [totalPoints, highestScore.score, playerName, setHighestScore]);
 
   return (
-    <>
-      <GameLogo />
-      <div className='game__container f-jc-c'>
-        <div className="difficulty-tag">
-          <DifficultyTag gameDifficulty={gameDifficulty} />
-        </div>
-        <h1 className='lost'>HAS PERDIDO...</h1>
-        <h3>HAS ALCANZADO EL NIVEL <span className='highlight'>{level}</span></h3>
-        <div className="h-section gap-lg mx-auto">
-          <div className="v-section gap-md">
-            <div className='score__container--box'>
-              <p>TUS PUNTOS TOTALES</p>
-              <h3>{totalPoints}</h3>
-            </div>
-            <div className='score__container--box'>
-              <p>LA PUNTUACIÓN MÁS ALTA</p>
-              <h3>{highestScore.score}</h3>
-              <h3>{highestScore.name}</h3>
-            </div>
-          </div>
-          <div className="v-section gap-md">
-            <div className="v-section score__container--box">
-              <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
-                <div className='info-icon'>i</div>
-              </Tooltip>
-              <p>ÚLTIMAS PALABRAS</p>
-              <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
-                {lastLevelWords.map((word, index) => (
-                  <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
-                  <Link to={`https://dle.rae.es/${word.word}`} target='_blank' rel='noreferrer'>
-                    {word.word.toUpperCase()}
-                  </Link>
-                </h4>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="score__container--box pos-rel">
-            <TopScores hasTooltip difficulty={gameDifficulty} />
-          </div>
-        </div>
-        <div className="h-section gap-xs f-jc-c mb-sm">
-          <button onClick={handlePlayAgain}>JUGAR DE NUEVO</button>
-        </div>
-        <GameSound />
+    <div className='game__container f-jc-c'>
+      <div className="difficulty-tag">
+        <DifficultyTag gameDifficulty={gameDifficulty} />
       </div>
-    </>
+      <h1 className='lost'>HAS PERDIDO...</h1>
+      <h3>HAS ALCANZADO EL NIVEL <span className='highlight'>{level}</span></h3>
+      <div className="h-section gap-lg mx-auto">
+        <div className="v-section gap-md">
+          <div className='score__container--box'>
+            <p>TUS PUNTOS TOTALES</p>
+            <h3>{totalPoints}</h3>
+          </div>
+          <div className='score__container--box'>
+            <p>LA PUNTUACIÓN MÁS ALTA</p>
+            <h3>{highestScore.score}</h3>
+            <h3>{highestScore.name}</h3>
+          </div>
+        </div>
+        <div className="v-section gap-md">
+          <div className="v-section score__container--box">
+            <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
+              <div className='info-icon'>i</div>
+            </Tooltip>
+            <p>ÚLTIMAS PALABRAS</p>
+            <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
+              {lastLevelWords.map((word, index) => (
+                <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
+                <Link to={`https://dle.rae.es/${word.word}`} target='_blank' rel='noreferrer'>
+                  {word.word.toUpperCase()}
+                </Link>
+              </h4>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="score__container--box pos-rel">
+          <TopScores hasTooltip difficulty={gameDifficulty} />
+        </div>
+      </div>
+      <div className="h-section gap-xs f-jc-c mb-sm">
+        <button onClick={handlePlayAgain}>JUGAR DE NUEVO</button>
+      </div>
+      <GameSound />
+    </div>
   )
 }

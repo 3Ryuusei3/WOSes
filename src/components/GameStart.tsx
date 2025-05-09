@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import GameLogo from '../atoms/GameLogo';
 import TopScores from '../atoms/TopScores';
 import HowToPlayModal from '../atoms/HowToPlayModal';
 import DifficultySelector from '../atoms/DifficultySelector';
@@ -44,7 +43,6 @@ export default function GameStart() {
 
   return (
     <>
-      <GameLogo />
       <div className='game__container f-jc-c pos-rel'>
         <div className="h-section gap-sm">
           <div className='v-section gap-md w100 f-jc-c'>

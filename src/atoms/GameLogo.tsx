@@ -6,6 +6,8 @@ interface GameLogoProps {
 
 export default function GameLogo({ width = 170 }: GameLogoProps) {
   return (
-    <img src={logo} alt='logo' width={width} className='logo' />
+    <div className="logo-container">
+      <img src={logo} alt='logo' width={width} className='logo' />
+    </div>
   );
 }

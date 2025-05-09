@@ -4,6 +4,8 @@ import GameLost from './GameLost';
 import GameLobby from './GameLobby';
 import GameLoading from './GameLoading';
 
+import GameLogo from '../atoms/GameLogo';
+
 import useZoom from '../hooks/useZoom';
 
 import useGameStore from '../store/useGameStore';
@@ -14,7 +16,8 @@ const GamePage = () => {
 
   return (
     <main style={{ zoom }}>
-      <div className="container">
+      <GameLogo />
+      <div className="container pos-rel">
         {mode === 'start' ? (
           <GameStart />
         ) : mode === 'game' ? (

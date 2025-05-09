@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
 
-import GameLogo from '../atoms/GameLogo';
-
 import useCountdown from '../hooks/useCountdown';
 import useGameStore from '../store/useGameStore';
 
@@ -27,20 +25,17 @@ export default function GameLoading() {
   }, [countdownMusic]);
 
   return (
-    <>
-      <GameLogo />
-      <div className='game__container'>
-        <h1 className='highlight'>EL JUEGO COMIENZA EN...</h1>
-        <div className="loading__container">
-          <h2 className='highlight'>
-            {Math.floor(countdown) === 0 ? '¡YA!' : Math.floor(countdown)}
-          </h2>
-          <div className="loading__container--box loading__container--box-xl"></div>
-          <div className="loading__container--box loading__container--box-lg"></div>
-          <div className="loading__container--box loading__container--box-md"></div>
-          <div className="loading__container--box"></div>
-        </div>
+    <div className='game__container'>
+      <h1 className='highlight'>EL JUEGO COMIENZA EN...</h1>
+      <div className="loading__container">
+        <h2 className='highlight'>
+          {Math.floor(countdown) === 0 ? '¡YA!' : Math.floor(countdown)}
+        </h2>
+        <div className="loading__container--box loading__container--box-xl"></div>
+        <div className="loading__container--box loading__container--box-lg"></div>
+        <div className="loading__container--box loading__container--box-md"></div>
+        <div className="loading__container--box"></div>
       </div>
-    </>
+    </div>
   )
 }

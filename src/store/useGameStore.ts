@@ -86,7 +86,7 @@ const useGameStore = create<GameState>((set) => ({
   setNumberOfPerfectRounds: (rounds) => set((state) => ({
     numberOfPerfectRounds: typeof rounds === 'function' ? rounds(state.numberOfPerfectRounds) : rounds
   })),
-  volume: 0.3,
+  volume: 0.2,
   setVolume: (volume) => set({ volume })
 }));
 
