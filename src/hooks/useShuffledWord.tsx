@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import useGameStore from '../store/useGameStore';
 
@@ -61,6 +61,11 @@ const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: n
   const [initialShuffledWord, setInitialShuffledWord] = useState<string[]>([]);
   const [fakeLetter, setFakeLetter] = useState<string>('');
   const [darkLetterIndex, setDarkLetterIndex] = useState<number>(0);
+  const volumeRef = useRef(volume);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
 
   useEffect(() => {
     if (initialShuffledWord.length === 0) {
@@ -94,13 +99,13 @@ const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: n
       setShuffledWordObject(letterObject);
 
       const audio = new Audio(shuffleSound);
-      audio.volume = volume;
+      audio.volume = volumeRef.current;
       audio.play();
     };
 
     const interval = setInterval(shuffleAndAddLetter, intervalTime);
     return () => clearInterval(interval);
-  }, [word, intervalTime, shouldShuffle, initialShuffledWord, fakeLetter, level, hiddenLetterIndex, darkLetterIndex]);
+  }, [word, intervalTime, shouldShuffle, initialShuffledWord, fakeLetter, level, hiddenLetterIndex, darkLetterIndex, gameMechanics, lastLevelWords, levelsToAdvance, possibleWords]);
 
   return shuffledWordObject;
 };

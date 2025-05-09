@@ -7,7 +7,7 @@ import soundHigh from './../assets/speaker-high.svg';
 export default function GameSound() {
   const { volume, setVolume } = useGameStore();
 
-  const volumeState = volume === 0 ? 'off' : volume === 0.3 ? 'low' : 'high';
+  const volumeState = volume === 0 ? 'off' : volume === 0.2 ? 'low' : 'high';
 
   return (
     <img
@@ -18,9 +18,9 @@ export default function GameSound() {
         if (volumeState === 'high') {
           setVolume(0);
         } else if (volumeState === 'off') {
-          setVolume(0.3);
+          setVolume(0.2);
         } else {
-          setVolume(0.5);
+          setVolume(0.4);
         }
       }}
     />

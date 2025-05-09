@@ -1,26 +1,36 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import backgroundMusic from '../assets/background.mp3';
 
 const useBackgroundAudio = (volume: number = 0.5) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   useEffect(() => {
-    const audio = new Audio(backgroundMusic);
-    audio.loop = true;
-    audio.volume = volume;
+    if (!audioRef.current) {
+      audioRef.current = new Audio(backgroundMusic);
+      audioRef.current.loop = true;
 
-    const playAudio = () => {
-      setTimeout(() => {
-        audio.play().catch(() => {});
-      });
-    };
+      const playAudio = () => {
+        setTimeout(() => {
+          audioRef.current?.play().catch(() => {});
+        });
+      };
 
-    document.addEventListener('click', playAudio, { once: true });
+      document.addEventListener('click', playAudio, { once: true });
+    }
 
     return () => {
-      document.removeEventListener('click', playAudio);
-      audio.pause();
-      audio.currentTime = 0;
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
   }, [volume]);
 };
 
