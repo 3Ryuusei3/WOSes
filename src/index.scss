@@ -116,10 +116,25 @@ h4 {
 }
 
 h5 {
+  font-size: 22px;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--clr-text-primary);
+
+  @media screen and (max-width: 576px) {
+    font-size: 20px;
+  }
+}
+
+h6 {
   font-size: 18px;
   line-height: 1.1;
   text-align: center;
   color: var(--clr-text-primary);
+
+  @media screen and (max-width: 576px) {
+    font-size: 17px;
+  }
 }
 
 .title-sm {
@@ -175,6 +190,11 @@ button, .btn {
     border: 1px solid var(--clr-accent-primary-dim);
     box-shadow: 0 3px 0 0 var(--clr-accent-primary-dim), 0 -3px 0 0 var(--clr-accent-primary-dim);
     cursor: not-allowed;
+  }
+
+  &--deco {
+    pointer-events: none;
+    cursor: pointer !important;
   }
 
   &--win {
@@ -399,6 +419,57 @@ main {
 
 .cursor {
   cursor: pointer;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    text-decoration: underline;
+  }
+}
+
+.mechanic-button {
+  background: none;
+  border: none;
+  box-shadow: none;
+  font-size: 24px;
+  line-height: 1.1;
+  text-align: center;
+  padding: 2px;
+  margin: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &.dark {
+    color: var(--clr-text-primary);
+    text-shadow: 0px 2px 0 var(--clr-bg-primary-dim);
+  }
+
+  &.lost {
+    color: var(--clr-lose);
+    text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+  }
+
+  &.highlight {
+    color: var(--clr-accent-primary);
+    text-shadow: 0px 2px 0 var(--clr-accent-secondary);
+  }
+
+  &.won {
+    color: var(--clr-win);
+    text-shadow: 0px 2px 0 var(--clr-win-highlight);
+  }
+
+  @media screen and (max-width: 576px) {
+    font-size: 22px;
+  }
 }
 
 .title {
@@ -1171,11 +1242,6 @@ main {
 
   @media screen and (max-width: 576px) {
     min-height: 320px;
-  }
-
-  h4 {
-    font-size: 28px;
-    line-height: 1.4;
   }
 
   &__arrows {

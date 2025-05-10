@@ -8,6 +8,6 @@ interface DifficultyTagProps {
 
 export default function DifficultyTag({ gameDifficulty }: DifficultyTagProps) {
   return (
-    <button className={`btn btn--xs mx-auto ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}>{getDifficultyLabel(gameDifficulty)}</button>
+    <button className={`btn btn--deco btn--xs mx-auto ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}>{getDifficultyLabel(gameDifficulty)}</button>
   );
 }

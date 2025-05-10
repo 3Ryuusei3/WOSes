@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import Tooltip from '../atoms/Tooltip';
 import GameSound from '../atoms/GameSound';
 import DifficultyTag from '../atoms/DifficultyTag';
+import MechanicsModal from '../atoms/MechanicsModal';
+import MechanicItem from '../atoms/MechanicItem';
 
 import useRemoveSeconds from '../hooks/useRemoveSeconds';
 import useRandomWords from '../hooks/useRandomWords';
@@ -31,6 +33,8 @@ export default function GameLobby() {
   } = useGameStore();
 
   const [canAdvance, setCanAdvance] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMechanic, setSelectedMechanic] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,7 +47,12 @@ export default function GameLobby() {
       containerRef.current?.focus();
     }, 2000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [volume]);
+
+  const handleMechanicClick = (mechanicKey: string) => {
+    setSelectedMechanic(mechanicKey);
+    setIsModalOpen(true);
+  };
 
   useSetMechanics(gameMechanics, level);
   useRandomWords(gameDifficulty);
@@ -54,6 +63,10 @@ export default function GameLobby() {
       setMode('loading');
     }
   }, [canAdvance, setMode]);
+
+  const areAllMechanicsFalse = gameMechanics ? Object.values(gameMechanics).every(value => value === false) : false;
+
+  console.log(areAllMechanicsFalse);
 
   return (
     <div
@@ -117,6 +130,35 @@ export default function GameLobby() {
             ))}
           </div>
         </div>
+        {gameMechanics && (
+          <>
+            <div className="v-section score__container--box">
+              <p>PRÓXIMOS RETOS</p>
+              {canAdvance && !areAllMechanicsFalse && (
+                <Tooltip message="Haz clic sobre cada reto para ver más información">
+                  <div className='info-icon'>i</div>
+                </Tooltip>
+              )}
+              <div className="v-section gap-xs">
+                {!canAdvance ? (
+                  <h4 className="highlight">CARGANDO...</h4>
+                ) : areAllMechanicsFalse ? (
+                  <h4 className="won">EL SIGUIENTE<br/>NIVEL NO<br/>CONTENDRÁ<br/>NINGÚN RETO</h4>
+                ) : (
+                  Object.entries(gameMechanics).map(([key, value]) => (
+                    value && <MechanicItem key={key} mechanicKey={key} onClick={handleMechanicClick} />
+                  ))
+                )}
+              </div>
+            </div>
+            <MechanicsModal
+              isOpen={isModalOpen}
+              setModalOpen={setIsModalOpen}
+              mechanicType={selectedMechanic}
+            />
+          </>
+        )}
+
       </div>
       {secondsToRemove > 0 && (
         <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>

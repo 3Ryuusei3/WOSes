@@ -211,8 +211,8 @@ const instructions = [
             </div>
           </div>
           <div className='score__container--box f-jc-c'>
-            <h5 className="won">+1s EXTRA</h5>
-            <h5 className="won">2 LETRAS MÁS USADAS</h5>
+            <h6 className="won">+1s EXTRA</h6>
+            <h6 className="won">2 LETRAS MÁS USADAS</h6>
           </div>
         </div>
       </>
