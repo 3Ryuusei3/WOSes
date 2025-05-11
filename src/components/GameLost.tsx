@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import TopScores from '../atoms/TopScores';
@@ -30,6 +30,8 @@ export default function GameLost() {
     volume
   } = useGameStore();
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const handlePlayAgain = () => {
     setMode('start');
     setTotalPoints(0);
@@ -41,12 +43,14 @@ export default function GameLost() {
   };
 
   useEffect(() => {
-    const audio = new Audio(gameOverSound);
-    audio.volume = volume;
+    if (!audioRef.current) {
+      audioRef.current = new Audio(gameOverSound);
+      audioRef.current.volume = volume;
 
-    audio.addEventListener('canplaythrough', () => {
-      audio.play().catch(err => console.error('Audio playback failed:', err));
-    }, { once: true });
+      audioRef.current.addEventListener('canplaythrough', () => {
+        audioRef.current?.play().catch(err => console.error('Audio playback failed:', err));
+      }, { once: true });
+    }
 
     if (totalPoints > highestScore.score) {
       setHighestScore({
@@ -56,10 +60,18 @@ export default function GameLost() {
     }
 
     return () => {
-      audio.pause();
-      audio.currentTime = 0;
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
   }, [totalPoints, highestScore.score, playerName, setHighestScore]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   return (
     <div className='game__container f-jc-c'>

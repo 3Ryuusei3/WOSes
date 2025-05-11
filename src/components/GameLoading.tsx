@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import useCountdown from '../hooks/useCountdown';
 import useGameStore from '../store/useGameStore';
@@ -8,21 +8,35 @@ import countdownMusic from '../assets/countdown.mp3';
 export default function GameLoading() {
   const countdown = useCountdown();
   const { volume } = useGameStore();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const audio = new Audio(countdownMusic);
-    audio.volume = volume;
+    if (!audioRef.current) {
+      audioRef.current = new Audio(countdownMusic);
+      audioRef.current.volume = volume;
 
-    const playAudio = setTimeout(() => {
-      audio.play();
-    }, 100);
+      timeoutRef.current = setTimeout(() => {
+        audioRef.current?.play().catch(() => {});
+      }, 100);
+    }
 
     return () => {
-      clearTimeout(playAudio);
-      audio.pause();
-      audio.currentTime = 0;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
-  }, [countdownMusic]);
+  }, [volume]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   return (
     <div className='game__container'>

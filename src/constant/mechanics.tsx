@@ -16,7 +16,7 @@ const MECHANICS_INFO: Record<MechanicKey, Omit<MechanicInfo, 'key'>> = {
   dark: {
     label: 'LETRA OSCURA',
     cssClass: 'dark',
-    description: 'UNA DE LAS LETRAS ESTARÁ OSCURA SIN PODER VERSE. ESTA CAMBIARÁ CADA VEZ QUE LAS LETRAS SE REORGANICEN',
+    description: 'UNA DE LAS LETRAS ESTARÁ TAPADA SIN PODER VERSE. CAMBIARÁ DE LETRA CADA VEZ QUE SE REORGANICEN',
     show: "DESAPARECE TRAS UN TIEMPO",
     example: (
       <div className="selectedWord">

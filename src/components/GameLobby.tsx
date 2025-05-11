@@ -36,17 +36,33 @@ export default function GameLobby() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMechanic, setSelectedMechanic] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const audio = new Audio(levelPassedSound);
-    audio.volume = volume;
-    audio.play();
+    if (!audioRef.current) {
+      audioRef.current = new Audio(levelPassedSound);
+      audioRef.current.volume = volume;
+      audioRef.current.play().catch(() => {});
+    }
 
     const timer = setTimeout(() => {
       setCanAdvance(true);
       containerRef.current?.focus();
     }, 2000);
-    return () => clearTimeout(timer);
+
+    return () => {
+      clearTimeout(timer);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
+  }, [volume]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
   }, [volume]);
 
   const handleMechanicClick = (mechanicKey: string) => {

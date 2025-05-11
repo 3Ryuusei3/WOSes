@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ScoreContainer from '../atoms/ScoreContainer';
@@ -64,12 +64,16 @@ export default function GameScreen() {
   const [hasPlayedRevealSound, setHasPlayedRevealSound] = useState(false);
   const [hasPlayedEndSound, setHasPlayedEndSound] = useState(false);
 
-  const updateLastLevelWordsAndPoints = () => {
+  const goalAudioRef = useRef<HTMLAudioElement | null>(null);
+  const revealAudioRef = useRef<HTMLAudioElement | null>(null);
+  const endAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const updateLastLevelWordsAndPoints = useCallback(() => {
     setTotalPoints(prev => prev + correctWordsPoints());
     setLastLevelWords(words);
-  };
+  }, [correctWordsPoints, setTotalPoints, setLastLevelWords, words]);
 
-  const updateHighscoreDB = async (finalPoints: number) => {
+  const updateHighscoreDB = useCallback(async (finalPoints: number) => {
     try {
       const id = uuidv4();
       const createdAt = new Date().toISOString();
@@ -77,30 +81,30 @@ export default function GameScreen() {
     } catch (error) {
       console.error('Error inserting highscore:', error);
     }
-  }
+  }, [playerName, level, gameDifficulty]);
 
-  const hasCompletedLevel = () => {
+  const hasCompletedLevel = useCallback(() => {
     return correctWordsPoints() >= goalPoints ||
            (levelPoints > 0 &&
             levelPoints === correctWordsPoints() &&
             correctWords.length === possibleWords.length);
-  };
+  }, [correctWordsPoints, goalPoints, levelPoints, correctWords.length, possibleWords.length]);
 
-  const advanceToNextLevel = (levelsAdded: number) => {
+  const advanceToNextLevel = useCallback((levelsAdded: number) => {
     setLevelsToAdvance(levelsAdded);
     setLevel((prev: number) => prev + levelsAdded);
     setLastRoundPoints(correctWordsPoints());
     updateLastLevelWordsAndPoints();
     setMode('lobby');
-  };
+  }, [setLevelsToAdvance, setLevel, setLastRoundPoints, correctWordsPoints, updateLastLevelWordsAndPoints, setMode]);
 
-  const endGameAndSaveScore = (finalPoints: number) => {
+  const endGameAndSaveScore = useCallback((finalPoints: number) => {
     updateLastLevelWordsAndPoints();
     updateHighscoreDB(finalPoints);
     setMode('lost');
-  };
+  }, [updateLastLevelWordsAndPoints, updateHighscoreDB, setMode]);
 
-  const handleEndOfLevel = () => {
+  const handleEndOfLevel = useCallback(() => {
     const finalPoints = totalPoints + correctWordsPoints();
 
     if (hasCompletedLevel()) {
@@ -110,7 +114,49 @@ export default function GameScreen() {
     } else {
       endGameAndSaveScore(finalPoints);
     }
-  };
+  }, [totalPoints, correctWordsPoints, hasCompletedLevel, levelPoints, advanceToNextLevel, endGameAndSaveScore]);
+
+  // Initialize audio refs
+  useEffect(() => {
+    if (!goalAudioRef.current) {
+      goalAudioRef.current = new Audio(goalSound);
+    }
+    if (!revealAudioRef.current) {
+      revealAudioRef.current = new Audio(revealSound);
+    }
+    if (!endAudioRef.current) {
+      endAudioRef.current = new Audio(endSound);
+    }
+
+    return () => {
+      // Clean up audio when component unmounts
+      if (goalAudioRef.current) {
+        goalAudioRef.current.pause();
+        goalAudioRef.current.currentTime = 0;
+      }
+      if (revealAudioRef.current) {
+        revealAudioRef.current.pause();
+        revealAudioRef.current.currentTime = 0;
+      }
+      if (endAudioRef.current) {
+        endAudioRef.current.pause();
+        endAudioRef.current.currentTime = 0;
+      }
+    };
+  }, []);
+
+  // Update volume when it changes
+  useEffect(() => {
+    if (goalAudioRef.current) {
+      goalAudioRef.current.volume = volume;
+    }
+    if (revealAudioRef.current) {
+      revealAudioRef.current.volume = volume;
+    }
+    if (endAudioRef.current) {
+      endAudioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   useEffect(() => {
     if (percentage === 0 ||
@@ -119,27 +165,44 @@ export default function GameScreen() {
     }
 
     if (levelPoints > 0 && correctWordsPoints() >= goalPoints && !hasPlayedGoalSound) {
-      const goalAudio = new Audio(goalSound);
-      goalAudio.volume = volume;
-      goalAudio.play();
+      if (goalAudioRef.current) {
+        goalAudioRef.current.currentTime = 0;
+        goalAudioRef.current.play().catch(() => {});
+      }
       setHasPlayedGoalSound(true);
     }
 
     const anyMechanicsActive = Object.values(gameMechanics).some(value => value);
     if (anyMechanicsActive && percentage <= showLettersPercentage && !hasPlayedRevealSound) {
-      const revealAudio = new Audio(revealSound);
-      revealAudio.play();
-      revealAudio.volume = volume;
+      if (revealAudioRef.current) {
+        revealAudioRef.current.currentTime = 0;
+        revealAudioRef.current.play().catch(() => {});
+      }
       setHasPlayedRevealSound(true);
     }
 
     if (timeLeft <= 3000 && !hasPlayedEndSound) {
-      const endAudio = new Audio(endSound);
-      endAudio.play();
-      endAudio.volume = volume;
+      if (endAudioRef.current) {
+        endAudioRef.current.currentTime = 0;
+        endAudioRef.current.play().catch(() => {});
+      }
       setHasPlayedEndSound(true);
     }
-  }, [percentage, levelPoints, correctWordsPoints, goalPoints, hasPlayedGoalSound, hasPlayedRevealSound, hasPlayedEndSound]);
+  }, [
+    percentage,
+    levelPoints,
+    correctWordsPoints,
+    goalPoints,
+    hasPlayedGoalSound,
+    hasPlayedRevealSound,
+    hasPlayedEndSound,
+    showLettersPercentage,
+    timeLeft,
+    correctWords.length,
+    possibleWords.length,
+    gameMechanics,
+    handleEndOfLevel
+  ]);
 
   return (
     <>

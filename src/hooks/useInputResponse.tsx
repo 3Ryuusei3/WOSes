@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import hitMusic from '../assets/hit.mp3';
 
@@ -6,12 +6,33 @@ export default function useInputResponse(possibleWords: string[], inputWord: str
   const [animateError, setAnimateError] = useState(false);
   const [animateSuccess, setAnimateSuccess] = useState(false);
   const [animateRepeated, setAnimateRepeated] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(hitMusic);
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   const playHitAudio = () => {
-    const audio = new Audio(hitMusic);
-    audio.volume = volume;
-    audio.play();
-    return audio;
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    }
+    return audioRef.current;
   };
 
   const triggerAnimateErrpr = () => {
@@ -21,12 +42,9 @@ export default function useInputResponse(possibleWords: string[], inputWord: str
 
   const triggerAnimateSuccess = () => {
     setAnimateSuccess(true);
-    const audio = playHitAudio();
-    audio.volume = volume;
+    playHitAudio();
     setTimeout(() => {
       setAnimateSuccess(false);
-      audio.pause();
-      audio.currentTime = 0;
     }, 500);
   };
 
