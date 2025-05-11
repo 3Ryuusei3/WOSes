@@ -18,12 +18,12 @@ const RUNNING_OUT_OF_TIME_PERCENTAGE = 15;
 
 const SHOW_LETTERS_RANGE = {
   START: {
-    LEVEL: 1,
+    LEVEL: 6,
     PERCENTAGE: 55
   },
   END: {
     LEVEL: 50,
-    PERCENTAGE: 30
+    PERCENTAGE: 35
   }
 };
 
@@ -62,19 +62,19 @@ const POINTS_PER_LETTER = {
 const LEVEL_RANGES = {
   DARK_LETTER: {
     START: 6,
-    END: 18
+    END: 22
   },
   FAKE_LETTER: {
-    START: 10,
-    END: 20
+    START: 12,
+    END: 28
   },
   HIDDEN_LETTER: {
-    START: 16,
-    END: 26
+    START: 18,
+    END: 36
   },
   FIRST_LETTER: {
-    START: 28,
-    END: 40
+    START: 34,
+    END: 54
   }
 };
 
