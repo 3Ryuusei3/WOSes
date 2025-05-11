@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 import ScoreContainer from '../atoms/ScoreContainer';
 import WordInput from '../atoms/WordInput';
@@ -16,7 +15,7 @@ import useCalculatePoints from './../hooks/useCalculatePoints';
 import useGameStore from '../store/useGameStore';
 
 import { calculateLevelsToAdvance, calculateProbability } from '../utils';
-import sql from '../utils/db';
+import { insertScoreWithNextId } from '../services/rooms';
 
 import {
   RUNNING_OUT_OF_TIME_PERCENTAGE,
@@ -75,9 +74,9 @@ export default function GameScreen() {
 
   const updateHighscoreDB = useCallback(async (finalPoints: number) => {
     try {
-      const id = uuidv4();
       const createdAt = new Date().toISOString();
-      await sql`INSERT INTO scores (id, name, score, level, difficulty, created_at) VALUES (${id}, ${playerName}, ${finalPoints}, ${level}, ${gameDifficulty}, ${createdAt})`;
+      const { error } = await insertScoreWithNextId(playerName, finalPoints, level, gameDifficulty, createdAt);
+      if (error) throw error;
     } catch (error) {
       console.error('Error inserting highscore:', error);
     }

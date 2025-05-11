@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import Tooltip from './Tooltip';
 
@@ -7,7 +7,8 @@ import useGameStore from '../store/useGameStore';
 import TopScore from '../types/TopScore';
 import Difficulty from '../types/Difficulty';
 
-import sql from '../utils/db';
+import { getAllTimeTopScores, getWeeklyTopScores, subscribeToScores } from '../services/rooms';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 import { getThisWeekDateRange, getDifficultyLabel } from '../utils';
 
@@ -24,43 +25,65 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
   const [allTimeScores, setAllTimeScores] = useState<TopScore[]>([]);
   const [weeklyScores, setWeeklyScores] = useState<TopScore[]>([]);
   const [showAllTime, setShowAllTime] = useState(true);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+
+  // Function to map database response to TopScore type
+  const mapScores = (data: {
+    id: number;
+    name: string;
+    score: number;
+    level: number;
+    created_at: string;
+    updated_at?: string;
+  }[]): TopScore[] => data.map((item) => ({
+    id: String(item.id), // Convert to string for TopScore interface
+    name: item.name,
+    score: item.score,
+    level: item.level,
+    created_at: item.created_at,
+  }));
+
+  // Function to fetch scores from Supabase
+  const fetchScores = async () => {
+    try {
+      const weekRange = getThisWeekDateRange();
+
+      // Get all-time scores
+      const { data: allTimeData, error: allTimeError } = await getAllTimeTopScores(difficulty);
+      if (allTimeError) throw allTimeError;
+
+      // Get weekly scores
+      const { data: weeklyData, error: weeklyError } = await getWeeklyTopScores(
+        difficulty,
+        weekRange.start,
+        weekRange.end
+      );
+      if (weeklyError) throw weeklyError;
+
+      // Update state with fetched data
+      if (allTimeData) setAllTimeScores(mapScores(allTimeData));
+      if (weeklyData) setWeeklyScores(mapScores(weeklyData));
+    } catch (error) {
+      console.error('Error fetching scores:', error);
+    }
+  };
 
   useEffect(() => {
-    async function fetchScores() {
-      try {
-        const weekRange = getThisWeekDateRange();
-
-        const allTimeData = await sql`
-          SELECT * FROM scores
-          WHERE difficulty = ${difficulty}
-          ORDER BY level DESC, score ASC
-          LIMIT 10
-        ` as { id: string; name: string; score: number; level: number; created_at: string }[];
-
-        const weeklyData = await sql`
-          SELECT * FROM scores
-          WHERE difficulty = ${difficulty}
-          AND created_at >= ${weekRange.start} AND created_at <= ${weekRange.end}
-          ORDER BY level DESC, score ASC
-          LIMIT 10
-        ` as { id: string; name: string; score: number; level: number; created_at: string }[];
-
-        const mapScores = (data: { id: string; name: string; score: number; level: number; created_at: string }[]): TopScore[] => data.map((item) => ({
-          id: item.id,
-          name: item.name,
-          score: item.score,
-          level: item.level,
-          created_at: item.created_at,
-        }));
-
-        setAllTimeScores(mapScores(allTimeData));
-        setWeeklyScores(mapScores(weeklyData));
-      } catch (error) {
-        console.error('Error fetching scores:', error);
-      }
-    }
-
+    // Initial fetch of scores
     fetchScores();
+
+    // Set up realtime subscription
+    channelRef.current = subscribeToScores(() => {
+      // Refresh scores when a change is detected
+      fetchScores();
+    }, difficulty);
+
+    // Cleanup function to unsubscribe from realtime updates
+    return () => {
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
+      }
+    };
   }, [highestScore, difficulty]);
 
   const toggleRanking = () => {

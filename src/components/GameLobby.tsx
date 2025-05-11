@@ -82,8 +82,6 @@ export default function GameLobby() {
 
   const areAllMechanicsFalse = gameMechanics ? Object.values(gameMechanics).every(value => value === false) : false;
 
-  console.log(areAllMechanicsFalse);
-
   return (
     <div
       ref={containerRef}
