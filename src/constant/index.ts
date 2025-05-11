@@ -80,6 +80,19 @@ const LEVEL_RANGES = {
 
 const SHUFFLE_INTERVAL = 10000;
 
+const WORD_LEVEL_RANGES = {
+  START: {
+    MIN: 1,
+    MAX: 10,
+    LETTERS: ["AS", "ES", "RA", "RE", "LA", "TA"]
+  },
+  MID: {
+    MIN: 11,
+    MAX: 20,
+    LETTERS: ["A", "S", "R"]
+  }
+};
+
 export {
   START_TIME,
   THRESHHOLD,
@@ -91,4 +104,5 @@ export {
   LEVEL_RANGES,
   POINTS_PER_LETTER,
   SHUFFLE_INTERVAL,
+  WORD_LEVEL_RANGES,
 };

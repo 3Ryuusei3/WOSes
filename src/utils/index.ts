@@ -100,8 +100,6 @@ const getDifficultyLabel = (diff: Difficulty) => {
   }
 };
 
-
-
 export {
   generateRandomRoom,
   calculateLevelsToAdvance,
