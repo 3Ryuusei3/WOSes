@@ -9,6 +9,7 @@ export default function WarningMessage({ gameMechanics }: WarningMessageProps) {
     const letters = [];
     if (gameMechanics.fake) letters.push("FALSA");
     if (gameMechanics.hidden) letters.push("OCULTA");
+    if (gameMechanics.still) letters.push("INMÓVIL");
     if (gameMechanics.dark) letters.push("OSCURA");
 
     if (letters.length === 0) return null;
@@ -37,6 +38,7 @@ export default function WarningMessage({ gameMechanics }: WarningMessageProps) {
       else if (cleanWord === "OCULTA") styledWord = <span key={index} className="highlight">{cleanWord}</span>;
       else if (cleanWord === "OSCURA") styledWord = <span key={index} className="dark">{cleanWord}</span>;
       else if (cleanWord === "OCULTAN") styledWord = <span key={index} className="won">{cleanWord}</span>;
+      else if (cleanWord === "INMÓVIL") styledWord = <span key={index} className="still">{cleanWord}</span>;
       else styledWord = cleanWord;
 
       return [

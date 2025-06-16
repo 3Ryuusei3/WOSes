@@ -41,9 +41,9 @@ const instructions = [
       <>
         <h4 className="highlight">LAS PALABRAS SE ORGANIZAN POR DIFICULTADES SEGÚN LA FRECUENCIA DE USO PERCIBIDA POR LOS USUARIOS</h4>
         <div className="h-section gap-xs f-jc-c pos-rel w-fit mx-auto">
-          <button className="btn--sm btn--win">FÁCIL</button>
-          <button className="btn--sm">ESTÁNDAR</button>
-          <button className="btn--sm btn--lose">DIFÍCIL</button>
+          <button className="btn--sm btn--win">ESTÁNDAR</button>
+          <button className="btn--sm">DIFÍCIL</button>
+          <button className="btn--sm btn--lose">EXPERTO</button>
         </div>
       </>
     )
@@ -243,7 +243,7 @@ const instructions = [
             ?
             <span className="letterPoints">1</span>
           </span>
-          <span className="selectedLetter">
+          <span className="selectedLetter still">
             I
             <span className="letterPoints">1</span>
           </span>

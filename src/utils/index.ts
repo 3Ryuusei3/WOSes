@@ -90,13 +90,13 @@ const getThisWeekDateRange = () => {
 const getDifficultyLabel = (diff: Difficulty) => {
   switch (diff) {
     case 'easy':
-      return 'FÁCIL';
-    case 'medium':
       return 'ESTÁNDAR';
+    case 'medium':
+      return 'DIFÍCIL';
     case 'hard':
-      return 'DIFÍCIL';
+      return 'EXPERTO';
     default:
-      return 'DIFÍCIL';
+      return 'EXPERTO';
   }
 };
 

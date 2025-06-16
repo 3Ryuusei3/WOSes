@@ -28,7 +28,7 @@ const useSetMechanics = (gameMechanics: Mechanics, level: number) => {
   const setGameMechanics = useGameStore(state => state.setGameMechanics);
 
   useEffect(() => {
-    const difficulties: MechanicsType[] = ['DARK_LETTER', 'FAKE_LETTER', 'HIDDEN_LETTER', 'FIRST_LETTER'];
+    const difficulties: MechanicsType[] = ['DARK_LETTER', 'FAKE_LETTER', 'HIDDEN_LETTER', 'FIRST_LETTER', 'STILL_LETTER'];
     const newMechanics = difficulties.reduce((acc, type) => {
       const probability = calculateMechanicsProbability(level, type);
       const random = Math.floor(Math.random() * 100);

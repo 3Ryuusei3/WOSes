@@ -18,21 +18,21 @@ export default function DifficultySelector({ gameDifficulty, onDifficultyChange 
         className={`btn ${gameDifficulty === 'easy' ? 'selected' : ''} btn--sm btn--win`}
         onClick={() => handleDifficulty('easy')}
       >
-        FÁCIL
+        ESTÁNDAR
       </button>
       <button
         className={`btn ${gameDifficulty === 'medium' ? 'selected' : ''} btn--sm`}
         onClick={() => handleDifficulty('medium')}
       >
-        ESTÁNDAR
+        DIFÍCIL
       </button>
       <button
         className={`btn ${gameDifficulty === 'hard' ? 'selected' : ''} btn--sm btn--lose`}
         onClick={() => handleDifficulty('hard')}
       >
-        DIFÍCIL
+        EXPERTO
       </button>
-      <Tooltip message="Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad ''DIFÍCIL'' contiene todas las palabras que existen en la RAE.">
+      <Tooltip message="Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad ''EXPERTO'' contiene todas las palabras que existen en la RAE.">
         <div className='info-icon'>i</div>
       </Tooltip>
     </div>

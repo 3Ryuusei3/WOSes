@@ -115,7 +115,6 @@ export default function GameScreen() {
     }
   }, [totalPoints, correctWordsPoints, hasCompletedLevel, levelPoints, advanceToNextLevel, endGameAndSaveScore]);
 
-  // Initialize audio refs
   useEffect(() => {
     if (!goalAudioRef.current) {
       goalAudioRef.current = new Audio(goalSound);
@@ -128,7 +127,6 @@ export default function GameScreen() {
     }
 
     return () => {
-      // Clean up audio when component unmounts
       if (goalAudioRef.current) {
         goalAudioRef.current.pause();
         goalAudioRef.current.currentTime = 0;
@@ -144,7 +142,6 @@ export default function GameScreen() {
     };
   }, []);
 
-  // Update volume when it changes
   useEffect(() => {
     if (goalAudioRef.current) {
       goalAudioRef.current.volume = volume;

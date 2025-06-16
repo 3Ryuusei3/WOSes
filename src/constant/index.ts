@@ -62,20 +62,24 @@ const POINTS_PER_LETTER = {
 const LEVEL_RANGES = {
   DARK_LETTER: {
     START: 6,
-    END: 22
+    END: 20
+  },
+  STILL_LETTER: {
+    START: 6,
+    END: 54,
   },
   FAKE_LETTER: {
     START: 12,
-    END: 28
+    END: 26
   },
   HIDDEN_LETTER: {
     START: 18,
-    END: 36
+    END: 34
   },
   FIRST_LETTER: {
-    START: 34,
-    END: 54
-  }
+    START: 30,
+    END: 60
+  },
 };
 
 const SHUFFLE_INTERVAL = 10000;
@@ -84,12 +88,12 @@ const WORD_LEVEL_RANGES = {
   START: {
     MIN: 1,
     MAX: 10,
-    LETTERS: ["AS", "ES", "RA", "RE", "LA", "TA"]
+    LETTERS: ["AS", "ES", "RA", "EN", "LA", "TA", "DE"]
   },
   MID: {
     MIN: 11,
-    MAX: 20,
-    LETTERS: ["A", "S", "R"]
+    MAX: 30,
+    LETTERS: ["A", "S", "R", "D"]
   }
 };
 

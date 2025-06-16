@@ -91,6 +91,32 @@ const MECHANICS_INFO: Record<MechanicKey, Omit<MechanicInfo, 'key'>> = {
       </div>
     )
   },
+  still: {
+    label: 'LETRA INMÓVIL',
+    cssClass: 'still',
+    description: 'LA LETRA PERMANECERÁ FIJA Y NO SE REORDENARÁ',
+    show: "LA LETRA INMÓVIL SE MARCA EN VERDE",
+    example: (
+      <div className="selectedWord">
+        <span className="selectedLetter">
+          A
+          <span className="letterPoints">1</span>
+        </span>
+        <span className="selectedLetter">
+          B
+          <span className="letterPoints">3</span>
+        </span>
+        <span className="selectedLetter still">
+          L
+          <span className="letterPoints">1</span>
+        </span>
+        <span className="selectedLetter">
+          A
+          <span className="letterPoints">1</span>
+        </span>
+      </div>
+    )
+  },
   first: {
     label: 'SOLO PRIMERA LETRA',
     cssClass: 'won',

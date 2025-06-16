@@ -38,6 +38,10 @@ export default function SelectedWord({
       classes.push('common');
     }
 
+    if (letter.isStill && gameMechanics.still) {
+      classes.push('still');
+    }
+
     return classes.join(' ');
   };
 
@@ -51,7 +55,7 @@ export default function SelectedWord({
           key={`${index}-${letter.letter}`}
           className={getLetterClasses(letter)}
         >
-          {letter.isHidden && gameMechanics.hidden && percentage > SHOW_LETTERS_PERCENTAGE
+          {letter.isHidden && gameMechanics.hidden && percentage > SHOW_LETTERS_PERCENTAGE && !letter.isStill
             ? '?'
             : letter.letter
           }

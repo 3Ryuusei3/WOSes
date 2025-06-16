@@ -80,7 +80,8 @@ const useGameStore = create<GameState>()(
         dark: false,
         fake: false,
         hidden: false,
-        first: false
+        first: false,
+        still: false
       },
       setGameMechanics: (difficulty) => set({ gameMechanics: difficulty }),
       gameDifficulty: 'medium',

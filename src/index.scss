@@ -30,6 +30,9 @@
   --clr-win-dim: #74fef2;
   --clr-win-highlight: #0196b4;
   --clr-tip: #b3d7fb;
+  --clr-still: #23FF4C;
+  --clr-still-dim: #00ff0077;
+  --clr-still-highlight: #00520F;
 
   --clr-progress-bg: #1c0c2f;
   --clr-progress-on-time: var(--clr-win);
@@ -459,6 +462,11 @@ main {
     text-shadow: 0px 2px 0 var(--clr-lose-highlight);
   }
 
+  &.still {
+    color: var(--clr-still);
+    text-shadow: 0px 2px 0 var(--clr-still-highlight);
+  }
+
   &.highlight {
     color: var(--clr-accent-primary);
     text-shadow: 0px 2px 0 var(--clr-accent-secondary);
@@ -488,6 +496,11 @@ main {
 .lost {
   color: var(--clr-lose);
   text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+}
+
+.still {
+  color: var(--clr-still);
+  text-shadow: 0px 2px 0 var(--clr-still-highlight);
 }
 
 .won {
@@ -809,6 +822,26 @@ main {
     background-color: var(--clr-tip);
     text-shadow: 0px 2px 0 var(--clr-border-secondary);
     animation: commonSelectedLetter 0.5s linear forwards;
+  }
+
+  &.still {
+    background-color: var(--clr-still);
+    border: 2px solid var(--clr-still-highlight);
+    text-shadow: 0px 2px 0 var(--clr-still-dim);
+    animation: none !important;
+    transform: none !important;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      filter: contrast(2);
+      background: url('./assets/vines.png') no-repeat center center;
+      background-size: contain;
+    }
   }
 }
 

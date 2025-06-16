@@ -36,7 +36,7 @@ export default function GameLost() {
     setMode('start');
     setTotalPoints(0);
     setLevel(1);
-    setGameMechanics({ fake: false, hidden: false, first: false, dark: false });
+    setGameMechanics({ fake: false, hidden: false, first: false, dark: false, still: false });
     setGameTime(START_TIME);
     setNumberOfPerfectRounds(0);
     setLevelsToAdvance(0)
