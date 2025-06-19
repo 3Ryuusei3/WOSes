@@ -153,7 +153,7 @@ export default function GameLobby() {
                   <div className='info-icon'>i</div>
                 </Tooltip>
               )}
-              <div className="v-section gap-2xs">
+              <div className="v-section">
                 {!canAdvance ? (
                   <h4 className="highlight">CARGANDO...</h4>
                 ) : areAllMechanicsFalse ? (

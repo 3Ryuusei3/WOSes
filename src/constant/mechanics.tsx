@@ -95,7 +95,7 @@ const MECHANICS_INFO: Record<MechanicKey, Omit<MechanicInfo, 'key'>> = {
     label: 'LETRA INMÓVIL',
     cssClass: 'still',
     description: 'LA LETRA PERMANECERÁ FIJA Y NO SE REORDENARÁ',
-    show: "LA LETRA INMÓVIL SE MARCA EN VERDE",
+    show: "LA LETRA INMÓVIL SE MARCA DE COLOR VERDE O SOLO CON UNA ENREDADERA SI FORMA PARTE DE OTRO RETO",
     example: (
       <div className="selectedWord">
         <span className="selectedLetter">

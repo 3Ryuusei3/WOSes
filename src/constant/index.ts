@@ -60,17 +60,17 @@ const POINTS_PER_LETTER = {
 }
 
 const LEVEL_RANGES = {
-  DARK_LETTER: {
-    START: 6,
-    END: 20
-  },
   STILL_LETTER: {
     START: 6,
-    END: 54,
+    END: 22,
+  },
+  DARK_LETTER: {
+    START: 10,
+    END: 26
   },
   FAKE_LETTER: {
-    START: 12,
-    END: 26
+    START: 14,
+    END: 30
   },
   HIDDEN_LETTER: {
     START: 18,

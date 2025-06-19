@@ -795,6 +795,26 @@ main {
     font-size: 46px;
   }
 
+  &.still {
+    background-color: var(--clr-still);
+    border: 2px solid var(--clr-still-highlight);
+    text-shadow: 0px 2px 0 var(--clr-still-highlight);
+    animation: none !important;
+    transform: none !important;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 51%;
+      left: 51%;
+      transform: translate(-50%, -50%);
+      width: 123%;
+      height: 123%;
+      background: url('./assets/vines.png') no-repeat center center;
+      background-size: contain;
+    }
+  }
+
   &.fake {
     background-color: var(--clr-lose);
     text-shadow: 0px 2px 0 var(--clr-lose-highlight);
@@ -822,26 +842,6 @@ main {
     background-color: var(--clr-tip);
     text-shadow: 0px 2px 0 var(--clr-border-secondary);
     animation: commonSelectedLetter 0.5s linear forwards;
-  }
-
-  &.still {
-    background-color: var(--clr-still);
-    border: 2px solid var(--clr-still-highlight);
-    text-shadow: 0px 2px 0 var(--clr-still-highlight);
-    animation: none !important;
-    transform: none !important;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 51%;
-      left: 51%;
-      transform: translate(-50%, -50%);
-      width: 123%;
-      height: 123%;
-      background: url('./assets/vines.png') no-repeat center center;
-      background-size: contain;
-    }
   }
 }
 
