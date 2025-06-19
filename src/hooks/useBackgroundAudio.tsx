@@ -10,13 +10,17 @@ const useBackgroundAudio = (volume: number = 0.5) => {
       audioRef.current = new Audio(backgroundMusic);
       audioRef.current.loop = true;
 
-      const playAudio = () => {
+      const playAudio = (event: Event) => {
+        const target = event.target as HTMLElement;
+        if (target && (target.hasAttribute('data-start-button'))) {
+          return;
+        }
         setTimeout(() => {
           audioRef.current?.play().catch(() => {});
         });
+        document.removeEventListener('click', playAudio);
       };
-
-      document.addEventListener('click', playAudio, { once: true });
+      document.addEventListener('click', playAudio);
     }
 
     return () => {

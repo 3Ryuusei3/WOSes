@@ -66,7 +66,13 @@ export default function GameStart() {
             </div>
             <h6 className='highlight cursor' onClick={() => setHowToPlayModal(true)}><u>APRENDE A JUGAR AQUÍ</u></h6>
             <div className="h-section gap-xs f-jc-c">
-              <button className={`btn ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`} onClick={handleSubmit}>EMPEZAR PARTIDA EN {getDifficultyLabel(gameDifficulty)}</button>
+              <button
+                className={`btn ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}
+                onClick={handleSubmit}
+                data-start-button="true"
+              >
+                EMPEZAR PARTIDA EN {getDifficultyLabel(gameDifficulty)}
+              </button>
             </div>
           </div>
           <div className="ranking ranking--lg v-section gap-md top-scores">
