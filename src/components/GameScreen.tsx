@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ScoreContainer from '../atoms/ScoreContainer';
 import WordInput from '../atoms/WordInput';
@@ -29,6 +30,7 @@ import endSound from '../assets/end.mp3';
 import GameSound from '../atoms/GameSound';
 
 export default function GameScreen() {
+  const { i18n } = useTranslation();
   const {
     playerName,
     setMode,
@@ -75,12 +77,13 @@ export default function GameScreen() {
   const updateHighscoreDB = useCallback(async (finalPoints: number) => {
     try {
       const createdAt = new Date().toISOString();
-      const { error } = await insertScoreWithNextId(playerName, finalPoints, level, gameDifficulty, createdAt);
+      const language = i18n.language;
+      const { error } = await insertScoreWithNextId(playerName, finalPoints, level, gameDifficulty, language, createdAt);
       if (error) throw error;
     } catch (error) {
       console.error('Error inserting highscore:', error);
     }
-  }, [playerName, level, gameDifficulty]);
+  }, [playerName, level, gameDifficulty, i18n.language]);
 
   const hasCompletedLevel = useCallback(() => {
     return correctWordsPoints() >= goalPoints ||

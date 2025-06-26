@@ -1,11 +1,13 @@
+import { useTranslation } from 'react-i18next';
+import { getLanguageConstants } from '../constant';
+
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
 import Mechanics from '../types/Mechanics';
-import { POINTS_PER_LETTER } from '../constant';
 
 interface SelectedWordProps {
   shuffledWordObject: ShuffledWordObjectType[];
   percentage: number;
-  gameMechanics: Mechanics
+  gameMechanics: Mechanics;
   SHOW_LETTERS_PERCENTAGE: number;
 }
 
@@ -15,6 +17,9 @@ export default function SelectedWord({
   gameMechanics,
   SHOW_LETTERS_PERCENTAGE,
 }: SelectedWordProps) {
+  const { i18n } = useTranslation();
+  const { POINTS_PER_LETTER } = getLanguageConstants(i18n.language);
+
   const getLetterClasses = (letter: ShuffledWordObjectType) => {
     const classes = ['selectedLetter'];
 
@@ -60,7 +65,7 @@ export default function SelectedWord({
             : letter.letter
           }
           <span className='letterPoints'>
-            {POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER]}
+            {POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER] || 1}
           </span>
         </span>
       ))}

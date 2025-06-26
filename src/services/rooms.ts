@@ -7,6 +7,7 @@ interface ScoreRecord {
   score: number;
   level: number;
   difficulty: string;
+  language: string;
   created_at: string;
   updated_at?: string;
 }
@@ -16,20 +17,22 @@ type DbResponse<T> = {
   error: PostgrestError | null;
 };
 
-// Get all-time top scores for a specific difficulty
-export async function getAllTimeTopScores(difficulty: string, limit = 10): Promise<DbResponse<ScoreRecord[]>> {
+// Get all-time top scores for a specific difficulty and language
+export async function getAllTimeTopScores(difficulty: string, language: string, limit = 10): Promise<DbResponse<ScoreRecord[]>> {
   return await supabase
     .from('rooms')
     .select('*')
     .eq('difficulty', difficulty)
+    .eq('language', language)
     .order('level', { ascending: false })
     .order('score', { ascending: true })
     .limit(limit);
 }
 
-// Get weekly top scores for a specific difficulty
+// Get weekly top scores for a specific difficulty and language
 export async function getWeeklyTopScores(
   difficulty: string,
+  language: string,
   startDate: string,
   endDate: string,
   limit = 10
@@ -38,6 +41,7 @@ export async function getWeeklyTopScores(
     .from('rooms')
     .select('*')
     .eq('difficulty', difficulty)
+    .eq('language', language)
     .gte('created_at', startDate)
     .lte('created_at', endDate)
     .order('level', { ascending: false })
@@ -51,6 +55,7 @@ export async function insertScore(
   score: number,
   level: number,
   difficulty: string,
+  language: string,
   createdAt: string
 ): Promise<DbResponse<ScoreRecord[]>> {
   try {
@@ -62,6 +67,7 @@ export async function insertScore(
           score,
           level,
           difficulty,
+          language,
           created_at: createdAt
         }
       ])
@@ -78,6 +84,7 @@ export async function insertScoreWithNextId(
   score: number,
   level: number,
   difficulty: string,
+  language: string,
   createdAt: string
 ): Promise<DbResponse<ScoreRecord[]>> {
   try {
@@ -88,6 +95,7 @@ export async function insertScoreWithNextId(
         p_score: score,
         p_level: level,
         p_difficulty: difficulty,
+        p_language: language,
         p_created_at: createdAt
       });
   } catch (error) {
@@ -102,6 +110,7 @@ type ScoreRealtimePayload = RealtimePostgresChangesPayload<{
   score: number;
   level: number;
   difficulty: string;
+  language: string;
   created_at: string;
   updated_at?: string;
 }>;
@@ -109,8 +118,19 @@ type ScoreRealtimePayload = RealtimePostgresChangesPayload<{
 // Subscribe to realtime changes on the scores table
 export function subscribeToScores(
   callback: (payload: ScoreRealtimePayload) => void,
-  difficulty?: string
+  difficulty?: string,
+  language?: string
 ): RealtimeChannel {
+  // Build filter string for multiple conditions
+  let filter = '';
+  if (difficulty && language) {
+    filter = `difficulty=eq.${difficulty},language=eq.${language}`;
+  } else if (difficulty) {
+    filter = `difficulty=eq.${difficulty}`;
+  } else if (language) {
+    filter = `language=eq.${language}`;
+  }
+
   const channel = supabase
     .channel('rooms-changes')
     .on(
@@ -119,7 +139,7 @@ export function subscribeToScores(
         event: '*',
         schema: 'public',
         table: 'rooms',
-        ...(difficulty ? { filter: `difficulty=eq.${difficulty}` } : {})
+        ...(filter ? { filter } : {})
       },
       callback
     )

@@ -1,4 +1,4 @@
-import { getDifficultyLabel } from "../utils";
+import { useTranslation } from 'react-i18next';
 
 import Difficulty from "../types/Difficulty";
 
@@ -7,7 +7,11 @@ interface DifficultyTagProps {
 }
 
 export default function DifficultyTag({ gameDifficulty }: DifficultyTagProps) {
+  const { t } = useTranslation();
+
   return (
-    <button className={`btn btn--deco btn--xs mx-auto ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}>{getDifficultyLabel(gameDifficulty)}</button>
+    <button className={`btn btn--deco btn--xs mx-auto ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}>
+      {t(`difficulties.${gameDifficulty}`)}
+    </button>
   );
 }

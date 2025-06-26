@@ -1,6 +1,10 @@
-import { THRESHHOLD, POINTS_PER_LETTER } from '../constant';
+import { useTranslation } from 'react-i18next';
+import { THRESHHOLD, getLanguageConstants } from '../constant';
 
 const useCalculatePoints = (possibleWords: string[], correctWords: string[]) => {
+  const { i18n } = useTranslation();
+  const { POINTS_PER_LETTER } = getLanguageConstants(i18n.language);
+
   const correctWordsPoints = () => {
     return correctWords.reduce((acc: number, word: string) => {
       return acc + word.split('').reduce((acc, letter) => acc + POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER], 0);

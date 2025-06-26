@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Word from '../types/Word';
 import Difficulty from '../types/Difficulty';
@@ -13,6 +14,7 @@ interface ScoreContainerProps {
 }
 
 export default function ScoreContainer({ words, correctWordsPoints, goalPoints, level, gameDifficulty }: ScoreContainerProps) {
+  const { t } = useTranslation();
   const guessedCount = words.filter(w => w.guessed).length;
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -27,11 +29,11 @@ export default function ScoreContainer({ words, correctWordsPoints, goalPoints, 
       <div className={`score__container--box ${guessedCount === words.length ? 'won' : ''}`}>
         <div className="h-section gap-md">
           <div className="v-section">
-            <p>NIVEL</p>
+            <p>{t('common.level').toUpperCase()}</p>
             <h3>{level}</h3>
           </div>
           <div className="v-section gap-2xs">
-            <p>DIFICULTAD</p>
+            <p>{t('common.difficulty').toUpperCase()}</p>
             <DifficultyTag gameDifficulty={gameDifficulty} />
           </div>
         </div>
@@ -39,11 +41,11 @@ export default function ScoreContainer({ words, correctWordsPoints, goalPoints, 
       <div className={`score__container--box ${correctWordsPoints() >= goalPoints ? 'won' : ''}`}>
         <div className="h-section gap-md">
           <div className="v-section">
-            <p>OBJETIVO</p>
+            <p>{t('game.targetScore').toUpperCase()}</p>
             <h3>{correctWordsPoints()}/{goalPoints}</h3>
           </div>
           <div className="v-section">
-            <p>PALABRAS</p>
+            <p>{t('game.foundWords').toUpperCase()}</p>
             <h3>{guessedCount}/{words.length}</h3>
           </div>
         </div>

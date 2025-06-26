@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import TopScores from '../atoms/TopScores';
 import Tooltip from '../atoms/Tooltip';
@@ -12,6 +13,7 @@ import gameOverSound from '../assets/gameover.mp3';
 import { START_TIME } from '../constant';
 
 export default function GameLost() {
+  const { t, i18n } = useTranslation();
   const {
     setMode,
     totalPoints,
@@ -40,6 +42,13 @@ export default function GameLost() {
     setGameTime(START_TIME);
     setNumberOfPerfectRounds(0);
     setLevelsToAdvance(0)
+  };
+
+  const getDictionaryUrl = (word: string) => {
+    if (i18n.language === 'en') {
+      return `https://www.merriam-webster.com/dictionary/${word.toLowerCase()}`;
+    }
+    return `https://dle.rae.es/${word}`;
   };
 
   useEffect(() => {
@@ -78,30 +87,30 @@ export default function GameLost() {
       <div className="difficulty-tag">
         <DifficultyTag gameDifficulty={gameDifficulty} />
       </div>
-      <h1 className='lost'>HAS PERDIDO...</h1>
-      <h3>HAS ALCANZADO EL NIVEL <span className='highlight'>{level}</span></h3>
+      <h1 className='lost'>{t('game.lost')}</h1>
+      <h3>{t('game.reachedLevel', { level })}</h3>
       <div className="h-section gap-lg mx-auto">
         <div className="v-section gap-md">
           <div className='score__container--box'>
-            <p>TUS PUNTOS TOTALES</p>
+            <p>{t('common.totalPoints')}</p>
             <h3>{totalPoints}</h3>
           </div>
           <div className='score__container--box'>
-            <p>LA PUNTUACIÓN MÁS ALTA</p>
+            <p>{t('common.highestScore')}</p>
             <h3>{highestScore.score}</h3>
             <h3>{highestScore.name}</h3>
           </div>
         </div>
         <div className="v-section gap-md">
           <div className="v-section score__container--box">
-            <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
+            <Tooltip message={t('game.wordMeaning')}>
               <div className='info-icon'>i</div>
             </Tooltip>
-            <p>ÚLTIMAS PALABRAS</p>
+            <p>{t('common.lastWords')}</p>
             <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
               {lastLevelWords.map((word, index) => (
                 <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
-                <Link to={`https://dle.rae.es/${word.word}`} target='_blank' rel='noreferrer'>
+                <Link to={getDictionaryUrl(word.word)} target='_blank' rel='noreferrer'>
                   {word.word.toUpperCase()}
                 </Link>
               </h4>
@@ -114,7 +123,7 @@ export default function GameLost() {
         </div>
       </div>
       <div className="h-section gap-xs f-jc-c mb-sm">
-        <button onClick={handlePlayAgain}>JUGAR DE NUEVO</button>
+        <button onClick={handlePlayAgain}>{t('common.playAgain')}</button>
       </div>
       <GameSound />
     </div>

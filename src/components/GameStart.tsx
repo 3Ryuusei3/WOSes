@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import TopScores from '../atoms/TopScores';
 import HowToPlayModal from '../atoms/HowToPlayModal';
 import DifficultySelector from '../atoms/DifficultySelector';
-import { getDifficultyLabel } from '../utils';
+import LanguageSelector from '../atoms/LanguageSelector';
+import Difficulty from '../types/Difficulty';
 
 import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
@@ -16,6 +18,8 @@ export default function GameStart() {
   const { playerName, setPlayerName, setMode, gameMechanics, level, setGameDifficulty, gameDifficulty, volume } = useGameStore();
   const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
+  const { t } = useTranslation();
+
   useSetMechanics(gameMechanics, level);
   useRandomWords(gameDifficulty);
 
@@ -41,12 +45,17 @@ export default function GameStart() {
     setPlayerName(value);
   };
 
+  const getDifficultyLabel = (difficulty: Difficulty) => {
+    return t(`difficulties.${difficulty}`);
+  };
+
   return (
     <>
       <div className='game__container f-jc-c pos-rel'>
+        <LanguageSelector />
         <div className="h-section gap-sm">
           <div className='v-section gap-md w100 f-jc-c'>
-            <h2 className='highlight title-sm'>INTRODUCE TU NOMBRE Y ELIGE LA DIFICULTAD</h2>
+            <h2 className='highlight title-sm'>{t('gameStart.nameAndDifficulty')}</h2>
             <DifficultySelector
               gameDifficulty={gameDifficulty}
               onDifficultyChange={setGameDifficulty}
@@ -55,23 +64,23 @@ export default function GameStart() {
               <input
                 className='mx-auto'
                 type='text'
-                placeholder='INTRODUCE TU NOMBRE...'
+                placeholder={t('common.enterName')}
                 value={playerName}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
               />
               <small className={`txt-center ${error ? '' : 'op-0'}`}>
-                EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES
+                {t('gameStart.nameError')}
               </small>
             </div>
-            <h6 className='highlight cursor' onClick={() => setHowToPlayModal(true)}><u>APRENDE A JUGAR AQUÍ</u></h6>
+            <h6 className='highlight cursor' onClick={() => setHowToPlayModal(true)}><u>{t('gameStart.learnToPlay')}</u></h6>
             <div className="h-section gap-xs f-jc-c">
               <button
                 className={`btn ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}
                 onClick={handleSubmit}
                 data-start-button="true"
               >
-                EMPEZAR PARTIDA EN {getDifficultyLabel(gameDifficulty)}
+                {t('common.start', { difficulty: getDifficultyLabel(gameDifficulty) })}
               </button>
             </div>
           </div>

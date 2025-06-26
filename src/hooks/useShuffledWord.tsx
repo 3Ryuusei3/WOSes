@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useGameStore from '../store/useGameStore';
 
 import { getMostCommonLetter } from '../utils';
 
-import { LETTERS, LEVELS_TO_ADVANCE } from '../constant';
+import { getLanguageConstants, LEVELS_TO_ADVANCE } from '../constant';
 
 import ShuffledWordObjectType from '../types/ShuffledWordObject';
 import Mechanics from '../types/Mechanics';
@@ -82,6 +83,8 @@ const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: 
 };
 
 const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number, volume: number) => {
+  const { i18n } = useTranslation();
+  const { LETTERS } = getLanguageConstants(i18n.language);
   const { level, hiddenLetterIndex } = useGameStore();
 
   const [shuffledWordObject, setShuffledWordObject] = useState<ShuffledWordObjectType[]>([]);
@@ -141,7 +144,7 @@ const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: n
 
     const interval = setInterval(shuffleAndAddLetter, intervalTime);
     return () => clearInterval(interval);
-  }, [word, intervalTime, shouldShuffle, initialShuffledWord, fakeLetter, level, hiddenLetterIndex, darkLetterIndex, gameMechanics, lastLevelWords, levelsToAdvance, possibleWords, stillLetterIndex, fakeLetterIndex]);
+  }, [word, intervalTime, shouldShuffle, initialShuffledWord, fakeLetter, level, hiddenLetterIndex, darkLetterIndex, gameMechanics, lastLevelWords, levelsToAdvance, possibleWords, stillLetterIndex, fakeLetterIndex, LETTERS]);
 
   return shuffledWordObject;
 };

@@ -1,5 +1,7 @@
 import { useState, Dispatch, SetStateAction } from "react";
-import instructions from './Instructions';
+import { useTranslation } from 'react-i18next';
+
+import Instructions from './Instructions';
 import arrowLeft from '../assets/arrow-left.svg';
 import arrowRight from '../assets/arrow-right.svg';
 
@@ -9,7 +11,9 @@ interface HowToPlayModalProps {
 }
 
 export default function HowToPlayModal({ isOpen, setHowToPlayModal }: HowToPlayModalProps) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
+  const instructions = Instructions();
 
   const handleClose = () => {
     setHowToPlayModal(false);
@@ -37,13 +41,13 @@ export default function HowToPlayModal({ isOpen, setHowToPlayModal }: HowToPlayM
         </div>
         <div className="v-section gap-md pos-rel">
           <h2 className="won">
-            {currentStep === instructions.length - 1 ? ' ¡A JUGAR!' : '¿CÓMO JUGAR?'}
+            {currentStep === instructions.length - 1 ? t('howToPlay.ready') : t('howToPlay.title')}
           </h2>
           <div className="instruction-slide">
             {instructions[currentStep].content}
             {currentStep === instructions.length - 1 && (
               <button onClick={handleClose} className="btn--win mx-auto">
-                ¡EMPIEZA YA!
+                {t('howToPlay.startNow')}
               </button>
             )}
             </div>

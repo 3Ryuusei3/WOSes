@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import Tooltip from '../atoms/Tooltip';
 import GameSound from '../atoms/GameSound';
@@ -37,6 +38,8 @@ export default function GameLobby() {
   const [selectedMechanic, setSelectedMechanic] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -82,6 +85,13 @@ export default function GameLobby() {
 
   const areAllMechanicsFalse = gameMechanics ? Object.values(gameMechanics).every(value => value === false) : false;
 
+  const getDictionaryUrl = (word: string) => {
+    if (i18n.language === 'en') {
+      return `https://www.merriam-webster.com/dictionary/${word.toLowerCase()}`;
+    }
+    return `https://dle.rae.es/${word}`;
+  };
+
   return (
     <div
       ref={containerRef}
@@ -95,49 +105,49 @@ export default function GameLobby() {
         <DifficultyTag gameDifficulty={gameDifficulty} />
       </div>
       {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
-        <h1 className='won'>¡PERFECTO!</h1>
+        <h1 className='won'>{t('lobby.perfect')}</h1>
       ) : (
-        <h1 className='highlight'>¡ENHORABUENA!</h1>
+        <h1 className='highlight'>{t('lobby.congratulations')}</h1>
       )}
       <h3>
-        HAS AVANZADO
+        {t('lobby.youAdvanced')}
         {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? (
           <span className='won'> {levelsToAdvance} </span>
         ) : (
           <span className='highlight'> {levelsToAdvance} </span>
         )}
-        NIVEL{levelsToAdvance > 1 ? 'ES': ''}
+        {levelsToAdvance > 1 ? t('lobby.levels') : t('lobby.level')}
       </h3>
       <div className="h-section gap-lg mx-auto">
         <div className='score__container--box f-jc-c'>
           <div className="v-section gap-sm">
             <div className="h-section gap-lg f-jc-sb f-ai-c ">
-              <p>PUNTOS DEL NIVEL {level - levelsToAdvance}</p>
+              <p>{t('common.levelPoints', { level: level - levelsToAdvance })}</p>
               <h3>{lastRoundPoints}</h3>
             </div>
             <div className="h-section gap-lg f-jc-sb f-ai-c ">
-              <p>TUS PUNTOS TOTALES</p>
+              <p>{t('common.totalPoints')}</p>
               <h3>{totalPoints}</h3>
             </div>
             <div className="h-section gap-lg f-jc-sb f-ai-c ">
-              <p>TIEMPO RESTANTE</p>
-              <h3><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}s</span></h3>
+              <p>{t('common.remainingTime')}</p>
+              <h3><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}{t('common.seconds')}</span></h3>
             </div>
             <div className="h-section gap-lg f-jc-sb f-ai-c ">
-              <p>RONDAS PERFECTAS</p>
+              <p>{t('common.perfectRounds')}</p>
               <h3><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : 'highlight'}`}>{numberOfPerfectRounds}</span></h3>
             </div>
           </div>
         </div>
         <div className="v-section score__container--box">
-          <Tooltip message="Haz clic en la palabra para ver su significado en el diccionario">
+          <Tooltip message={t('game.wordMeaning')}>
             <div className='info-icon'>i</div>
           </Tooltip>
-          <p>ÚLTIMAS PALABRAS</p>
+          <p>{t('common.lastWords')}</p>
           <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
             {lastLevelWords.map((word, index) => (
               <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
-                <Link to={`https://dle.rae.es/${word.word}`} target='_blank' rel='noreferrer'>
+                <Link to={getDictionaryUrl(word.word)} target='_blank' rel='noreferrer'>
                   {word.word.toUpperCase()}
                 </Link>
               </h4>
@@ -147,17 +157,17 @@ export default function GameLobby() {
         {gameMechanics && (
           <>
             <div className="v-section score__container--box">
-              <p>PRÓXIMOS RETOS</p>
+              <p>{t('lobby.nextChallenges')}</p>
               {canAdvance && !areAllMechanicsFalse && (
-                <Tooltip message="Haz clic sobre cada reto para ver más información">
+                <Tooltip message={t('lobby.challengeTooltip')}>
                   <div className='info-icon'>i</div>
                 </Tooltip>
               )}
               <div className="v-section">
                 {!canAdvance ? (
-                  <h4 className="highlight">CARGANDO...</h4>
+                  <h4 className="highlight">{t('common.loading')}</h4>
                 ) : areAllMechanicsFalse ? (
-                  <h4 className="won">EL SIGUIENTE<br/>NIVEL NO<br/>CONTENDRÁ<br/>NINGÚN RETO</h4>
+                  <h4 className="won" dangerouslySetInnerHTML={{ __html: t('lobby.noChallenges') }}></h4>
                 ) : (
                   Object.entries(gameMechanics).map(([key, value]) => (
                     value && <MechanicItem key={key} mechanicKey={key} onClick={handleMechanicClick} />
@@ -175,13 +185,13 @@ export default function GameLobby() {
 
       </div>
       {secondsToRemove > 0 && (
-        <h3>DISPONDRÁS DE <span className="lost">{secondsToRemove}s</span> MENOS EN EL SIGUIENTE NIVEL</h3>
+        <h3 dangerouslySetInnerHTML={{ __html: t('lobby.lessTime', { seconds: secondsToRemove }) }}></h3>
       )}
       {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR&& (
-        <h3>LAS <span className="tip">2 LETRAS</span>  MÁS USADAS ESTARÁN <span className="tip">RESALTADAS</span> y TENDRÁS <span className="won">1s EXTRA</span></h3>
+        <h3 dangerouslySetInnerHTML={{ __html: t('lobby.perfectBonus') }}></h3>
       )}
       {(levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR) && (
-        <h3>LA LETRA MÁS USADA ESTARÁ <span className="tip">RESALTADA</span></h3>
+        <h3 dangerouslySetInnerHTML={{ __html: t('lobby.threeStarBonus') }}></h3>
       )}
       <div className="h-section gap-xs f-jc-c mb-sm">
         <button
@@ -189,7 +199,7 @@ export default function GameLobby() {
           disabled={!canAdvance}
           className={!canAdvance ? 'button-disabled' : ''}
         >
-          JUGAR AL NIVEL {level}
+          {t('lobby.playLevel', { level })}
         </button>
       </div>
       <GameSound />

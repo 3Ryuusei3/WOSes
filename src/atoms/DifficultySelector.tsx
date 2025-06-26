@@ -1,4 +1,6 @@
 // New component: DifficultySelector.tsx
+import { useTranslation } from 'react-i18next';
+
 import Difficulty from '../types/Difficulty';
 import Tooltip from './Tooltip';
 
@@ -8,6 +10,8 @@ interface DifficultySelectorProps {
 }
 
 export default function DifficultySelector({ gameDifficulty, onDifficultyChange }: DifficultySelectorProps) {
+  const { t } = useTranslation();
+
   const handleDifficulty = (difficulty: Difficulty) => {
     onDifficultyChange(difficulty);
   };
@@ -18,21 +22,21 @@ export default function DifficultySelector({ gameDifficulty, onDifficultyChange 
         className={`btn ${gameDifficulty === 'easy' ? 'selected' : ''} btn--sm btn--win`}
         onClick={() => handleDifficulty('easy')}
       >
-        ESTÁNDAR
+        {t('difficulties.easy')}
       </button>
       <button
         className={`btn ${gameDifficulty === 'medium' ? 'selected' : ''} btn--sm`}
         onClick={() => handleDifficulty('medium')}
       >
-        DIFÍCIL
+        {t('difficulties.medium')}
       </button>
       <button
         className={`btn ${gameDifficulty === 'hard' ? 'selected' : ''} btn--sm btn--lose`}
         onClick={() => handleDifficulty('hard')}
       >
-        EXPERTO
+        {t('difficulties.hard')}
       </button>
-      <Tooltip message="Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad ''EXPERTO'' contiene todas las palabras que existen en la RAE.">
+      <Tooltip message={t('difficulties.tooltip')}>
         <div className='info-icon'>i</div>
       </Tooltip>
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useCountdown from '../hooks/useCountdown';
 import useGameStore from '../store/useGameStore';
@@ -6,6 +7,7 @@ import useGameStore from '../store/useGameStore';
 import countdownMusic from '../assets/countdown.mp3';
 
 export default function GameLoading() {
+  const { t } = useTranslation();
   const countdown = useCountdown();
   const { volume } = useGameStore();
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -40,10 +42,10 @@ export default function GameLoading() {
 
   return (
     <div className='game__container'>
-      <h1 className='highlight'>EL JUEGO COMIENZA EN...</h1>
+      <h1 className='highlight'>{t('game.gameStartsIn')}</h1>
       <div className="loading__container">
         <h2 className='highlight'>
-          {Math.floor(countdown) === 0 ? '¡YA!' : Math.floor(countdown)}
+          {Math.floor(countdown) === 0 ? t('game.start') : Math.floor(countdown)}
         </h2>
         <div className="loading__container--box loading__container--box-xl"></div>
         <div className="loading__container--box loading__container--box-lg"></div>

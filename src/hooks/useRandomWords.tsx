@@ -1,20 +1,12 @@
 import { useEffect } from 'react';
-
-import hardWordsData from '../data/hard.json';
-import mediumWordsData from '../data/medium.json';
-import easyWordsData from '../data/easy.json';
+import { useTranslation } from 'react-i18next';
 
 import useGameStore from '../store/useGameStore';
+import useLanguageWords from './useLanguageWords';
 
 import Difficulty from '../types/Difficulty';
 
-import { WORD_LEVEL_RANGES } from '../constant';
-
-const DIFFICULTY_WORDS = {
-  easy: easyWordsData,
-  medium: mediumWordsData,
-  hard: hardWordsData
-};
+import { getLanguageConstants } from '../constant';
 
 const getRandomWord = (words: string[]) => {
   return words[Math.floor(Math.random() * words.length)];
@@ -45,53 +37,54 @@ const hasAnyLetter = (word: string, letters: string[]): boolean => {
 };
 
 const useRandomWords = (difficulty: Difficulty = 'hard') => {
-  const wordsData = DIFFICULTY_WORDS[difficulty];
-
-  const level = useGameStore(state => state.level);
-  const setHiddenLetterIndex = useGameStore(state => state.setHiddenLetterIndex);
-  const setRandomWord = useGameStore(state => state.setRandomWord);
-  const setPossibleWords = useGameStore(state => state.setPossibleWords);
+  const { i18n } = useTranslation();
+  const { setRandomWord, setPossibleWords, level, setHiddenLetterIndex } = useGameStore();
+  const { words } = useLanguageWords(difficulty);
 
   useEffect(() => {
-    const filteredWords = wordsData.words.filter(word => word.length >= 4 && word.length <= 9);
-    const getWordBasedOnLevel = (words: string[]): string => {
-      if (level >= WORD_LEVEL_RANGES.START.MIN && level <= WORD_LEVEL_RANGES.START.MAX) {
-        const validWords = words.filter(word =>
-          hasLetterCombination(word.toUpperCase(), WORD_LEVEL_RANGES.START.LETTERS)
-        );
-        return validWords.length > 0 ? getRandomWord(validWords) : getRandomWord(words);
-      } else if (level >= WORD_LEVEL_RANGES.MID.MIN && level <= WORD_LEVEL_RANGES.MID.MAX) {
-        const validWords = words.filter(word =>
-          hasAnyLetter(word.toUpperCase(), WORD_LEVEL_RANGES.MID.LETTERS)
-        );
-        return validWords.length > 0 ? getRandomWord(validWords) : getRandomWord(words);
-      } else {
-        return getRandomWord(words);
-      }
-    };
+    if (words && words.length > 0) {
+      const { WORD_LEVEL_RANGES } = getLanguageConstants(i18n.language);
+      const filteredWords = words.filter(word => word.length >= 4 && word.length <= 9);
 
-    let word = getWordBasedOnLevel(filteredWords);
-    let wordCount = countLetters(word);
-    let words = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
+      const getWordBasedOnLevel = (words: string[]): string => {
+        if (level >= WORD_LEVEL_RANGES.START.MIN && level <= WORD_LEVEL_RANGES.START.MAX) {
+          const validWords = words.filter(word =>
+            hasLetterCombination(word.toUpperCase(), WORD_LEVEL_RANGES.START.LETTERS)
+          );
+          return validWords.length > 0 ? getRandomWord(validWords) : getRandomWord(words);
+        } else if (level >= WORD_LEVEL_RANGES.MID.MIN && level <= WORD_LEVEL_RANGES.MID.MAX) {
+          const validWords = words.filter(word =>
+            hasAnyLetter(word.toUpperCase(), WORD_LEVEL_RANGES.MID.LETTERS)
+          );
+          return validWords.length > 0 ? getRandomWord(validWords) : getRandomWord(words);
+        } else {
+          return getRandomWord(words);
+        }
+      };
 
-    const maxAttempts = 100;
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      if (words.length >= 12 && words.length <= 22) {
-        break;
+      let word = getWordBasedOnLevel(filteredWords);
+      let wordCount = countLetters(word);
+      let possibleWordsList = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
+
+      // Intentar conseguir entre 12 y 22 palabras posibles
+      const maxAttempts = 100;
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (possibleWordsList.length >= 12 && possibleWordsList.length <= 22) {
+          break;
+        }
+        word = getWordBasedOnLevel(filteredWords);
+        wordCount = countLetters(word);
+        possibleWordsList = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
       }
-      word = getWordBasedOnLevel(filteredWords);
-      wordCount = countLetters(word);
-      words = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
+
+      // Ordenar palabras por longitud y alfabéticamente
+      possibleWordsList.sort((a, b) => a.length - b.length || a.localeCompare(b));
+
+      setRandomWord(word);
+      setPossibleWords(possibleWordsList);
+      setHiddenLetterIndex(Math.floor(Math.random() * word.length));
     }
-
-    words.sort((a, b) => a.length - b.length || a.localeCompare(b));
-
-    setRandomWord(word);
-    setPossibleWords(words);
-    setHiddenLetterIndex(Math.floor(Math.random() * word.length));
-  }, [setRandomWord, setPossibleWords, setHiddenLetterIndex, difficulty, wordsData, level]);
-
-  return null;
+  }, [words, level, setRandomWord, setPossibleWords, setHiddenLetterIndex, difficulty, i18n.language]);
 };
 
 export default useRandomWords;

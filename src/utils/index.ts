@@ -1,5 +1,4 @@
 import Word from "../types/Word";
-import Difficulty from "../types/Difficulty";
 
 import { LEVELS_TO_ADVANCE, THRESHHOLD  } from "../constant";
 
@@ -87,24 +86,10 @@ const getThisWeekDateRange = () => {
   };
 }
 
-const getDifficultyLabel = (diff: Difficulty) => {
-  switch (diff) {
-    case 'easy':
-      return 'ESTÁNDAR';
-    case 'medium':
-      return 'DIFÍCIL';
-    case 'hard':
-      return 'EXPERTO';
-    default:
-      return 'EXPERTO';
-  }
-};
-
 export {
   generateRandomRoom,
   calculateLevelsToAdvance,
   calculateProbability,
   getMostCommonLetter,
   getThisWeekDateRange,
-  getDifficultyLabel,
 };

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Tooltip from './Tooltip';
 
@@ -10,7 +11,7 @@ import Difficulty from '../types/Difficulty';
 import { getAllTimeTopScores, getWeeklyTopScores, subscribeToScores } from '../services/rooms';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
-import { getThisWeekDateRange, getDifficultyLabel } from '../utils';
+import { getThisWeekDateRange } from '../utils';
 
 import arrowLeft from '../assets/arrow-left.svg';
 import arrowRight from '../assets/arrow-right.svg';
@@ -21,6 +22,7 @@ interface TopScoresProps {
 }
 
 export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: TopScoresProps) {
+  const { t, i18n } = useTranslation();
   const { highestScore } = useGameStore();
   const [allTimeScores, setAllTimeScores] = useState<TopScore[]>([]);
   const [weeklyScores, setWeeklyScores] = useState<TopScore[]>([]);
@@ -47,14 +49,16 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
   const fetchScores = async () => {
     try {
       const weekRange = getThisWeekDateRange();
+      const currentLanguage = i18n.language;
 
       // Get all-time scores
-      const { data: allTimeData, error: allTimeError } = await getAllTimeTopScores(difficulty);
+      const { data: allTimeData, error: allTimeError } = await getAllTimeTopScores(difficulty, currentLanguage);
       if (allTimeError) throw allTimeError;
 
       // Get weekly scores
       const { data: weeklyData, error: weeklyError } = await getWeeklyTopScores(
         difficulty,
+        currentLanguage,
         weekRange.start,
         weekRange.end
       );
@@ -76,7 +80,7 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
     channelRef.current = subscribeToScores(() => {
       // Refresh scores when a change is detected
       fetchScores();
-    }, difficulty);
+    }, difficulty, i18n.language);
 
     // Cleanup function to unsubscribe from realtime updates
     return () => {
@@ -84,7 +88,7 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
         channelRef.current.unsubscribe();
       }
     };
-  }, [highestScore, difficulty]);
+  }, [highestScore, difficulty, i18n.language]);
 
   const toggleRanking = () => {
     setShowAllTime((prev) => !prev);
@@ -101,19 +105,19 @@ export default function TopScores({ hasTooltip = false, difficulty = 'hard' }: T
       <div className="v-section gap-2xs">
         {hasTooltip ? (
           <>
-            <h4 className="highlight">{showAllTime ? `TOP TOTAL` : `TOP SEMANAL`}</h4>
-            <p>{getDifficultyLabel(difficulty)}</p>
+            <h4 className="highlight">{showAllTime ? t('topScores.allTime') : t('topScores.thisWeek')}</h4>
+            <p>{t(`difficulties.${difficulty}`)}</p>
           </>
         ) : (
           <>
-            <h2>{showAllTime ? `TOP TOTAL` : `TOP SEMANAL`}</h2>
-            <p>{getDifficultyLabel(difficulty)}</p>
+            <h2>{showAllTime ? t('topScores.allTime') : t('topScores.thisWeek')}</h2>
+            <p>{t(`difficulties.${difficulty}`)}</p>
           </>
         )}
       </div>
       <div className="ranking">
         {hasTooltip && (
-          <Tooltip message="El ranking puede tardar en actualizarse">
+          <Tooltip message={t('topScores.updateDelay')}>
             <div className='info-icon'>i</div>
           </Tooltip>
         )}
