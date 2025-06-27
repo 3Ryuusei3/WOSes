@@ -78,7 +78,6 @@ export default function GameStart() {
               <button
                 className={`btn ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}
                 onClick={handleSubmit}
-                data-start-button="true"
               >
                 {t('common.start', { difficulty: getDifficultyLabel(gameDifficulty) })}
               </button>
