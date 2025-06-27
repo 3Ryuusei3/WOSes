@@ -37,6 +37,8 @@ interface GameState {
   setGameMechanics: (difficulty: Mechanics) => void;
   gameDifficulty: Difficulty;
   setGameDifficulty: (difficulty: Difficulty) => void;
+  numberOfRounds: number;
+  setNumberOfRounds: (rounds: number | ((prev: number) => number)) => void;
   numberOfPerfectRounds: number;
   setNumberOfPerfectRounds: (rounds: number | ((prev: number) => number)) => void;
   volume: number;
@@ -86,6 +88,10 @@ const useGameStore = create<GameState>()(
       setGameMechanics: (difficulty) => set({ gameMechanics: difficulty }),
       gameDifficulty: 'medium',
       setGameDifficulty: (difficulty) => set({ gameDifficulty: difficulty }),
+      numberOfRounds: 0,
+      setNumberOfRounds: (rounds) => set((state) => ({
+        numberOfRounds: typeof rounds === 'function' ? rounds(state.numberOfRounds) : rounds
+      })),
       numberOfPerfectRounds: 0,
       setNumberOfPerfectRounds: (rounds) => set((state) => ({
         numberOfPerfectRounds: typeof rounds === 'function' ? rounds(state.numberOfPerfectRounds) : rounds

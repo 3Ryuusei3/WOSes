@@ -27,6 +27,9 @@ export default function GameLost() {
     setGameMechanics,
     setGameTime,
     setLevelsToAdvance,
+    numberOfRounds,
+    setNumberOfRounds,
+    numberOfPerfectRounds,
     setNumberOfPerfectRounds,
     gameDifficulty,
     volume
@@ -41,6 +44,7 @@ export default function GameLost() {
     setGameMechanics({ fake: false, hidden: false, first: false, dark: false, still: false });
     setGameTime(START_TIME);
     setNumberOfPerfectRounds(0);
+    setNumberOfRounds(0);
     setLevelsToAdvance(0)
   };
 
@@ -88,19 +92,33 @@ export default function GameLost() {
         <DifficultyTag gameDifficulty={gameDifficulty} />
       </div>
       <h1 className='lost'>{t('game.lost')}</h1>
-      <h3>{t('game.reachedLevel', { level })}</h3>
-      <div className="h-section gap-lg mx-auto">
-        <div className="v-section gap-md">
-          <div className='score__container--box'>
+      <div className="h-section gap-md f-jc-c">
+        <div className='v-section'>
+          <div className='score__container--box score__container--box-sm won'>
+            <p>{t('lobby.level')}</p>
+            <h3>{level}</h3>
+          </div>
+        </div>
+        <div className='v-section'>
+          <div className='score__container--box score__container--box-sm won'>
             <p>{t('common.totalPoints')}</p>
             <h3>{totalPoints}</h3>
           </div>
-          <div className='score__container--box'>
-            <p>{t('common.highestScore')}</p>
-            <h3>{highestScore.score}</h3>
-            <h3>{highestScore.name}</h3>
+        </div>
+        <div className='v-section'>
+          <div className='score__container--box score__container--box-sm won'>
+            <p>{t('common.numberOfRounds')}</p>
+            <h3>{numberOfRounds}</h3>
           </div>
         </div>
+        <div className='v-section'>
+          <div className='score__container--box score__container--box-sm won'>
+            <p>{t('common.perfectRounds')}</p>
+            <h3>{numberOfPerfectRounds}</h3>
+          </div>
+        </div>
+      </div>
+      <div className="h-section gap-lg mx-auto">
         <div className="v-section gap-md">
           <div className="v-section score__container--box">
             <Tooltip message={t('game.wordMeaning')}>

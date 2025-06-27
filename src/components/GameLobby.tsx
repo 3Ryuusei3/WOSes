@@ -29,6 +29,7 @@ export default function GameLobby() {
     gameTime,
     gameMechanics,
     gameDifficulty,
+    numberOfRounds,
     numberOfPerfectRounds,
     volume
   } = useGameStore();
@@ -120,22 +121,26 @@ export default function GameLobby() {
       </h3>
       <div className="h-section gap-lg mx-auto">
         <div className='score__container--box f-jc-c'>
-          <div className="v-section gap-sm">
+          <div className="v-section gap-xs">
             <div className="h-section gap-lg f-jc-sb f-ai-c ">
               <p>{t('common.levelPoints', { level: level - levelsToAdvance })}</p>
-              <h3>{lastRoundPoints}</h3>
+              <h4 className='highlight'>{lastRoundPoints}</h4>
             </div>
             <div className="h-section gap-lg f-jc-sb f-ai-c ">
               <p>{t('common.totalPoints')}</p>
-              <h3>{totalPoints}</h3>
+              <h4 className='highlight'>{totalPoints}</h4>
             </div>
             <div className="h-section gap-lg f-jc-sb f-ai-c ">
               <p>{t('common.remainingTime')}</p>
-              <h3><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}{t('common.seconds')}</span></h3>
+              <h4><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}{t('common.seconds')}</span></h4>
+            </div>
+            <div className="h-section gap-lg f-jc-sb f-ai-c ">
+              <p>{t('common.numberOfRounds')}</p>
+              <h4><span className="highlight">{numberOfRounds}</span></h4>
             </div>
             <div className="h-section gap-lg f-jc-sb f-ai-c ">
               <p>{t('common.perfectRounds')}</p>
-              <h3><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : 'highlight'}`}>{numberOfPerfectRounds}</span></h3>
+              <h4><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : 'highlight'}`}>{numberOfPerfectRounds}</span></h4>
             </div>
           </div>
         </div>

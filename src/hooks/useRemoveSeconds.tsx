@@ -2,7 +2,14 @@ import { useEffect, useState } from 'react';
 import useGameStore from '../store/useGameStore';
 
 const useRemoveSeconds = () => {
-  const { gameTime, setGameTime, lastLevelWords, levelsToAdvance, setNumberOfPerfectRounds } = useGameStore();
+  const {
+    gameTime,
+    setGameTime,
+    lastLevelWords,
+    levelsToAdvance,
+    setNumberOfPerfectRounds,
+    setNumberOfRounds
+  } = useGameStore();
   const [secondsRemoved, setSecondsRemoved] = useState(0);
 
   const getRandomSeconds = () => {
@@ -34,6 +41,7 @@ const useRemoveSeconds = () => {
   const isPerfect = lastLevelWords.every(word => word.guessed);
 
   useEffect(() => {
+    setNumberOfRounds(prev => prev + 1);
     if (isPerfect) {
       setGameTime(prev => prev + 1);
       setNumberOfPerfectRounds(prev => prev + 1);
