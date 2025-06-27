@@ -50,6 +50,13 @@ export default function SelectedWord({
     return classes.join(' ');
   };
 
+  const getDisplayLetter = (letter: ShuffledWordObjectType) => {
+    if (letter.isHidden && gameMechanics.hidden && percentage > SHOW_LETTERS_PERCENTAGE) {
+      return '?';
+    }
+    return letter.letter;
+  };
+
   return (
     <div
       key={shuffledWordObject.map(letter => letter.letter).join('')}
@@ -60,10 +67,7 @@ export default function SelectedWord({
           key={`${index}-${letter.letter}`}
           className={getLetterClasses(letter)}
         >
-          {letter.isHidden && gameMechanics.hidden && percentage > SHOW_LETTERS_PERCENTAGE && !letter.isStill
-            ? '?'
-            : letter.letter
-          }
+          {getDisplayLetter(letter)}
           <span className='letterPoints'>
             {POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER] || 1}
           </span>

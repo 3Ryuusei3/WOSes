@@ -27,7 +27,6 @@ const SHOW_LETTERS_RANGE = {
   }
 };
 
-// Spanish Configuration
 const LETTERS_ES = 'abcdefghijklmnñopqrstuvwxyz';
 
 const POINTS_PER_LETTER_ES = {
@@ -73,7 +72,6 @@ const WORD_LEVEL_RANGES_ES = {
   }
 };
 
-// English Configuration
 const LETTERS_EN = 'abcdefghijklmnopqrstuvwxyz';
 
 const POINTS_PER_LETTER_EN = {
@@ -143,7 +141,6 @@ const LEVEL_RANGES = {
 
 const SHUFFLE_INTERVAL = 10000;
 
-// Helper function to get language-specific constants
 export const getLanguageConstants = (language: string) => {
   if (language === 'en') {
     return {

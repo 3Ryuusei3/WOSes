@@ -66,7 +66,6 @@ const useRandomWords = (difficulty: Difficulty = 'hard') => {
       let wordCount = countLetters(word);
       let possibleWordsList = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
 
-      // Intentar conseguir entre 12 y 22 palabras posibles
       const maxAttempts = 100;
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
         if (possibleWordsList.length >= 12 && possibleWordsList.length <= 22) {
@@ -77,7 +76,6 @@ const useRandomWords = (difficulty: Difficulty = 'hard') => {
         possibleWordsList = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
       }
 
-      // Ordenar palabras por longitud y alfabéticamente
       possibleWordsList.sort((a, b) => a.length - b.length || a.localeCompare(b));
 
       setRandomWord(word);
