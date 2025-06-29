@@ -16,6 +16,7 @@
     "highestScore": "HIGHEST SCORE",
     "levelPoints": "LEVEL {{level}} POINTS",
     "remainingTime": "REMAINING TIME",
+    "reachedLevel": "REACHED LEVEL",
     "numberOfRounds": "NUMBER OF ROUNDS",
     "perfectRounds": "PERFECT ROUNDS",
     "enter": "Enter",

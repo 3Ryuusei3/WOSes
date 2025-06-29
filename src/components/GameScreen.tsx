@@ -48,7 +48,9 @@ export default function GameScreen() {
     lastLevelWords,
     gameMechanics,
     gameDifficulty,
-    volume
+    volume,
+    numberOfRounds,
+    numberOfPerfectRounds
   } = useGameStore();
 
   const showLettersPercentage = calculateProbability(
@@ -78,12 +80,12 @@ export default function GameScreen() {
     try {
       const createdAt = new Date().toISOString();
       const language = i18n.language;
-      const { error } = await insertScoreWithNextId(playerName, finalPoints, level, gameDifficulty, language, createdAt);
+      const { error } = await insertScoreWithNextId(playerName, finalPoints, level, gameDifficulty, language, createdAt, numberOfRounds, numberOfPerfectRounds);
       if (error) throw error;
     } catch (error) {
       console.error('Error inserting highscore:', error);
     }
-  }, [playerName, level, gameDifficulty, i18n.language]);
+  }, [playerName, level, gameDifficulty, i18n.language, numberOfRounds, numberOfPerfectRounds]);
 
   const hasCompletedLevel = useCallback(() => {
     return correctWordsPoints() >= goalPoints ||

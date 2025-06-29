@@ -16,6 +16,7 @@
     "highestScore": "LA PUNTUACIÓN MÁS ALTA",
     "levelPoints": "PUNTOS DEL NIVEL {{level}}",
     "remainingTime": "TIEMPO RESTANTE",
+    "reachedLevel": "NIVEL ALCANZADO",
     "numberOfRounds": "NÚMERO DE RONDAS",
     "perfectRounds": "RONDAS PERFECTAS",
     "enter": "Entrar",

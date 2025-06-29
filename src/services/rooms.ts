@@ -10,6 +10,8 @@ interface ScoreRecord {
   language: string;
   created_at: string;
   updated_at?: string;
+  rounds?: number;
+  perfects?: number;
 }
 
 type DbResponse<T> = {
@@ -25,7 +27,9 @@ export async function getAllTimeTopScores(difficulty: string, language: string, 
     .eq('difficulty', difficulty)
     .eq('language', language)
     .order('level', { ascending: false })
-    .order('score', { ascending: true })
+    .order('rounds', { ascending: false })
+    .order('perfects', { ascending: false })
+    .order('score', { ascending: false })
     .limit(limit);
 }
 
@@ -45,7 +49,9 @@ export async function getWeeklyTopScores(
     .gte('created_at', startDate)
     .lte('created_at', endDate)
     .order('level', { ascending: false })
-    .order('score', { ascending: true })
+    .order('rounds', { ascending: false })
+    .order('perfects', { ascending: false })
+    .order('score', { ascending: false })
     .limit(limit);
 }
 
@@ -56,7 +62,9 @@ export async function insertScore(
   level: number,
   difficulty: string,
   language: string,
-  createdAt: string
+  createdAt: string,
+  rounds?: number,
+  perfects?: number
 ): Promise<DbResponse<ScoreRecord[]>> {
   try {
     return await supabase
@@ -68,7 +76,9 @@ export async function insertScore(
           level,
           difficulty,
           language,
-          created_at: createdAt
+          created_at: createdAt,
+          ...(rounds !== undefined && { rounds }),
+          ...(perfects !== undefined && { perfects })
         }
       ])
       .select();
@@ -85,7 +95,9 @@ export async function insertScoreWithNextId(
   level: number,
   difficulty: string,
   language: string,
-  createdAt: string
+  createdAt: string,
+  rounds: number,
+  perfects: number
 ): Promise<DbResponse<ScoreRecord[]>> {
   try {
     // Call the Supabase function that handles getting the next ID and inserting the record
@@ -96,7 +108,9 @@ export async function insertScoreWithNextId(
         p_level: level,
         p_difficulty: difficulty,
         p_language: language,
-        p_created_at: createdAt
+        p_created_at: createdAt,
+        p_rounds: rounds,
+        p_perfects: perfects
       });
   } catch (error) {
     console.error('Error in insertScoreWithNextId:', error);

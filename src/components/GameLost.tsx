@@ -95,7 +95,7 @@ export default function GameLost() {
       <div className="h-section gap-md f-jc-c">
         <div className='v-section'>
           <div className='score__container--box score__container--box-sm won'>
-            <p>{t('lobby.level')}</p>
+            <p>{t('common.reachedLevel')}</p>
             <h3>{level}</h3>
           </div>
         </div>
