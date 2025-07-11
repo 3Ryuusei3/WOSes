@@ -1,5 +1,5 @@
 const fs = require('fs');
-const wordsData = require('./../data/words1.json');
+const wordsData = require('../data/filteredData/difficultWordsFiltered.json');
 
 const canFormWord = (word, letters) => {
   const lettersCount = letters.split('').reduce((acc, letter) => {

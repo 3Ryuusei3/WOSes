@@ -52,6 +52,20 @@ const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: 
 
   const shuffledLetters = [...letterObject];
 
+  if (gameMechanics.still) {
+    const stillLetters = shuffledLetters.filter(letter => letter.isStill);
+    if (stillLetters.length > 1) {
+      let foundFirst = false;
+      shuffledLetters.forEach(letter => {
+        if (letter.isStill && !foundFirst) {
+          foundFirst = true;
+        } else if (letter.isStill) {
+          letter.isStill = false;
+        }
+      });
+    }
+  }
+
   if (gameMechanics.still && finalStillPosition >= 0) {
     const stillLetterObj = shuffledLetters.find(letter => letter.isStill);
 
