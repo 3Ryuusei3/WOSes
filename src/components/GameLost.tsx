@@ -8,6 +8,7 @@ import GameSound from '../atoms/GameSound';
 import DifficultyTag from '../atoms/DifficultyTag';
 
 import useGameStore from '../store/useGameStore';
+import useWindowSize from '../hooks/useWindowSize';
 
 import gameOverSound from '../assets/gameover.mp3';
 import { START_TIME } from '../constant';
@@ -36,6 +37,7 @@ export default function GameLost() {
   } = useGameStore();
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { columns } = useWindowSize();
 
   const handlePlayAgain = () => {
     setMode('start');
@@ -125,7 +127,7 @@ export default function GameLost() {
               <div className='info-icon'>i</div>
             </Tooltip>
             <p>{t('common.lastWords')}</p>
-            <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
+            <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / columns), '--wordlist-columns': columns } as React.CSSProperties}>
               {lastLevelWords.map((word, index) => (
                 <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
                 <Link to={getDictionaryUrl(word.word)} target='_blank' rel='noreferrer'>

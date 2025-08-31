@@ -11,6 +11,7 @@ import MechanicItem from '../atoms/MechanicItem';
 import useRemoveSeconds from '../hooks/useRemoveSeconds';
 import useRandomWords from '../hooks/useRandomWords';
 import useSetMechanics from '../hooks/useSetMechanics';
+import useWindowSize from '../hooks/useWindowSize';
 
 import useGameStore from '../store/useGameStore';
 
@@ -33,6 +34,8 @@ export default function GameLobby() {
     numberOfPerfectRounds,
     volume
   } = useGameStore();
+
+  const { columns } = useWindowSize();
 
   const [canAdvance, setCanAdvance] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -122,23 +125,23 @@ export default function GameLobby() {
       <div className="h-section gap-lg mx-auto">
         <div className='score__container--box f-jc-c'>
           <div className="v-section gap-xs">
-            <div className="h-section gap-lg f-jc-sb f-ai-c ">
+            <div className="h-section gap-lg f-jc-sb f-ai-c">
               <p>{t('common.levelPoints', { level: level - levelsToAdvance })}</p>
               <h4 className='highlight'>{lastRoundPoints}</h4>
             </div>
-            <div className="h-section gap-lg f-jc-sb f-ai-c ">
+            <div className="h-section gap-lg f-jc-sb f-ai-c">
               <p>{t('common.totalPoints')}</p>
               <h4 className='highlight'>{totalPoints}</h4>
             </div>
-            <div className="h-section gap-lg f-jc-sb f-ai-c ">
+            <div className="h-section gap-lg f-jc-sb f-ai-c">
               <p>{t('common.remainingTime')}</p>
               <h4><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : secondsToRemove > 0 ? 'lost' : 'highlight'}`}>{gameTime}{t('common.seconds')}</span></h4>
             </div>
-            <div className="h-section gap-lg f-jc-sb f-ai-c ">
+            <div className="h-section gap-lg f-jc-sb f-ai-c">
               <p>{t('common.numberOfRounds')}</p>
               <h4><span className="highlight">{numberOfRounds}</span></h4>
             </div>
-            <div className="h-section gap-lg f-jc-sb f-ai-c ">
+            <div className="h-section gap-lg f-jc-sb f-ai-c">
               <p>{t('common.perfectRounds')}</p>
               <h4><span className={`${levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR? 'won' : 'highlight'}`}>{numberOfPerfectRounds}</span></h4>
             </div>
@@ -149,7 +152,7 @@ export default function GameLobby() {
             <div className='info-icon'>i</div>
           </Tooltip>
           <p>{t('common.lastWords')}</p>
-          <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / 3) } as React.CSSProperties}>
+          <div className="v-section score__container--wordlist" style={{ '--wordlist-rows': Math.ceil(lastLevelWords.length / columns), '--wordlist-columns': columns } as React.CSSProperties}>
             {lastLevelWords.map((word, index) => (
               <h4 className={`${word.guessed ? 'highlight' : 'unguessed'}`} key={`${index}-${word}`}>
                 <Link to={getDictionaryUrl(word.word)} target='_blank' rel='noreferrer'>

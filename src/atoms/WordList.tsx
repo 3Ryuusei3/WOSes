@@ -3,6 +3,8 @@ import { useRef } from 'react';
 import Word from '../types/Word';
 import Mechanics from '../types/Mechanics';
 
+import useWindowSize from '../hooks/useWindowSize';
+
 interface WordListProps {
   words: Word[];
   playerName: string;
@@ -13,9 +15,10 @@ interface WordListProps {
 
 export default function WordList({ words, playerName, percentage, gameMechanics, SHOW_LETTERS_PERCENTAGE }: WordListProps) {
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const { columns } = useWindowSize();
 
   return (
-    <ul className='wordlist' style={{ '--wordlist-rows': Math.ceil(words.length / 3) } as React.CSSProperties}>
+    <ul className='wordlist' style={{ '--wordlist-rows': Math.ceil(words.length / columns), '--wordlist-columns': columns } as React.CSSProperties}>
       {words.map((wordObj, index) => (
         <li
           key={`${index}-${wordObj.word}`}

@@ -40,7 +40,6 @@
   --clr-progress-late: var(--clr-lose);
   --clr-progress-color: var(--clr-progress-on-time);
 
-
   font-family: "M PLUS Rounded 1c", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 900;
   color: var(--clr-text-secondary);
@@ -229,7 +228,7 @@ button, .btn {
   }
 
   &--sm {
-    font-size: 16px;
+    font-size: 18px;
     padding: 8px 20px;
   }
 
@@ -545,6 +544,13 @@ main {
   gap: 48px;
 }
 
+.bp-sm {
+  @media screen and (max-width: 576px) {
+    flex-direction: column;
+    gap: 0px
+  }
+}
+
 .pos-rel {
   position: relative;
 }
@@ -577,8 +583,8 @@ main {
 .logo {
   filter: drop-shadow(0px 2px 20px var(--clr-bg-primary));
   @media screen and (max-width: 576px) {
-    width: 260px;
-    margin-bottom: 20px;
+    width: 200px;
+    margin-bottom: 5px;
   }
 }
 
@@ -731,7 +737,8 @@ main {
 
 .score__container--wordlist {
   display: grid;
-  grid-template: repeat(var(--wordlist-rows), 1fr) / repeat(3, 1fr);
+  grid-template: repeat(var(--wordlist-rows), 1fr) / repeat(var(--wordlist-columns), 1fr);
+  stone: var(--wordlist-columns);
   column-gap: 16px;
   grid-auto-flow: column dense;
 
@@ -794,9 +801,9 @@ main {
   animation: selectedLetter 0.5s linear forwards;
 
   @media screen and (max-width: 576px) {
-    width: 80px;
-    height: 80px;
-    font-size: 46px;
+    width: 84px;
+    height: 84px;
+    font-size: 50px;
   }
 
   &.still {
@@ -984,9 +991,9 @@ main {
 
 .wordlist {
   display: grid;
-  grid-template: repeat(var(--wordlist-rows), 1fr) / repeat(3, 1fr);
+  grid-template: repeat(var(--wordlist-rows), 1fr) / repeat(var(--wordlist-columns), 1fr);
   column-gap: 16px;
-  row-gap: 1.5px;
+  row-gap: 2px;
   grid-auto-flow: column dense;
 }
 
@@ -1008,8 +1015,9 @@ main {
   transition: background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease, transform 0.5s ease;
 
   @media screen and (max-width: 576px) {
-    width: 23px;
-    height: 23px;
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
   }
 
   span {
@@ -1061,7 +1069,7 @@ main {
   letter-spacing: 0.05px;
 
   @media screen and (max-width: 576px) {
-    font-size: 13px;
+    font-size: 16px;
   }
 }
 
@@ -1262,8 +1270,8 @@ main {
     border-radius: 4px;
 
     @media screen and (max-width: 576px) {
-      max-width: 900px;
-      padding: 70px 100px;
+      max-width: 700px;
+      padding: 25px 100px 10px;
     }
   }
 }
@@ -1349,7 +1357,7 @@ main {
 
   @media screen and (max-width: 576px) {
     top: 50px;
-    left: 10px;
+    left: 50px;
 
     .language-toggle {
       font-size: 12px;

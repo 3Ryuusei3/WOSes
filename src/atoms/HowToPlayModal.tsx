@@ -5,6 +5,8 @@ import Instructions from './Instructions';
 import arrowLeft from '../assets/arrow-left.svg';
 import arrowRight from '../assets/arrow-right.svg';
 
+import useWindowSize from '../hooks/useWindowSize';
+
 interface HowToPlayModalProps {
   isOpen: boolean;
   setHowToPlayModal: Dispatch<SetStateAction<boolean>>;
@@ -14,6 +16,7 @@ export default function HowToPlayModal({ isOpen, setHowToPlayModal }: HowToPlayM
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const instructions = Instructions();
+  const { columns } = useWindowSize();
 
   const handleClose = () => {
     setHowToPlayModal(false);
@@ -29,7 +32,7 @@ export default function HowToPlayModal({ isOpen, setHowToPlayModal }: HowToPlayM
 
   return (
     <div className={`modal ${isOpen ? 'open' : ''}`}>
-      <div className='modal__content'>
+      <div className='modal__content' style={{ '--wordlist-columns': columns } as React.CSSProperties}>
         <div className='modal__close'>
           <span className='' onClick={handleClose}>
             <h4 className='sr-only lost'>ｘ</h4>
