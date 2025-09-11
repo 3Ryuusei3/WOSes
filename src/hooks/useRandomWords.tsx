@@ -36,15 +36,20 @@ const hasAnyLetter = (word: string, letters: string[]): boolean => {
   return letters.some(letter => word.includes(letter));
 };
 
+const filterUsedWords = (words: string[], usedWords: string[]): string[] => {
+  return words.filter(word => !usedWords.includes(word.toLowerCase()));
+};
+
 const useRandomWords = (difficulty: Difficulty = 'hard') => {
   const { i18n } = useTranslation();
-  const { setRandomWord, setPossibleWords, level, setHiddenLetterIndex } = useGameStore();
+  const { setRandomWord, setPossibleWords, level, setHiddenLetterIndex, previousRoundsWords } = useGameStore();
   const { words } = useLanguageWords(difficulty);
 
   useEffect(() => {
     if (words && words.length > 0) {
       const { WORD_LEVEL_RANGES } = getLanguageConstants(i18n.language);
       const filteredWords = words.filter(word => word.length >= 4 && word.length <= 9);
+      const availableWords = filterUsedWords(filteredWords, previousRoundsWords);
 
       const getWordBasedOnLevel = (words: string[]): string => {
         if (level >= WORD_LEVEL_RANGES.START.MIN && level <= WORD_LEVEL_RANGES.START.MAX) {
@@ -62,18 +67,20 @@ const useRandomWords = (difficulty: Difficulty = 'hard') => {
         }
       };
 
-      let word = getWordBasedOnLevel(filteredWords);
+      const wordsToUse = availableWords.length >= 5 ? availableWords : filteredWords;
+
+      let word = getWordBasedOnLevel(wordsToUse);
       let wordCount = countLetters(word);
-      let possibleWordsList = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
+      let possibleWordsList = wordsToUse.filter(w => canFormWord(countLetters(w), wordCount));
 
       const maxAttempts = 100;
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
         if (possibleWordsList.length >= 12 && possibleWordsList.length <= 22) {
           break;
         }
-        word = getWordBasedOnLevel(filteredWords);
+        word = getWordBasedOnLevel(wordsToUse);
         wordCount = countLetters(word);
-        possibleWordsList = filteredWords.filter(w => canFormWord(countLetters(w), wordCount));
+        possibleWordsList = wordsToUse.filter(w => canFormWord(countLetters(w), wordCount));
       }
 
       possibleWordsList.sort((a, b) => a.length - b.length || a.localeCompare(b));
@@ -82,7 +89,7 @@ const useRandomWords = (difficulty: Difficulty = 'hard') => {
       setPossibleWords(possibleWordsList);
       setHiddenLetterIndex(Math.floor(Math.random() * word.length));
     }
-  }, [words, level, setRandomWord, setPossibleWords, setHiddenLetterIndex, difficulty, i18n.language]);
+  }, [words, level, setRandomWord, setPossibleWords, setHiddenLetterIndex, difficulty, i18n.language, previousRoundsWords]);
 };
 
 export default useRandomWords;

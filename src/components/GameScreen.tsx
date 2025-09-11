@@ -50,7 +50,8 @@ export default function GameScreen() {
     gameDifficulty,
     volume,
     numberOfRounds,
-    numberOfPerfectRounds
+    numberOfPerfectRounds,
+    setPreviousRoundsWords
   } = useGameStore();
 
   const showLettersPercentage = calculateProbability(
@@ -100,12 +101,14 @@ export default function GameScreen() {
     setLastRoundPoints(correctWordsPoints());
     updateLastLevelWordsAndPoints();
     setMode('lobby');
-  }, [setLevelsToAdvance, setLevel, setLastRoundPoints, correctWordsPoints, updateLastLevelWordsAndPoints, setMode]);
+    setPreviousRoundsWords((prevWords) => [...prevWords, randomWord]);
+  }, [setLevelsToAdvance, setLevel, setLastRoundPoints, correctWordsPoints, updateLastLevelWordsAndPoints, setMode, randomWord]);
 
   const endGameAndSaveScore = useCallback((finalPoints: number) => {
     updateLastLevelWordsAndPoints();
     updateHighscoreDB(finalPoints);
     setMode('lost');
+    setPreviousRoundsWords([]);
   }, [updateLastLevelWordsAndPoints, updateHighscoreDB, setMode]);
 
   const handleEndOfLevel = useCallback(() => {

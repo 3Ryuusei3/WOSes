@@ -41,6 +41,8 @@ interface GameState {
   setNumberOfRounds: (rounds: number | ((prev: number) => number)) => void;
   numberOfPerfectRounds: number;
   setNumberOfPerfectRounds: (rounds: number | ((prev: number) => number)) => void;
+  previousRoundsWords: string[];
+  setPreviousRoundsWords: (words: string[] | ((prev: string[]) => string[])) => void;
   volume: number;
   setVolume: (volume: number) => void;
 }
@@ -97,7 +99,11 @@ const useGameStore = create<GameState>()(
         numberOfPerfectRounds: typeof rounds === 'function' ? rounds(state.numberOfPerfectRounds) : rounds
       })),
       volume: 0.2,
-      setVolume: (volume) => set({ volume })
+      setVolume: (volume) => set({ volume }),
+      previousRoundsWords: [],
+      setPreviousRoundsWords: (words) => set((state) => ({
+        previousRoundsWords: typeof words === 'function' ? words(state.previousRoundsWords) : words
+      }))
     }),
     {
       name: 'woses-game-storage',
