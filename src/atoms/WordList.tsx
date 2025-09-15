@@ -1,6 +1,8 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import Word from '../types/Word';
+import hitSound from '../assets/hit.mp3';
+import useGameStore from '../store/useGameStore';
 import Mechanics from '../types/Mechanics';
 
 import useWindowSize from '../hooks/useWindowSize';
@@ -14,6 +16,28 @@ interface WordListProps {
 }
 
 export default function WordList({ words, playerName, percentage, gameMechanics, SHOW_LETTERS_PERCENTAGE }: WordListProps) {
+  const { players, role, volume } = useGameStore();
+  const prevGuessedCountRef = useRef<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (!audioRef.current) audioRef.current = new Audio(hitSound);
+  }, []);
+
+  useEffect(() => {
+    const guessedCount = words.filter(w => w.guessed).length;
+    if (guessedCount > prevGuessedCountRef.current) {
+      const effectiveVol = (players === 'multi' && role === 'player') ? 0 : volume;
+      if (audioRef.current) {
+        audioRef.current.volume = effectiveVol;
+        if (effectiveVol > 0) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play().catch(() => {});
+        }
+      }
+    }
+    prevGuessedCountRef.current = guessedCount;
+  }, [words, players, role, volume]);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
   const { columns } = useWindowSize();
 
@@ -26,7 +50,7 @@ export default function WordList({ words, playerName, percentage, gameMechanics,
           ref={el => wordRefs.current[index] = el}
         >
           {wordObj.guessed && (
-            <span className='playerName'>{playerName}</span>
+            <span className='playerName'>{wordObj.guessedByName || playerName}</span>
           )}
           <span className='wordLetters'>
             {wordObj.word.split('').map((letter, letterIndex) => (

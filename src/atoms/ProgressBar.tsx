@@ -12,7 +12,7 @@ export default function ProgressBar({ timeLeft, percentage, RUNNING_OUT_OF_TIME_
       <div
         className="progress__container"
         style={{
-          '--remaining-percentage': `${percentage}%`,
+          '--remaining-percentage': `${Math.max(0, Math.min(100, percentage))}%`,
           '--clr-progress-color': percentage < RUNNING_OUT_OF_TIME_PERCENTAGE ? 'var(--clr-progress-late)' : percentage < SHOW_LETTERS_PERCENTAGE ? 'var(--clr-progress-mid)' : 'var(--clr-progress-on-time)'
         } as React.CSSProperties}
       >

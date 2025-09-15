@@ -2,14 +2,18 @@ import Word from "../types/Word";
 
 import { LEVELS_TO_ADVANCE, THRESHHOLD  } from "../constant";
 
-const generateRandomRoom = () =>{
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const generateRandomRoomCode = () =>{
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
   const charactersLength = characters.length;
   for (let i = 0; i < 6; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
-  return '/game?id=' + result;
+  return result.toUpperCase();
+}
+
+const isValidPlayerName = (name: string) => {
+  return name.length >= 3 && name.length <= 10;
 }
 
 const calculateLevelsToAdvance = (completionPercentage: number): number => {
@@ -87,7 +91,8 @@ const getThisWeekDateRange = () => {
 }
 
 export {
-  generateRandomRoom,
+  generateRandomRoomCode,
+  isValidPlayerName,
   calculateLevelsToAdvance,
   calculateProbability,
   getMostCommonLetter,

@@ -20,7 +20,7 @@ export default function ScoreContainer({ words, correctWordsPoints, goalPoints, 
 
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.style.top = `${(containerRef.current.offsetHeight * - 1) - 20}px`;
+      containerRef.current.style.top = `${(containerRef.current.offsetHeight * - 1) - 15}px`;
     }
   }, []);
 

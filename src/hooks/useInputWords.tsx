@@ -21,6 +21,12 @@ const useInputWords = (initialWords: string[]) => {
     }
   };
 
+  const markWordGuessed = (target: string, guessedByName?: string) => {
+    setWords(prev => prev.map(w => w.word === target ? { ...w, guessed: true, guessedByName } : w));
+  };
+
+  const clearInput = () => setInputWord('');
+
   const correctWords = words.filter(w => w.guessed).map(w => w.word);
 
   return {
@@ -29,6 +35,8 @@ const useInputWords = (initialWords: string[]) => {
     correctWords,
     handleChange,
     handleKeyDown,
+    markWordGuessed,
+    clearInput,
   };
 };
 

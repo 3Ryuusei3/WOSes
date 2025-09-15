@@ -1,23 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-const useProgressBar = (duration: number) => {
-  const [timeLeft, setTimeLeft] = useState(duration * 1000);
+const useProgressBar = (duration: number, startedAtMs?: number) => {
+  const durationMsRef = useRef<number>(duration * 1000);
+  const startedAtRef = useRef<number>(startedAtMs ?? Date.now());
+  const [now, setNow] = useState<number>(Date.now());
 
   useEffect(() => {
-    setTimeLeft(duration * 1000);
+    durationMsRef.current = duration * 1000;
   }, [duration]);
 
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    if (startedAtMs) {
+      startedAtRef.current = startedAtMs;
+    } else {
+      startedAtRef.current = Date.now();
+    }
+  }, [startedAtMs, duration]);
 
-    const intervalId = setInterval(() => {
-      setTimeLeft(prevTime => prevTime - 10);
-    }, 10);
+  useEffect(() => {
+    let rafId: number | null = null;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    return () => clearInterval(intervalId);
-  }, [timeLeft]);
+    const tick = () => setNow(Date.now());
 
-  const percentage = (timeLeft / (duration * 1000)) * 100;
+    intervalId = setInterval(tick, 200);
+
+    const loop = () => {
+      tick();
+      rafId = window.requestAnimationFrame(loop);
+    };
+    rafId = window.requestAnimationFrame(loop);
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  const endAt = startedAtRef.current + durationMsRef.current;
+  const timeLeft = Math.max(0, endAt - now);
+  const percentage = Math.max(0, Math.min(100, (timeLeft / durationMsRef.current) * 100 || 0));
 
   return { timeLeft, percentage };
 };

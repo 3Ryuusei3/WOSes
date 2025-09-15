@@ -176,9 +176,12 @@ const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: n
       const letterObject = createLetterObject(word, gameMechanics, fakeLetter, hiddenLetterIndex, possibleWords, lastLevelWords, levelsToAdvance, stillLetterIndex, fakeLetterIndex, finalStillPosition, initialDarkIndex);
       setShuffledWordObject(letterObject);
 
+      // Mute shuffle for players in multiplayer
       const audio = new Audio(shuffleSound);
-      audio.volume = volumeRef.current;
-      audio.play();
+      const { players, role } = useGameStore.getState();
+      const effectiveVol = (players === 'multi' && role === 'player') ? 0 : volumeRef.current;
+      audio.volume = effectiveVol;
+      if (effectiveVol > 0) audio.play();
     };
 
     const interval = setInterval(shuffleAndAddLetter, intervalTime);

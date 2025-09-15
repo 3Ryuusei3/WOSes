@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import TopScores from '../atoms/TopScores';
+// import PlayersRanking from '../atoms/PlayersRanking';
+import PlayersPanel from '../atoms/PlayersPanel';
 import Tooltip from '../atoms/Tooltip';
 import GameSound from '../atoms/GameSound';
 import DifficultyTag from '../atoms/DifficultyTag';
@@ -28,6 +30,8 @@ export default function GameLost() {
     setGameMechanics,
     setGameTime,
     setLevelsToAdvance,
+    players,
+    role,
     numberOfRounds,
     setNumberOfRounds,
     numberOfPerfectRounds,
@@ -88,6 +92,17 @@ export default function GameLost() {
     }
   }, [volume]);
 
+  if (players === 'multi' && role === 'player') {
+    return (
+      <div className='game__container f-jc-c'>
+        <PlayersPanel lastLevelWords={lastLevelWords} />
+        <div className="h-section gap-xs f-jc-c mt-sm">
+          <Link to="/game"><button>Salir</button></Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='game__container f-jc-c'>
       <div className="difficulty-tag">
@@ -143,7 +158,10 @@ export default function GameLost() {
         </div>
       </div>
       <div className="h-section gap-xs f-jc-c mb-sm">
-        <button onClick={handlePlayAgain}>{t('common.playAgain')}</button>
+        {role !== 'host' && (
+          <button onClick={handlePlayAgain}>{t('common.playAgain')}</button>
+        )}
+        <Link to="/game"><button>Salir</button></Link>
       </div>
       <GameSound />
     </div>

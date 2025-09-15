@@ -3,6 +3,7 @@
     "play": "PLAY",
     "playAgain": "PLAY AGAIN",
     "start": "START GAME IN {{difficulty}}",
+    "startMultiplayer": "CREATE ROOM IN {{difficulty}}",
     "close": "CLOSE",
     "yes": "YES",
     "no": "NO",

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 import Mode from '../types/Mode';
+import Role from '../types/Role';
 import Word from '../types/Word';
 import Mechanics from '../types/Mechanics';
 import Difficulty from '../types/Difficulty';
@@ -13,6 +14,18 @@ interface GameState {
   setMode: (mode: Mode) => void;
   playerName: string;
   setPlayerName: (name: string) => void;
+  playerId: number | null;
+  setPlayerId: (id: number | null) => void;
+  roundId: number | null;
+  setRoundId: (id: number | null) => void;
+  players: string;
+  setPlayers: (players: string) => void;
+  roomCode: string;
+  setRoomCode: (code: string) => void;
+  roomId: number | null;
+  setRoomId: (id: number | null) => void;
+  role: Role | null;
+  setRole: (role: Role | null) => void;
   randomWord: string;
   setRandomWord: (word: string) => void;
   possibleWords: string[];
@@ -54,6 +67,18 @@ const useGameStore = create<GameState>()(
       setMode: (mode) => set({ mode }),
       playerName: '',
       setPlayerName: (name) => set({ playerName: name }),
+      playerId: null,
+      setPlayerId: (id) => set({ playerId: id }),
+      roundId: null,
+      setRoundId: (id) => set({ roundId: id }),
+      players: 'single',
+      setPlayers: (players) => set({ players }),
+      roomCode: '',
+      setRoomCode: (code) => set({ roomCode: code }),
+      roomId: null,
+      setRoomId: (id) => set({ roomId: id }),
+      role: null,
+      setRole: (role) => set({ role }),
       randomWord: '',
       setRandomWord: (word) => set({ randomWord: word }),
       possibleWords: [],

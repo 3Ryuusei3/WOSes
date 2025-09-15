@@ -3,6 +3,7 @@
     "play": "JUGAR",
     "playAgain": "JUGAR DE NUEVO",
     "start": "EMPEZAR PARTIDA EN {{difficulty}}",
+    "startMultiplayer": "CREAR SALA EN {{difficulty}}",
     "close": "CERRAR",
     "yes": "SÍ",
     "no": "NO",
@@ -76,8 +77,12 @@
     "hard": "EXPERTO",
     "tooltip": "Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad \"EXPERTO\" contiene todas las palabras que existen en la RAE."
   },
+  "players": {
+    "single": "SOLO",
+    "multi": "MULTIJUGADOR"
+  },
   "gameStart": {
-    "nameAndDifficulty": "INTRODUCE TU NOMBRE Y ELIGE LA DIFICULTAD",
+    "nameAndDifficulty": "¡DEMUESTRA TU VOCABULARIO!",
     "nameError": "EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES",
     "learnToPlay": "APRENDE A JUGAR AQUÍ"
   },

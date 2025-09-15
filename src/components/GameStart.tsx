@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import TopScores from '../atoms/TopScores';
 import HowToPlayModal from '../atoms/HowToPlayModal';
 import DifficultySelector from '../atoms/DifficultySelector';
 import LanguageSelector from '../atoms/LanguageSelector';
-import Difficulty from '../types/Difficulty';
 
 import useRandomWords from '../hooks/useRandomWords';
 import useBackgroundAudio from '../hooks/useBackgroundAudio';
@@ -13,21 +13,45 @@ import useSetMechanics from '../hooks/useSetMechanics';
 
 import useGameStore from '../store/useGameStore';
 import GameSound from '../atoms/GameSound';
+import PlayersSelector from '../atoms/PlayersSelector';
+
+import { generateRandomRoomCode, isValidPlayerName } from '../utils';
+import { createRoomWithHost } from '../services/multiplayer';
 
 export default function GameStart() {
-  const { playerName, setPlayerName, setMode, gameMechanics, level, setGameDifficulty, gameDifficulty, volume } = useGameStore();
+  const { playerName, setPlayerName, setMode, gameMechanics, level, setGameDifficulty, gameDifficulty, volume, players, setPlayers, setRoomCode, setRole, setRoomId } = useGameStore();
   const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const enableMulti = searchParams.get('multi') === 'true';
 
   useSetMechanics(gameMechanics, level);
   useRandomWords(gameDifficulty);
 
   useBackgroundAudio(volume);
 
-  const handleSubmit = () => {
-    if (playerName.length >= 3 && playerName.length <= 10) {
-      setMode('loading');
+  const handleSubmit = async () => {
+    if (isValidPlayerName(playerName)) {
+      if (!enableMulti) {
+        // Force singleplayer if multi not enabled via query
+        setPlayers('single');
+      }
+      if (players === 'single') {
+        setMode('loading');
+      } else {
+        const roomCode = generateRandomRoomCode();
+        setRoomCode(roomCode);
+        const { data, error } = await createRoomWithHost(roomCode, playerName, gameDifficulty);
+        if (!error && data) {
+          setRole('host');
+          setRoomId(data.room.id);
+          navigate(`/game?id=${roomCode}`);
+        } else {
+          setError(true);
+        }
+      }
     } else {
       setError(true);
     }
@@ -45,8 +69,13 @@ export default function GameStart() {
     setPlayerName(value);
   };
 
-  const getDifficultyLabel = (difficulty: Difficulty) => {
-    return t(`difficulties.${difficulty}`);
+  const getButtonText = () => {
+    const difficultyLabel = t(`difficulties.${gameDifficulty}`);
+    if (players === 'multi') {
+      return t('common.startMultiplayer', { difficulty: difficultyLabel });
+    } else {
+      return t('common.start', { difficulty: difficultyLabel });
+    }
   };
 
   return (
@@ -55,10 +84,15 @@ export default function GameStart() {
         <LanguageSelector />
         <div className="h-section gap-sm">
           <div className='v-section gap-md w100 f-jc-c'>
-            <h2 className='highlight title-sm'>{t('gameStart.nameAndDifficulty')}</h2>
+            <h2 className='highlight'>{t('gameStart.nameAndDifficulty')}</h2>
             <DifficultySelector
               gameDifficulty={gameDifficulty}
               onDifficultyChange={setGameDifficulty}
+            />
+            <PlayersSelector
+              players={players}
+              setPlayers={setPlayers}
+              enableMulti={enableMulti}
             />
             <div className="v-section gap-xs">
               <input
@@ -79,7 +113,7 @@ export default function GameStart() {
                 className={`btn ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}
                 onClick={handleSubmit}
               >
-                {t('common.start', { difficulty: getDifficultyLabel(gameDifficulty) })}
+                {getButtonText()}
               </button>
             </div>
           </div>

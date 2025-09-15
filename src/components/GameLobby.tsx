@@ -18,6 +18,10 @@ import useGameStore from '../store/useGameStore';
 import levelPassedSound from '../assets/win.mp3';
 
 import { LEVELS_TO_ADVANCE } from '../constant';
+// import PlayersRanking from '../atoms/PlayersRanking';
+import PlayersPanel from '../atoms/PlayersPanel';
+import { subscribeToRoom, startRoomWithWord } from '../services/multiplayer';
+import useLanguageWords from '../hooks/useLanguageWords';
 
 export default function GameLobby() {
   const {
@@ -30,10 +34,20 @@ export default function GameLobby() {
     gameTime,
     gameMechanics,
     gameDifficulty,
+    players,
+    role,
+    roomId,
+    roomCode,
+    randomWord,
+    setRandomWord,
+    setPossibleWords,
+    setHiddenLetterIndex,
     numberOfRounds,
     numberOfPerfectRounds,
     volume
   } = useGameStore();
+
+  const { words } = useLanguageWords(gameDifficulty);
 
   const { columns } = useWindowSize();
 
@@ -82,10 +96,44 @@ export default function GameLobby() {
   const secondsToRemove = useRemoveSeconds();
 
   const handleAdvance = useCallback(() => {
-    if (canAdvance) {
+    if (!canAdvance) return;
+    // Host in multiplayer: start next round via DB so all devices follow
+    if (players === 'multi' && role === 'host' && roomCode && randomWord) {
+      startRoomWithWord(roomCode, randomWord).then(({ error }) => {
+        if (!error) setMode('loading');
+      });
+    } else {
       setMode('loading');
     }
-  }, [canAdvance, setMode]);
+  }, [canAdvance, players, role, roomCode, randomWord, setMode]);
+
+  // Realtime: follow room state while in Lobby
+  useEffect(() => {
+    if (!roomId) return;
+    const channel = subscribeToRoom(roomId, (payload: any) => {
+      const newRoom = (payload.new as any);
+      const newState = newRoom?.state;
+      const currentWord = newRoom?.current_word as string | null;
+      // Importante: en lobby no forzamos la palabra desde BBDD, el host genera una nueva localmente
+      if (currentWord && (newState === 'loading' || newState === 'game')) {
+        setRandomWord(currentWord);
+        // Recalculate possible words for everyone
+        const countLetters = (w: string) => w.split('').reduce((acc: any, l: string) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {});
+        const canFormWord = (wc: any, lc: any) => Object.keys(wc).every(k => (lc[k] || 0) >= wc[k]);
+        const lettersCount = countLetters(currentWord);
+        const possible = (words || []).filter((w) => canFormWord(countLetters(w), lettersCount));
+        possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
+        setPossibleWords(possible);
+        setHiddenLetterIndex(Math.floor(Math.random() * currentWord.length));
+      }
+      if (newState === 'loading') setMode('loading');
+      else if (newState === 'game') setMode('game');
+      else if (newState === 'lost') setMode('lost');
+    });
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [roomId, setMode, setRandomWord, setPossibleWords, setHiddenLetterIndex, words]);
 
   const areAllMechanicsFalse = gameMechanics ? Object.values(gameMechanics).every(value => value === false) : false;
 
@@ -95,6 +143,14 @@ export default function GameLobby() {
     }
     return `https://dle.rae.es/${word}`;
   };
+
+  if (players === 'multi' && role === 'player') {
+    return (
+      <div className='game__container f-jc-c'>
+        <PlayersPanel lastLevelWords={lastLevelWords} />
+      </div>
+    );
+  }
 
   return (
     <div
