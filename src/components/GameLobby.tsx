@@ -18,7 +18,6 @@ import useGameStore from '../store/useGameStore';
 import levelPassedSound from '../assets/win.mp3';
 
 import { LEVELS_TO_ADVANCE } from '../constant';
-// import PlayersRanking from '../atoms/PlayersRanking';
 import PlayersPanel from '../atoms/PlayersPanel';
 import { subscribeToRoom, startRoomWithWord } from '../services/multiplayer';
 import useLanguageWords from '../hooks/useLanguageWords';

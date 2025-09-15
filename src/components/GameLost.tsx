@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import TopScores from '../atoms/TopScores';
-// import PlayersRanking from '../atoms/PlayersRanking';
 import PlayersPanel from '../atoms/PlayersPanel';
 import Tooltip from '../atoms/Tooltip';
 import GameSound from '../atoms/GameSound';
@@ -97,7 +96,7 @@ export default function GameLost() {
       <div className='game__container f-jc-c'>
         <PlayersPanel lastLevelWords={lastLevelWords} />
         <div className="h-section gap-xs f-jc-c mt-sm">
-          <Link to="/game"><button>Salir</button></Link>
+          <button onClick={() => setMode('start')} className='btn btn--sm btn--lose'>SALIR</button>
         </div>
       </div>
     );
@@ -161,7 +160,7 @@ export default function GameLost() {
         {role !== 'host' && (
           <button onClick={handlePlayAgain}>{t('common.playAgain')}</button>
         )}
-        <Link to="/game"><button>Salir</button></Link>
+        <button onClick={() => setMode('start')} className='btn btn--sm btn--lose'>SALIR</button>
       </div>
       <GameSound />
     </div>

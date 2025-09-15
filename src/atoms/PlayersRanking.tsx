@@ -15,7 +15,7 @@ interface PlayersRankingProps {
 }
 
 export default function PlayersRanking({ title = 'RANKING', sortBy = 'score', toggleable = false }: PlayersRankingProps) {
-  const { roomId } = useGameStore();
+  const { roomId, playerName } = useGameStore();
   const [players, setPlayers] = useState<Player[]>([]);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const [showLastRound, setShowLastRound] = useState(sortBy === 'last_round_score');
@@ -50,7 +50,7 @@ export default function PlayersRanking({ title = 'RANKING', sortBy = 'score', to
   return (
     <div className="v-section gap-lg f-jc-c">
       {toggleable && (
-        <div className={`top-scores__arrows top-scores__arrows`}>
+        <div className={`top-scores__arrows top-scores__arrows top-scores__arrows--tooltip`}>
           <img src={arrowLeft} alt="arrow-left" onClick={() => setShowLastRound(prev => !prev)} />
           <img src={arrowRight} alt="arrow-right" onClick={() => setShowLastRound(prev => !prev)} />
         </div>
@@ -62,10 +62,12 @@ export default function PlayersRanking({ title = 'RANKING', sortBy = 'score', to
         {sorted.length > 0 ? (
           sorted.map((player, index) => {
             const value = effectiveKey === 'last_round_score' ? (player.last_round_score ?? 0) : (player.score ?? 0);
+            const placeClass = index === 0 ? 'won' : index === 1 ? 'highlight' : index === 2 ? 'unguessed' : 'lost';
+            const isMe = player.name === playerName;
             return (
               <div className="h-section gap-sm" key={player.id}>
-                <h6 className="won">{String(index + 1).padStart(2, '0')}</h6>
-                <h6 className="highlight">{player.name}</h6>
+                <h6 className={placeClass}>{String(index + 1).padStart(2, '0')}</h6>
+                <h6 className={isMe ? 'tip' : 'highlight'}>{player.name}</h6>
                 <h6 className="unguessed ml-auto">{value}</h6>
               </div>
             );

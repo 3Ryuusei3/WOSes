@@ -69,7 +69,7 @@ export default function GameLoading() {
 
   return (
     <div className='game__container'>
-      <h1 className='highlight'>{t('game.gameStartsIn')}</h1>
+      <h2 className='highlight'>{t('game.gameStartsIn')}</h2>
       <div className="loading__container">
         <h2 className='highlight'>
           {countdown <= 0 ? t('game.start') : Math.ceil(countdown)}

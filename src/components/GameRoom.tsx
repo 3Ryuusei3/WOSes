@@ -170,7 +170,7 @@ export default function GameRoom() {
                   />
                   <small className={`txt-center ${nameError ? '' : 'op-0'}`}>{t('gameStart.nameError')}</small>
                   <small className={`txt-center lost ${joinError ? '' : 'op-0'}`}>{joinError || ''}</small>
-                  <button className='btn mx-auto' onClick={handleJoin} disabled={!isValidPlayerName(playerName)}>ENTRAR A LA SALA</button>
+                  <button className='btn btn--sm mx-auto' onClick={handleJoin} disabled={!isValidPlayerName(playerName)}>ENTRAR A LA SALA</button>
                 </div>
               </div>
             ) : (
