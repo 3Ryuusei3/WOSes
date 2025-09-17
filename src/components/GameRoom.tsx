@@ -2,30 +2,31 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { QRCodeSVG } from "qrcode.react";
 import useGameStore from '../store/useGameStore';
 import useLanguageWords from '../hooks/useLanguageWords';
-import { getRoomPlayers, subscribeToRoomPlayers, startRoomWithWord, joinRoomAsPlayer, subscribeToRoom } from '../services/multiplayer';
+import { getRoomPlayers, subscribeToRoomPlayers, startRoomWithWord, joinRoomAsPlayer, subscribeToRoom, seedRoundWords } from '../services/multiplayer';
 import { isValidPlayerName } from '../utils';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '../lib/supabase';
+import Difficulty from '../types/Difficulty';
 
 export default function GameRoom() {
   const { t } = useTranslation();
-  const { roomCode, playerName, setPlayerName, role, setRole, roomId, setRoomId, setMode, randomWord, setRandomWord, setPossibleWords, setHiddenLetterIndex, gameDifficulty, setPlayers, setPlayerId } = useGameStore();
+  const { roomCode, playerName, setPlayerName, role, setRole, roomId, setRoomId, setMode, randomWord, setRandomWord, setPossibleWords, setHiddenLetterIndex, gameDifficulty, setPlayers, setPlayerId, setGameDifficulty } = useGameStore();
   const { words } = useLanguageWords(gameDifficulty);
   const [roomPlayers, setRoomPlayers] = useState<{ id: number; name: string; score: number; role: 'host' | 'player' }[]>([]);
   const playersChannelRef = useRef<ReturnType<typeof subscribeToRoomPlayers> | null>(null);
   const roomChannelRef = useRef<ReturnType<typeof subscribeToRoom> | null>(null);
   const [nameError, setNameError] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
+  // Pre-seeding antes de crear la ronda causaba "Round not found". Sembramos solo tras startRoomWithWord.
 
   const isHost = role === 'host';
 
   useEffect(() => {
-    // Initial fetch of players if roomId is known
     if (roomId) {
       getRoomPlayers(roomId).then(({ data }) => {
         if (data) setRoomPlayers(data);
       });
 
-      // Subscribe to realtime players list
       if (!playersChannelRef.current) {
         playersChannelRef.current = subscribeToRoomPlayers(roomId, () => {
           getRoomPlayers(roomId).then(({ data }) => {
@@ -34,11 +35,14 @@ export default function GameRoom() {
         });
       }
 
-      // Subscribe to room state to transition when host starts
       if (!roomChannelRef.current) {
         roomChannelRef.current = subscribeToRoom(roomId, (payload) => {
           const newRoom = (payload.new as any);
           const newState = newRoom?.state;
+          const newDifficulty = newRoom?.difficulty as Difficulty | undefined;
+          if (newDifficulty) {
+            setGameDifficulty(newDifficulty);
+          }
           const currentWord = newRoom?.current_word as string | null;
           if (currentWord) {
             setRandomWord(currentWord);
@@ -76,12 +80,26 @@ export default function GameRoom() {
 
   const canStart = nonHostPlayers.length >= 2;
 
+  // (Seeding se hace tras startRoomWithWord en handleStart y en Lobby)
+
   const handleStart = async () => {
     if (!roomCode || !canStart) return;
     // Host sets current word for all
     const currentWord = randomWord || '';
     const { data, error } = await startRoomWithWord(roomCode, currentWord);
     if (!error && data) {
+      // Seed pending words for consistency across clients
+      try {
+        if (words && words.length > 0) {
+          // Rebuild possible words locally from currentWord to send only valid anagrams
+          const countLetters = (w: string) => w.split('').reduce((acc: any, l: string) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {});
+          const canFormWord = (wc: any, lc: any) => Object.keys(wc).every(k => (lc[k] || 0) >= wc[k]);
+          const lettersCount = countLetters(currentWord);
+          const possible = (words || []).filter((w) => canFormWord(countLetters(w), lettersCount));
+          possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
+          await seedRoundWords(roomCode, possible);
+        }
+      } catch (_) {}
       setMode('loading');
     }
   };
@@ -99,6 +117,15 @@ export default function GameRoom() {
       setRoomId(data.room.id);
       setPlayerId(data.player.id);
       setPlayers('multi');
+      try {
+        const { data: roomRow } = await supabase
+          .from('rooms')
+          .select('difficulty')
+          .eq('id', data.room.id)
+          .single();
+        const diff = (roomRow as any)?.difficulty as Difficulty | undefined;
+        if (diff) setGameDifficulty(diff);
+      } catch (_) {}
     } else if (error) {
       setJoinError(error.message || 'No se puede acceder a la sala');
     }

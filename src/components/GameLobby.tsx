@@ -19,7 +19,7 @@ import levelPassedSound from '../assets/win.mp3';
 
 import { LEVELS_TO_ADVANCE } from '../constant';
 import PlayersPanel from '../atoms/PlayersPanel';
-import { subscribeToRoom, startRoomWithWord } from '../services/multiplayer';
+import { subscribeToRoom, startRoomWithWord, seedRoundWords } from '../services/multiplayer';
 import useLanguageWords from '../hooks/useLanguageWords';
 
 export default function GameLobby() {
@@ -55,6 +55,7 @@ export default function GameLobby() {
   const [selectedMechanic, setSelectedMechanic] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const seededRef = useRef<boolean>(false);
 
   const { t, i18n } = useTranslation();
 
@@ -79,6 +80,25 @@ export default function GameLobby() {
     };
   }, [volume]);
 
+  // Host: seed next round words as soon as we enter lobby and have a new randomWord ready
+  useEffect(() => {
+    const seedNextRound = async () => {
+      if (seededRef.current) return;
+      if (players !== 'multi' || role !== 'host') return;
+      if (!roomCode || !randomWord || !words || words.length === 0) return;
+      try {
+        const countLetters = (w: string) => w.split('').reduce((acc: any, l: string) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {});
+        const canFormWord = (wc: any, lc: any) => Object.keys(wc).every(k => (lc[k] || 0) >= wc[k]);
+        const lettersCount = countLetters(randomWord);
+        const possible = (words || []).filter((w) => canFormWord(countLetters(w), lettersCount));
+        possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
+        await seedRoundWords(roomCode, possible);
+        seededRef.current = true;
+      } catch (_) {}
+    };
+    seedNextRound();
+  }, [players, role, roomCode, randomWord, words]);
+
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
@@ -98,8 +118,18 @@ export default function GameLobby() {
     if (!canAdvance) return;
     // Host in multiplayer: start next round via DB so all devices follow
     if (players === 'multi' && role === 'host' && roomCode && randomWord) {
-      startRoomWithWord(roomCode, randomWord).then(({ error }) => {
-        if (!error) setMode('loading');
+      startRoomWithWord(roomCode, randomWord).then(async ({ error }) => {
+        if (!error) {
+          try {
+            const countLetters = (w: string) => w.split('').reduce((acc: any, l: string) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {});
+            const canFormWord = (wc: any, lc: any) => Object.keys(wc).every(k => (lc[k] || 0) >= wc[k]);
+            const lettersCount = countLetters(randomWord);
+            const possible = (words || []).filter((w) => canFormWord(countLetters(w), lettersCount));
+            possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
+            await seedRoundWords(roomCode, possible);
+          } catch (_) {}
+          setMode('loading');
+        }
       });
     } else {
       setMode('loading');

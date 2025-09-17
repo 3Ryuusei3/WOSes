@@ -41,6 +41,8 @@
   --clr-progress-late: var(--clr-lose);
   --clr-progress-color: var(--clr-progress-on-time);
 
+  --text-shadow-position: 1px;
+
   font-family: "M PLUS Rounded 1c", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 900;
   color: var(--clr-text-secondary);
@@ -77,32 +79,28 @@ body {
 }
 
 h1 {
-  font-size: 48px;
+  font-size: 40px;
   line-height: 1.1;
   text-align: center;
-  text-shadow: 0px 1px 0 var(--clr-bg-terciary);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-bg-terciary);
 }
 
 h2 {
-  font-size: 36px;
+  font-size: 24px;
   line-height: 1.1;
   text-align: center;
-  text-shadow: 0px 1px 0 var(--clr-bg-terciary);
-
-  @media screen and (max-width: 576px) {
-    font-size: 24px;
-  }
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-bg-terciary);
 }
 
 h3 {
-  font-size: 27px;
+  font-size: 22px;
   line-height: 1.1;
   text-align: center;
   font-weight: 900;
 }
 
 h4 {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.1;
   text-align: center;
   color: var(--clr-text-primary);
@@ -152,7 +150,7 @@ a {
 
   &:hover {
     color: var(--clr-accent-primary-highlight);
-    text-shadow: 0px 1px 0 var(--clr-accent-terciary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-terciary);
   }
 }
 
@@ -456,69 +454,69 @@ main {
 
   &.dark {
     color: var(--clr-dark);
-    text-shadow: 0px 2px 0 var(--clr-dark-dim);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark-dim);
   }
 
   &.lost {
     color: var(--clr-lose);
-    text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-lose-highlight);
   }
 
   &.still {
     color: var(--clr-still);
-    text-shadow: 0px 2px 0 var(--clr-still-highlight);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-still-highlight);
   }
 
   &.highlight {
     color: var(--clr-accent-primary);
-    text-shadow: 0px 2px 0 var(--clr-accent-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-secondary);
   }
 
   &.won {
     color: var(--clr-win);
-    text-shadow: 0px 2px 0 var(--clr-win-highlight);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-win-highlight);
   }
 }
 
 .title {
   color: var(--clr-text-secondary);
-  text-shadow: 0px 2px 10px var(--clr-bg-primary);
+  text-shadow: 0px var(--text-shadow-position) 10px var(--clr-bg-primary);
 }
 
 .highlight {
   color: var(--clr-accent-primary);
-  text-shadow: 0px 2px 0 var(--clr-accent-secondary);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-secondary);
   text-decoration-color: var(--clr-accent-primary);
 }
 
 .lost {
   color: var(--clr-lose);
-  text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-lose-highlight);
 }
 
 .still {
   color: var(--clr-still);
-  text-shadow: 0px 2px 0 var(--clr-still-highlight);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-still-highlight);
 }
 
 .won {
   color: var(--clr-win);
-  text-shadow: 0px 2px 0 var(--clr-win-highlight);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-win-highlight);
 }
 
 .dark {
   color: var(--clr-dark);
-  text-shadow: 0px 2px 0 var(--clr-dark-dim);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark-dim);
 }
 
 .unguessed {
   color: var(--clr-accent-secondary);
-  text-shadow: 0px 2px 0 var(--clr-accent-secondary-highlight);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-secondary-highlight);
 }
 
 .tip {
   color: var(--clr-tip);
-  text-shadow: 0px 2px 0 var(--clr-tip-dim);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-tip-dim);
 }
 
 .gap-2xs {
@@ -572,7 +570,7 @@ main {
 }
 
 .logo {
-  filter: drop-shadow(0px 2px 20px var(--clr-bg-primary));
+  filter: drop-shadow(0px var(--text-shadow-position) 20px var(--clr-bg-primary));
 }
 
 .qr__container {
@@ -584,7 +582,7 @@ main {
   margin: 2rem;
   padding: 48px 32px;
   color: var(--clr-accent-primary);
-  text-shadow: 0px 2px 0 var(--clr-accent-secondary);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-secondary);
   background-color: var(--clr-bg-primary);
   border: 2px solid var(--clr-accent-primary);
   box-shadow: 0 0 0 4px var(--clr-progress-bg);
@@ -698,7 +696,7 @@ main {
   padding: 8px;
   gap: 8px;
   color: var(--clr-accent-primary);
-  text-shadow: 0px 2px 0 var(--clr-accent-secondary);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-secondary);
   background-color: var(--clr-bg-secondary);
   border: 2px solid var(--clr-accent-primary);
   box-shadow: 0 0 0 4px var(--clr-progress-bg);
@@ -780,14 +778,14 @@ main {
   text-align: center;
   border: 2px solid var(--clr-border-secondary);
   box-shadow: 0 0 0 4px var(--clr-border-primary);
-  text-shadow: 0px 2px 0 var(--clr-border-secondary);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
   transform: rotateX(0deg);
   animation: selectedLetter 0.5s linear forwards;
 
   &.still {
     background-color: var(--clr-still);
     border: 2px solid var(--clr-still-highlight);
-    text-shadow: 0px 2px 0 var(--clr-still-highlight);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-still-highlight);
     animation: none !important;
     transform: none !important;
 
@@ -806,19 +804,19 @@ main {
 
   &.fake {
     background-color: var(--clr-lose);
-    text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-lose-highlight);
     animation: fakeSelectedLetter 0.5s linear forwards;
   }
 
   &.hidden {
     background-color: var(--clr-accent-primary);
-    text-shadow: 0px 2px 0 var(--clr-accent-primary-highlight);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-primary-highlight);
     animation: hiddenSelectedLetter 0.5s linear forwards;
   }
 
   &.dark {
     background-color: var(--clr-text-primary);;
-    text-shadow: 0px 2px 0 var(--clr-dark-dim);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark-dim);
     animation: darkSelectedLetter 0.5s linear forwards;
   }
 
@@ -829,7 +827,7 @@ main {
 
   &.common {
     background-color: var(--clr-tip);
-    text-shadow: 0px 2px 0 var(--clr-border-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
     animation: commonSelectedLetter 0.5s linear forwards;
   }
 }
@@ -837,17 +835,17 @@ main {
 @keyframes selectedLetter {
   0% {
     color: var(--clr-text-secondary);
-    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
     transform: rotateX(180deg);
   }
   50% {
     color: var(--clr-text-secondary);
-    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
     transform: rotateX(90deg);
   }
   100% {
     color: var(--clr-text-primary);
-    text-shadow: 0px 2px 0 var(--clr-border-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
     transform: rotateX(0deg);
   }
 }
@@ -856,18 +854,18 @@ main {
   0% {
     color: var(--clr-text-secondary);
     background-color: var(--clr-text-secondary);
-    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
     transform: rotateX(180deg);
   }
   50% {
     color: var(--clr-text-secondary);
     background-color: var(--clr-text-secondary);
-    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
     transform: rotateX(90deg);
   }
   100% {
     color: var(--clr-text-primary);
-    text-shadow: 0px 2px 0 var(--clr-lose-highlight);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-lose-highlight);
     background-color: var(--clr-lose);
     transform: rotateX(0deg);
   }
@@ -877,18 +875,18 @@ main {
   0% {
     color: var(--clr-text-secondary);
     background-color: var(--clr-text-secondary);
-    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
     transform: rotateX(180deg);
   }
   50% {
     color: var(--clr-text-secondary);
     background-color: var(--clr-text-secondary);
-    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
     transform: rotateX(90deg);
   }
   100% {
     color: var(--clr-text-primary);
-    text-shadow: 0px 2px 0 var(--clr-accent-primary-highlight);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-primary-highlight);
     background-color: var(--clr-accent-primary);
     transform: rotateX(0deg);
   }
@@ -898,18 +896,18 @@ main {
   0% {
     color: var(--clr-dark);
     background-color: var(--clr-text-primary);
-    text-shadow: 0px 2px 0 var(--clr-dark);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark);
     transform: rotateX(180deg);
   }
   50% {
     color: var(--clr-dark);
     background-color: var(--clr-text-primary);
-    text-shadow: 0px 2px 0 var(--clr-dark);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark);
     transform: rotateX(90deg);
   }
   100% {
     color: var(--clr-dark);
-    text-shadow: 0px 2px 0 var(--clr-dark);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark);
     background-color: var(--clr-text-primary);
     transform: rotateX(0deg);
   }
@@ -919,19 +917,19 @@ main {
   0% {
     color: var(--clr-text-secondary);
     background-color: var(--clr-text-secondary);
-    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
     transform: rotateX(180deg);
   }
   50% {
     color: var(--clr-text-secondary);
     background-color: var(--clr-text-secondary);
-    text-shadow: 0px 2px 0 var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
     transform: rotateX(90deg);
   }
   100% {
     color: var(--clr-text-primary);
     background-color: var(--clr-tip);
-    text-shadow: 0px 2px 0 var(--clr-border-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
     transform: rotateX(0deg);
   }
 }
@@ -1292,7 +1290,10 @@ main {
 }
 
 .is-zoomed {
+  --text-shadow-position: 2px;
+
   .game__container {
+    padding: 36px 24px;
     border: 10px solid var(--clr-text-secondary);
     min-height: 550px;
     max-width: unset;
@@ -1348,24 +1349,28 @@ main {
   }
 
   h1 {
+    font-size: 48px;
     @media screen and (max-width: 576px) {
       -webkit-text-size-adjust: 40%;
     }
   }
 
   h2 {
+    font-size: 36px;
     @media screen and (max-width: 576px) {
       font-size: 30px;
     }
   }
 
   h3 {
+    font-size: 27px;
     @media screen and (max-width: 576px) {
       font-size: 24px;
     }
   }
 
   h4 {
+    font-size: 22px;
     @media screen and (max-width: 576px) {
       font-size: 20px;
     }

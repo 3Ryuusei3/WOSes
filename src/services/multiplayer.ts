@@ -157,6 +157,13 @@ export async function startRoomWithWord(code: string, currentWord: string): Prom
   return { data: { id: payload.room_id, code: payload.code, state: payload.state, players: payload.players, current_word: payload.current_word }, error: null };
 }
 
+// Seed all possible words for the new round as pending rows in room_words
+export async function seedRoundWords(code: string, words: string[]): Promise<DbResponse<{ inserted: number }>> {
+  const { data, error } = await supabase.rpc('seed_round_words', { p_code: code, p_words: words });
+  if (error) return { data: null, error };
+  return { data: data as any, error: null };
+}
+
 // Submit a word (auto validation server-side)
 export async function submitWord(
   code: string,
@@ -183,6 +190,18 @@ export async function getCorrectWords(roomId: number, roundId?: number): Promise
     .eq('status', 'correct');
   if (roundId) query.eq('round_id', roundId);
   return await query.order('id', { ascending: true });
+}
+
+// Fetch all words for a round (pending + correct) to build a consistent board
+export async function getRoundWords(roomId: number, roundId: number): Promise<DbResponse<{ word: string; status: string }[]>> {
+  const { data, error } = await supabase
+    .from('room_words')
+    .select('word,status')
+    .eq('room_id', roomId)
+    .eq('round_id', roundId)
+    .order('word', { ascending: true });
+  if (error) return { data: null, error };
+  return { data: data as any, error: null };
 }
 
 type RoomWordsRealtimePayload = RealtimePostgresChangesPayload<RoomWordRow>;

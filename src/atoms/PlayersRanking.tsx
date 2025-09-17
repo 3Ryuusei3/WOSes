@@ -68,7 +68,7 @@ export default function PlayersRanking({ title = 'RANKING', sortBy = 'score', to
               <div className="h-section gap-sm" key={player.id}>
                 <h6 className={placeClass}>{String(index + 1).padStart(2, '0')}</h6>
                 <h6 className={isMe ? 'tip' : 'highlight'}>{player.name}</h6>
-                <h6 className="unguessed ml-auto">{value}</h6>
+                <h6 className={isMe ? 'tip ml-auto' : 'unguessed ml-auto'}>{value}</h6>
               </div>
             );
           })

@@ -29,7 +29,7 @@ import hitSound from '../assets/hit.mp3';
 import revealSound from '../assets/reveal.mp3';
 import endSound from '../assets/end.mp3';
 import GameSound from '../atoms/GameSound';
-import { subscribeToCorrectWords, getCorrectWords, submitWord, getPlayerNameById, finishRoundToLobby, finishRoundToLost, getLatestRoundId, getCorrectCountForRound } from '../services/multiplayer';
+import { subscribeToCorrectWords, submitWord, getPlayerNameById, finishRoundToLobby, finishRoundToLost, getLatestRoundId, getCorrectCountForRound, getRoundWords, subscribeToRoom } from '../services/multiplayer';
 
 export default function GameScreen() {
   const { t, i18n } = useTranslation();
@@ -80,6 +80,7 @@ export default function GameScreen() {
   const [hasPlayedEndSound, setHasPlayedEndSound] = useState(false);
   const [playerAttempts, setPlayerAttempts] = useState<{ word: string; status: 'pending' | 'correct' | 'invalid' | 'rejected' | 'tip' }[]>([]);
   const wordsChannelRef = useRef<ReturnType<typeof subscribeToCorrectWords> | null>(null);
+  const roomChannelRef = useRef<ReturnType<typeof subscribeToRoom> | null>(null);
   const markWordGuessedRef = useRef(markWordGuessed);
   const currentRoundIdRef = useRef<number | null>(null);
   const hostPrevGuessedRef = useRef<number>(0);
@@ -224,12 +225,13 @@ export default function GameScreen() {
         currentRoundIdRef.current = currentRoundId ?? null;
         // Carga inicial solo de la ronda actual
         if (currentRoundIdRef.current) {
-          const { data } = await getCorrectWords(roomId, currentRoundIdRef.current);
-          if (data) {
-            for (const row of data as any[]) {
-              if (row.status === 'correct' && row.round_id === currentRoundIdRef.current) {
-                const name = row.room_players?.name || '';
-                markWordGuessedRef.current(row.word, name);
+          // Para asegurar mismo tablero: obtener todas las palabras de la ronda
+          const { data: roundWords } = await getRoundWords(roomId, currentRoundIdRef.current);
+          if (roundWords) {
+            // Marcar las correctas de inicio
+            for (const rw of roundWords) {
+              if (rw.status === 'correct') {
+                markWordGuessedRef.current(rw.word, '');
               }
             }
           }
@@ -340,6 +342,27 @@ export default function GameScreen() {
       return () => clearTimeout(t);
     }
   }, [players, role, percentage, mode, setMode]);
+
+  // Keep client mode aligned with room state in realtime (handles edge cases where fallbacks don't trigger)
+  useEffect(() => {
+    if (!roomId) return;
+    if (!roomChannelRef.current) {
+      roomChannelRef.current = subscribeToRoom(roomId, (payload: any) => {
+        const newState = (payload.new as any)?.state as string | undefined;
+        if (!newState) return;
+        if (newState === 'loading') setMode('loading');
+        else if (newState === 'game') setMode('game');
+        else if (newState === 'lobby') setMode('lobby');
+        else if (newState === 'lost') setMode('lost');
+      });
+    }
+    return () => {
+      if (roomChannelRef.current) {
+        roomChannelRef.current.unsubscribe();
+        roomChannelRef.current = null;
+      }
+    };
+  }, [roomId, setMode]);
 
   return (
     <>
