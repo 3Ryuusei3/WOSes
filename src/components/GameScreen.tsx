@@ -26,6 +26,7 @@ import {
 } from '../constant';
 
 import hitSound from '../assets/hit.mp3';
+import goalSound from '../assets/goal.mp3';
 import revealSound from '../assets/reveal.mp3';
 import endSound from '../assets/end.mp3';
 import GameSound from '../atoms/GameSound';
@@ -96,6 +97,7 @@ export default function GameScreen() {
     markWordGuessedRef.current = markWordGuessed;
   }, [markWordGuessed]);
 
+  const hitAudioRef = useRef<HTMLAudioElement | null>(null);
   const goalAudioRef = useRef<HTMLAudioElement | null>(null);
   const revealAudioRef = useRef<HTMLAudioElement | null>(null);
   const endAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -163,8 +165,11 @@ export default function GameScreen() {
   }, [totalPoints, correctWordsPoints, hasCompletedLevel, levelPoints, advanceToNextLevel, endGameAndSaveScore]);
 
   useEffect(() => {
+    if (!hitAudioRef.current) {
+      hitAudioRef.current = new Audio(hitSound);
+    }
     if (!goalAudioRef.current) {
-      goalAudioRef.current = new Audio(hitSound);
+      goalAudioRef.current = new Audio(goalSound);
     }
     if (!revealAudioRef.current) {
       revealAudioRef.current = new Audio(revealSound);
@@ -190,6 +195,9 @@ export default function GameScreen() {
   }, []);
 
   useEffect(() => {
+    if (hitAudioRef.current) {
+      hitAudioRef.current.volume = effectiveVolume;
+    }
     if (goalAudioRef.current) {
       goalAudioRef.current.volume = effectiveVolume;
     }
@@ -206,10 +214,10 @@ export default function GameScreen() {
     if (players === 'multi' && role === 'host') {
       const guessedCount = words.filter(w => w.guessed).length;
       if (guessedCount > hostPrevGuessedRef.current) {
-        if (goalAudioRef.current && effectiveVolume > 0) {
+        if (hitAudioRef.current && effectiveVolume > 0) {
           try {
-            goalAudioRef.current.currentTime = 0;
-            goalAudioRef.current.play().catch(() => {});
+            hitAudioRef.current.currentTime = 0;
+            hitAudioRef.current.play().catch(() => {});
           } catch (_) {}
         }
       }
@@ -248,13 +256,13 @@ export default function GameScreen() {
             // Host: play success sound immediately on new correct
             const state = useGameStore.getState();
             if (state.players === 'multi' && state.role === 'host') {
-              if (!goalAudioRef.current) {
-                goalAudioRef.current = new Audio(hitSound);
+              if (!hitAudioRef.current) {
+                hitAudioRef.current = new Audio(hitSound);
               }
-              if (goalAudioRef.current && effectiveVolume > 0) {
+              if (hitAudioRef.current && effectiveVolume > 0) {
                 try {
-                  goalAudioRef.current.currentTime = 0;
-                  await goalAudioRef.current.play();
+                  hitAudioRef.current.currentTime = 0;
+                  await hitAudioRef.current.play();
                 } catch (_) {}
               }
             }
@@ -363,6 +371,14 @@ export default function GameScreen() {
       }
     };
   }, [roomId, setMode]);
+
+  // Players: snapshot last words and round points on leaving game (to lobby/lost), in case fallbacks skip host path
+  useEffect(() => {
+    if (players === 'multi' && role === 'player' && (mode === 'lobby' || mode === 'lost')) {
+      setLastLevelWords(words);
+      setLastRoundPoints(playerRoundPoints);
+    }
+  }, [players, role, mode, words, playerRoundPoints, setLastLevelWords, setLastRoundPoints]);
 
   return (
     <>
