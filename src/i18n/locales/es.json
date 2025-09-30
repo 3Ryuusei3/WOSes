@@ -99,6 +99,7 @@
     "minScore": "Puntuación mínima",
     "targetScore": "Objetivo",
     "currentScore": "Puntuación actual",
+    "inputWord": "Introduce la palabra",
     "nextLevel": "Siguiente nivel",
     "gameCompleted": "¡Juego completado!",
     "finalScore": "Puntuación final",

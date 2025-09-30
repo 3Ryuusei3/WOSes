@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useInputResponse from '../hooks/useInputResponse';
 
@@ -21,6 +22,7 @@ export default function WordInput({
   percentage,
   volume
 }: WordInputProps) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } =
     useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown, volume);
@@ -35,7 +37,7 @@ export default function WordInput({
     <input
       type="text"
       className={`mx-auto mt-auto ${animateError ? 'animate-error' : ''} ${animateSuccess ? 'animate-success' : ''} ${animateRepeated ? 'animate-repeated' : ''}`}
-      placeholder='INTRODUCE LA PALABRA...'
+      placeholder={t('game.inputWord')}
       value={inputWord}
       onChange={handleChange}
       onKeyDown={handleKeyDownWithShake}

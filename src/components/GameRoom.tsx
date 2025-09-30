@@ -89,6 +89,7 @@ export default function GameRoom() {
     const { data, error } = await startRoomWithWord(roomCode, currentWord);
     if (!error && data) {
       // Seed pending words for consistency across clients
+      let seedingSuccess = false;
       try {
         if (words && words.length > 0) {
           // Rebuild possible words locally from currentWord to send only valid anagrams
@@ -97,9 +98,14 @@ export default function GameRoom() {
           const lettersCount = countLetters(currentWord);
           const possible = (words || []).filter((w) => canFormWord(countLetters(w), lettersCount));
           possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-          await seedRoundWords(roomCode, possible);
+          const seedResult = await seedRoundWords(roomCode, possible);
+          seedingSuccess = !seedResult.error;
         }
       } catch (_) {}
+      // Esperar un momento para que el seeding se complete en el servidor
+      if (seedingSuccess) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
       setMode('loading');
     }
   };

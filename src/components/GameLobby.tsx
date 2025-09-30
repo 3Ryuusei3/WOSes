@@ -80,24 +80,10 @@ export default function GameLobby() {
     };
   }, [volume]);
 
-  // Host: seed next round words as soon as we enter lobby and have a new randomWord ready
+  // Reset seeded flag when entering lobby (seeding now happens in handleAdvance)
   useEffect(() => {
-    const seedNextRound = async () => {
-      if (seededRef.current) return;
-      if (players !== 'multi' || role !== 'host') return;
-      if (!roomCode || !randomWord || !words || words.length === 0) return;
-      try {
-        const countLetters = (w: string) => w.split('').reduce((acc: any, l: string) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {});
-        const canFormWord = (wc: any, lc: any) => Object.keys(wc).every(k => (lc[k] || 0) >= wc[k]);
-        const lettersCount = countLetters(randomWord);
-        const possible = (words || []).filter((w) => canFormWord(countLetters(w), lettersCount));
-        possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-        await seedRoundWords(roomCode, possible);
-        seededRef.current = true;
-      } catch (_) {}
-    };
-    seedNextRound();
-  }, [players, role, roomCode, randomWord, words]);
+    seededRef.current = false;
+  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -114,27 +100,32 @@ export default function GameLobby() {
   useRandomWords(gameDifficulty);
   const secondsToRemove = useRemoveSeconds();
 
-  const handleAdvance = useCallback(() => {
+  const handleAdvance = useCallback(async () => {
     if (!canAdvance) return;
     // Host in multiplayer: start next round via DB so all devices follow
     if (players === 'multi' && role === 'host' && roomCode && randomWord) {
-      startRoomWithWord(roomCode, randomWord).then(async ({ error }) => {
-        if (!error) {
-          try {
-            const countLetters = (w: string) => w.split('').reduce((acc: any, l: string) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {});
-            const canFormWord = (wc: any, lc: any) => Object.keys(wc).every(k => (lc[k] || 0) >= wc[k]);
-            const lettersCount = countLetters(randomWord);
-            const possible = (words || []).filter((w) => canFormWord(countLetters(w), lettersCount));
-            possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-            await seedRoundWords(roomCode, possible);
-          } catch (_) {}
-          setMode('loading');
+      const { error } = await startRoomWithWord(roomCode, randomWord);
+      if (!error) {
+        let seedingSuccess = false;
+        try {
+          const countLetters = (w: string) => w.split('').reduce((acc: any, l: string) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {});
+          const canFormWord = (wc: any, lc: any) => Object.keys(wc).every(k => (lc[k] || 0) >= wc[k]);
+          const lettersCount = countLetters(randomWord);
+          const possible = (words || []).filter((w) => canFormWord(countLetters(w), lettersCount));
+          possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
+          const seedResult = await seedRoundWords(roomCode, possible);
+          seedingSuccess = !seedResult.error;
+        } catch (_) {}
+        // Esperar un momento para que el seeding se complete en el servidor
+        if (seedingSuccess) {
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
-      });
+        setMode('loading');
+      }
     } else {
       setMode('loading');
     }
-  }, [canAdvance, players, role, roomCode, randomWord, setMode]);
+  }, [canAdvance, players, role, roomCode, randomWord, setMode, words]);
 
   // Realtime: follow room state while in Lobby
   useEffect(() => {

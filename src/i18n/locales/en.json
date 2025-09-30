@@ -95,6 +95,7 @@
     "minScore": "Minimum score",
     "targetScore": "Target",
     "currentScore": "Current score",
+    "inputWord": "Enter a word",
     "nextLevel": "Next level",
     "gameCompleted": "Game completed!",
     "finalScore": "Final score",

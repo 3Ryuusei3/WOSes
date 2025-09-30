@@ -118,12 +118,38 @@ export default function GameScreen() {
     }
   }, [playerName, level, gameDifficulty, i18n.language, numberOfRounds, numberOfPerfectRounds]);
 
-  const hasCompletedLevel = useCallback(() => {
+  const hasCompletedLevel = useCallback(async () => {
+    // En multiplayer, el host debe verificar el conteo del servidor, no su estado local
+    if (players === 'multi' && role === 'host' && roomId) {
+      try {
+        const { data: roundId } = await getLatestRoundId(roomId);
+        if (roundId) {
+          // Obtener las palabras correctas reales del servidor
+          const { data: roundWords } = await getRoundWords(roomId, roundId);
+          if (roundWords) {
+            const serverCorrectWords = roundWords.filter(w => w.status === 'correct');
+            const { POINTS_PER_LETTER } = getLanguageConstants(i18n.language);
+            const serverPoints = serverCorrectWords.reduce((sum, w) => {
+              return sum + w.word.split('').reduce((acc, letter) => acc + POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER], 0);
+            }, 0);
+
+            return serverPoints >= goalPoints ||
+                   (levelPoints > 0 &&
+                    levelPoints === serverPoints &&
+                    serverCorrectWords.length >= possibleWords.length);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking server completion status:', error);
+      }
+    }
+
+    // Fallback al comportamiento original para singleplayer o en caso de error
     return correctWordsPoints() >= goalPoints ||
            (levelPoints > 0 &&
             levelPoints === correctWordsPoints() &&
             correctWords.length === possibleWords.length);
-  }, [correctWordsPoints, goalPoints, levelPoints, correctWords.length, possibleWords.length]);
+  }, [correctWordsPoints, goalPoints, levelPoints, correctWords.length, possibleWords.length, players, role, roomId, i18n.language]);
 
   const advanceToNextLevel = useCallback((levelsAdded: number) => {
     setLevelsToAdvance(levelsAdded);
@@ -144,10 +170,10 @@ export default function GameScreen() {
     setPreviousRoundsWords([]);
   }, [updateLastLevelWordsAndPoints, updateHighscoreDB, setMode, players]);
 
-  const handleEndOfLevel = useCallback(() => {
+  const handleEndOfLevel = useCallback(async () => {
     const finalPoints = totalPoints + correctWordsPoints();
 
-    if (hasCompletedLevel()) {
+    if (await hasCompletedLevel()) {
       const completionPercentage = (correctWordsPoints() / levelPoints) * 100;
       const levelsAdded = calculateLevelsToAdvance(completionPercentage);
       advanceToNextLevel(levelsAdded);
@@ -162,7 +188,7 @@ export default function GameScreen() {
         finishRoundToLost(roomCode);
       }
     }
-  }, [totalPoints, correctWordsPoints, hasCompletedLevel, levelPoints, advanceToNextLevel, endGameAndSaveScore]);
+  }, [totalPoints, correctWordsPoints, hasCompletedLevel, levelPoints, advanceToNextLevel, endGameAndSaveScore, players, role, roomCode]);
 
   useEffect(() => {
     if (!hitAudioRef.current) {
@@ -234,7 +260,23 @@ export default function GameScreen() {
         // Carga inicial solo de la ronda actual
         if (currentRoundIdRef.current) {
           // Para asegurar mismo tablero: obtener todas las palabras de la ronda
-          const { data: roundWords } = await getRoundWords(roomId, currentRoundIdRef.current);
+          // Retry con polling para manejar latencia en el seeding
+          let roundWords = null;
+          let attempts = 0;
+          const maxAttempts = 5;
+
+          while (!roundWords && attempts < maxAttempts) {
+            const { data } = await getRoundWords(roomId, currentRoundIdRef.current);
+            if (data && data.length > 0) {
+              roundWords = data;
+              break;
+            }
+            attempts++;
+            if (attempts < maxAttempts) {
+              await new Promise(resolve => setTimeout(resolve, 200)); // Esperar 200ms entre intentos
+            }
+          }
+
           if (roundWords) {
             // Marcar las correctas de inicio
             for (const rw of roundWords) {
@@ -244,7 +286,6 @@ export default function GameScreen() {
             }
           }
         }
-        // Suscripción global, pero filtramos por round_id en handler
         wordsChannelRef.current = subscribeToCorrectWords(roomId, async (payload: any) => {
           const newRow = payload.new;
           if (newRow && newRow.status === 'correct' && newRow.round_id === currentRoundIdRef.current) {
@@ -375,10 +416,52 @@ export default function GameScreen() {
   // Players: snapshot last words and round points on leaving game (to lobby/lost), in case fallbacks skip host path
   useEffect(() => {
     if (players === 'multi' && role === 'player' && (mode === 'lobby' || mode === 'lost')) {
-      setLastLevelWords(words);
+      // Cargar palabras correctas desde el servidor para asegurar sincronización
+      (async () => {
+        if (roomId && currentRoundIdRef.current) {
+          try {
+            // Retry con polling para manejar latencia
+            let roundWords = null;
+            let attempts = 0;
+            const maxAttempts = 5;
+
+            while (!roundWords && attempts < maxAttempts) {
+              const { data } = await getRoundWords(roomId, currentRoundIdRef.current);
+              if (data && data.length > 0) {
+                roundWords = data;
+                break;
+              }
+              attempts++;
+              if (attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 200)); // Esperar 200ms entre intentos
+              }
+            }
+
+            if (roundWords) {
+              // Actualizar el estado local con las palabras correctas del servidor
+              const updatedWords = words.map(w => {
+                const serverWord = roundWords.find(rw => rw.word === w.word);
+                if (serverWord && serverWord.status === 'correct') {
+                  return { ...w, guessed: true };
+                }
+                return w;
+              });
+              setLastLevelWords(updatedWords);
+            } else {
+              // Fallback al estado local si no hay datos del servidor después de reintentos
+              setLastLevelWords(words);
+            }
+          } catch (error) {
+            console.error('Error loading round words:', error);
+            setLastLevelWords(words);
+          }
+        } else {
+          setLastLevelWords(words);
+        }
+      })();
       setLastRoundPoints(playerRoundPoints);
     }
-  }, [players, role, mode, words, playerRoundPoints, setLastLevelWords, setLastRoundPoints]);
+  }, [players, role, mode, roomId, playerRoundPoints, words, setLastLevelWords, setLastRoundPoints]);
 
   return (
     <>
@@ -391,21 +474,19 @@ export default function GameScreen() {
             <input
               type="text"
               className='mx-auto mt-auto'
-              placeholder='INTRODUCE LA PALABRA...'
+              placeholder={t('game.inputWord')}
               value={inputWord}
               onChange={handleChange}
               onKeyDown={async (e) => {
                 if (e.key === 'Enter' && inputWord.trim() !== '') {
                   const attempt = inputWord.trim().toLowerCase();
                   if (attempt.length < 4) {
-                    // No cuenta: no se envía ni se añade a la lista
                     clearInput();
                     return;
                   }
                   const isValid = possibleWords.includes(attempt);
                   const localWord = attempt;
                   clearInput();
-                  // Si ya está resuelta globalmente (acertada por alguien), mostrar "tip" y no enviar
                   const alreadySolvedGlobally = words.some(w => w.word === localWord && w.guessed);
                   if (alreadySolvedGlobally) {
                     setPlayerAttempts(prev => [{ word: localWord, status: 'tip' as any }, ...prev]);
@@ -418,7 +499,6 @@ export default function GameScreen() {
                     setPlayerAttempts(prev => [{ word: localWord, status: 'pending' }, ...prev]);
                     const { data, error } = await submitWord(roomCode, playerId, localWord, true);
                     if (!error && data && (data as any).status === 'correct') {
-                      // Colorea como correcta en la lista del player y en el tablero global por suscripción del host
                       setPlayerAttempts(prev => prev.map(it => it.word === localWord ? { ...it, status: 'correct' } : it));
                       markWordGuessed(localWord);
                     } else {
@@ -436,7 +516,6 @@ export default function GameScreen() {
                 </h4>
               ))}
             </div>
-            {/* GameSound hidden for players */}
           </div>
         </div>
       ) : (

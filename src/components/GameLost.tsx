@@ -96,7 +96,7 @@ export default function GameLost() {
       <div className='game__container f-jc-c'>
         <PlayersPanel lastLevelWords={lastLevelWords} />
         <div className="h-section gap-xs f-jc-c mt-sm">
-          <button onClick={() => setMode('start')} className='btn btn--sm btn--lose'>SALIR</button>
+          <button onClick={handlePlayAgain}>{t('common.playAgain')}</button>
         </div>
       </div>
     );
@@ -157,10 +157,7 @@ export default function GameLost() {
         </div>
       </div>
       <div className="h-section gap-xs f-jc-c mb-sm">
-        {role !== 'host' && (
-          <button onClick={handlePlayAgain}>{t('common.playAgain')}</button>
-        )}
-        <button onClick={() => setMode('start')} className='btn btn--sm btn--lose'>SALIR</button>
+        <button onClick={handlePlayAgain}>{t('common.playAgain')}</button>
       </div>
       <GameSound />
     </div>
