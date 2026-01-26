@@ -117,8 +117,6 @@ export default function GameLobby() {
       current_word?: string;
       difficulty?: string;
     }) => {
-      console.log("[GameLobby] Synced state:", newState);
-
       if (newState.difficulty) {
         setGameDifficulty(newState.difficulty as Difficulty);
       }
@@ -169,7 +167,6 @@ export default function GameLobby() {
   // Detectar estado de conexión y auto-sincronizar al reconectar
   const { status: connectionStatus } = useRealtimeConnection({
     onReconnect: () => {
-      console.log("[GameLobby] Reconnected - auto-syncing state");
       if (isPlayer) {
         syncNow();
       }
@@ -244,26 +241,19 @@ export default function GameLobby() {
     }
   }, [canAdvance, players, role, roomCode, randomWord, setMode, words]);
 
-  // Realtime: follow room state while in Lobby
   useEffect(() => {
     if (!roomId) return;
     const channel = subscribeToRoom(roomId, (payload: any) => {
       const newRoom = payload.new as any;
       const newState = newRoom?.state;
       const currentWord = newRoom?.current_word as string | null;
-      
-      console.log("[GameLobby] Realtime event received, newState:", newState, "current mode:", "lobby");
-      
-      // Prevenir transiciones redundantes
+
       if (newState === "lobby") {
-        console.log("[GameLobby] Already in lobby - skipping");
         return;
       }
-      
-      // Importante: en lobby no forzamos la palabra desde BBDD, el host genera una nueva localmente
+
       if (currentWord && (newState === "loading" || newState === "game")) {
         setRandomWord(currentWord);
-        // Recalculate possible words for everyone
         const countLetters = (w: string) =>
           w.split("").reduce((acc: any, l: string) => {
             acc[l] = (acc[l] || 0) + 1;
@@ -279,8 +269,7 @@ export default function GameLobby() {
         setPossibleWords(possible);
         setHiddenLetterIndex(Math.floor(Math.random() * currentWord.length));
       }
-      
-      console.log("[GameLobby] Transitioning from lobby to", newState);
+
       if (newState === "loading") setMode("loading");
       else if (newState === "game") setMode("game");
       else if (newState === "lost") setMode("lost");

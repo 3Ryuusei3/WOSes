@@ -160,13 +160,9 @@ export default function GameScreen() {
       current_word?: string;
       difficulty?: string;
     }) => {
-      console.log("[GameScreen] Synced state:", newState);
-
-      // Si estamos yendo a lobby o lost, cargar las palabras del servidor
       if (newState.state === "lobby" || newState.state === "lost") {
         if (currentRoundIdRef.current && roomId) {
           try {
-            console.log("[GameScreen] Loading round words for", newState.state);
             const { data: roundWords } = await getRoundWords(
               roomId,
               currentRoundIdRef.current,
@@ -196,17 +192,10 @@ export default function GameScreen() {
               });
 
               setLastLevelWords(updatedWords);
-              console.log(
-                "[GameScreen] Loaded",
-                roundWords.length,
-                "words from server + player data",
-              );
             } else {
-              console.warn("[GameScreen] No round words found, using local");
               setLastLevelWords(wordsRef.current);
             }
           } catch (error) {
-            console.error("[GameScreen] Error loading round words:", error);
             setLastLevelWords(wordsRef.current);
           }
         }
@@ -227,7 +216,6 @@ export default function GameScreen() {
   // Detectar estado de conexión y auto-sincronizar al reconectar
   const { status: connectionStatus } = useRealtimeConnection({
     onReconnect: () => {
-      console.log("[GameScreen] Reconnected - auto-syncing state");
       if (isPlayer) {
         syncNow();
       }
@@ -639,17 +627,9 @@ export default function GameScreen() {
   useEffect(() => {
     if (!roomId || players !== "multi") return;
 
-    console.log("[GameScreen] Setting up room subscription, roomId:", roomId);
-
     if (!roomChannelRef.current) {
       roomChannelRef.current = subscribeToRoom(roomId, async (payload: any) => {
         const newState = (payload.new as any)?.state as string | undefined;
-        console.log(
-          "[GameScreen] Realtime event received, newState:",
-          newState,
-          "current mode:",
-          mode,
-        );
 
         if (!newState) return;
 
@@ -660,7 +640,6 @@ export default function GameScreen() {
           (newState === "lobby" && mode === "lobby") ||
           (newState === "lost" && mode === "lost")
         ) {
-          console.log("[GameScreen] Already in state", newState, "- skipping");
           return;
         }
 
@@ -669,12 +648,6 @@ export default function GameScreen() {
           role === "player" &&
           (newState === "lobby" || newState === "lost")
         ) {
-          console.log(
-            "[GameScreen] Player transitioning to",
-            newState,
-            ", loading words...",
-          );
-
           if (currentRoundIdRef.current) {
             try {
               let roundWords = null;
@@ -702,12 +675,6 @@ export default function GameScreen() {
               }
 
               if (roundWords) {
-                console.log(
-                  "[GameScreen] Successfully loaded",
-                  roundWords.length,
-                  "words",
-                );
-
                 // Usar refs para obtener valores actuales
                 const currentWords = wordsRef.current;
                 const currentPlayerAttempts = playerAttemptsRef.current;
@@ -732,30 +699,17 @@ export default function GameScreen() {
                   return w;
                 });
 
-                console.log(
-                  "[GameScreen] Updated words with server + player data",
-                );
                 setLastLevelWords(updatedWords);
               } else {
-                console.warn(
-                  "[GameScreen] Failed to load round words after",
-                  maxAttempts,
-                  "attempts",
-                );
                 setLastLevelWords(wordsRef.current);
               }
             } catch (error) {
-              console.error("[GameScreen] Error loading round words:", error);
               setLastLevelWords(wordsRef.current);
             }
-          } else {
-            console.warn("[GameScreen] No currentRoundId available");
           }
           setLastRoundPoints(playerRoundPoints);
         }
 
-        // Cambiar el estado para todos (con logs más detallados)
-        console.log("[GameScreen] Transitioning from", mode, "to", newState);
         if (newState === "loading") {
           setMode("loading");
         } else if (newState === "game") {
@@ -766,13 +720,10 @@ export default function GameScreen() {
           setMode("lost");
         }
       });
-
-      console.log("[GameScreen] Room subscription created successfully");
     }
 
     return () => {
       if (roomChannelRef.current) {
-        console.log("[GameScreen] Unsubscribing from room channel");
         roomChannelRef.current.unsubscribe();
         roomChannelRef.current = null;
       }

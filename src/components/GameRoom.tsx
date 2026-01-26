@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { useNavigate } from "react-router-dom";
 import useGameStore from "../store/useGameStore";
 import useLanguageWords from "../hooks/useLanguageWords";
 import {
@@ -18,6 +19,7 @@ import { showToast } from "../atoms/Toast";
 
 export default function GameRoom() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     roomCode,
     playerName,
@@ -35,6 +37,7 @@ export default function GameRoom() {
     setPlayers,
     setPlayerId,
     setGameDifficulty,
+    setRoomCode,
   } = useGameStore();
   const { words } = useLanguageWords(gameDifficulty);
   const [roomPlayers, setRoomPlayers] = useState<
@@ -81,16 +84,23 @@ export default function GameRoom() {
           const newRoom = payload.new as any;
           const newState = newRoom?.state;
           const newDifficulty = newRoom?.difficulty as Difficulty | undefined;
+          const newRoomCode = newRoom?.new_room_code as string | undefined;
 
-          console.log(
-            "[GameRoom] Realtime event received, newState:",
-            newState,
-            "current mode:",
-            "room",
-          );
+          if (newRoomCode && role === "player") {
+            showToast("El anfitrión ha creado una nueva sala", "info", 3000);
+
+            setMode("room");
+            setRoomCode(newRoomCode);
+            setRoomId(null);
+            setPlayerId(null);
+
+            setTimeout(() => {
+              navigate(`/game?id=${newRoomCode}`);
+            }, 1000);
+            return;
+          }
 
           if (newState === "room") {
-            console.log("[GameRoom] Already in room - skipping");
             return;
           }
           if (newDifficulty) {
@@ -118,7 +128,6 @@ export default function GameRoom() {
             );
           }
 
-          console.log("[GameRoom] Transitioning from room to", newState);
           if (newState === "loading") {
             setMode("loading");
           } else if (newState === "game") {
@@ -140,11 +149,16 @@ export default function GameRoom() {
     };
   }, [
     roomId,
+    role,
     setGameDifficulty,
     setRandomWord,
     setPossibleWords,
     setHiddenLetterIndex,
     setMode,
+    setRoomCode,
+    setRoomId,
+    setPlayerId,
+    navigate,
     words,
   ]);
 
@@ -153,21 +167,17 @@ export default function GameRoom() {
     [roomPlayers],
   );
 
-  const canStart = nonHostPlayers.length >= 1; // Cambiado de 2 a 1
-
-  // (Seeding se hace tras startRoomWithWord en handleStart y en Lobby)
+  const canStart = nonHostPlayers.length >= 1;
 
   const handleStart = async () => {
     if (!roomCode || !canStart) return;
 
     try {
-      // Host sets current word for all
       const currentWord = randomWord || "";
       const { data, error } = await startRoomWithWord(roomCode, currentWord);
 
       if (error) {
         showToast("Error al iniciar la partida: " + error.message, "error");
-        console.error("Error starting room:", error);
         return;
       }
 
@@ -176,11 +186,9 @@ export default function GameRoom() {
         return;
       }
 
-      // Seed pending words for consistency across clients
       let seedingSuccess = false;
       try {
         if (words && words.length > 0) {
-          // Rebuild possible words locally from currentWord to send only valid anagrams
           const countLetters = (w: string) =>
             w.split("").reduce((acc: any, l: string) => {
               acc[l] = (acc[l] || 0) + 1;
@@ -197,7 +205,6 @@ export default function GameRoom() {
           seedingSuccess = !seedResult.error;
 
           if (seedResult.error) {
-            console.error("Error seeding words:", seedResult.error);
             showToast(
               "Advertencia: algunas palabras podrían no sincronizarse",
               "warning",
@@ -206,7 +213,6 @@ export default function GameRoom() {
           }
         }
       } catch (err) {
-        console.error("Error seeding words:", err);
         showToast(
           "Advertencia: problema al sincronizar palabras",
           "warning",
@@ -214,14 +220,12 @@ export default function GameRoom() {
         );
       }
 
-      // Esperar un momento mejorado para que el seeding se complete en el servidor
       if (seedingSuccess) {
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
       setMode("loading");
     } catch (err) {
-      console.error("Unexpected error starting room:", err);
       showToast("Error inesperado al iniciar la partida", "error");
     }
   };
@@ -242,7 +246,6 @@ export default function GameRoom() {
         setPlayerId(data.player.id);
         setPlayers("multi");
 
-        // Cargar la dificultad de la sala inmediatamente después de unirse
         const { data: roomRow } = await supabase
           .from("rooms")
           .select("difficulty")
@@ -258,7 +261,6 @@ export default function GameRoom() {
       }
     } catch (err) {
       setJoinError("Error al intentar unirse a la sala");
-      console.error("Error joining room:", err);
     }
   };
 

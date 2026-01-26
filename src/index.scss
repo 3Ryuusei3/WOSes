@@ -1728,47 +1728,33 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.7;
+    opacity: 1;
     transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 1;
-    }
+    border: none;
+    box-shadow: none;
   }
 
   &--error {
     background-color: var(--clr-lose);
     border: 2px solid var(--clr-lose-highlight);
-    box-shadow:
-      0 3px 0 0 var(--clr-lose-highlight),
-      0 -3px 0 0 var(--clr-lose-dim);
     color: var(--clr-text-primary);
   }
 
   &--success {
     background-color: var(--clr-win);
     border: 2px solid var(--clr-win-highlight);
-    box-shadow:
-      0 3px 0 0 var(--clr-win-highlight),
-      0 -3px 0 0 var(--clr-win-dim);
     color: var(--clr-text-primary);
   }
 
   &--warning {
     background-color: var(--clr-accent-primary);
     border: 2px solid var(--clr-accent-secondary-highlight);
-    box-shadow:
-      0 3px 0 0 var(--clr-accent-secondary),
-      0 -3px 0 0 var(--clr-accent-terciary);
     color: var(--clr-text-primary);
   }
 
   &--info {
     background-color: var(--clr-tip);
     border: 2px solid var(--clr-border-primary);
-    box-shadow:
-      0 3px 0 0 var(--clr-border-primary),
-      0 -3px 0 0 var(--clr-tip-dim);
     color: var(--clr-text-primary);
   }
 

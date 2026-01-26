@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { useCallback, useState } from "react";
+import { supabase } from "../lib/supabase";
 
 /**
  * Hook para sincronización manual del estado de la sala
@@ -12,7 +12,7 @@ export default function useRoomStateSync(
     state?: string;
     current_word?: string;
     difficulty?: string;
-  }) => void
+  }) => void,
 ) {
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -26,22 +26,21 @@ export default function useRoomStateSync(
 
     try {
       const { data, error } = await supabase
-        .from('rooms')
-        .select('state, current_word, difficulty')
-        .eq('id', roomId)
+        .from("rooms")
+        .select("state, current_word, difficulty")
+        .eq("id", roomId)
         .single();
 
       if (error) {
-        console.error('[RoomSync] Error fetching room state:', error);
+        console.error("[RoomSync] Error fetching room state:", error);
         return;
       }
 
       if (data) {
-        console.log('[RoomSync] Manual sync - current state:', data.state);
         onStateChange(data);
       }
     } catch (err) {
-      console.error('[RoomSync] Exception during sync:', err);
+      console.error("[RoomSync] Exception during sync:", err);
     } finally {
       setIsSyncing(false);
     }
@@ -49,6 +48,6 @@ export default function useRoomStateSync(
 
   return {
     syncNow,
-    isSyncing
+    isSyncing,
   };
 }
