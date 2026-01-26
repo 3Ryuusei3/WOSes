@@ -4,6 +4,8 @@ import GameLost from './GameLost';
 import GameLobby from './GameLobby';
 import GameLoading from './GameLoading';
 import GameRoom from './GameRoom';
+import ConnectionStatus from '../atoms/ConnectionStatus';
+import { ToastContainer } from '../atoms/Toast';
 
 import { useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -15,7 +17,7 @@ import useZoom from '../hooks/useZoom';
 import useGameStore from '../store/useGameStore';
 
 const GamePage = () => {
-  const { mode, setRoomCode, setMode, role } = useGameStore();
+  const { mode, setRoomCode, setMode, role, players } = useGameStore();
   const zoom = useZoom();
   const [searchParams] = useSearchParams();
 
@@ -34,6 +36,8 @@ const GamePage = () => {
 
   return (
     <main style={{ zoom: effectiveZoom }} className={isZoomed ? 'is-zoomed' : ''}>
+      {players === 'multi' && <ConnectionStatus />}
+      <ToastContainer />
       <GameLogo isZoomed={isZoomed} />
       <div className="container pos-rel">
         {mode === 'start' ? (

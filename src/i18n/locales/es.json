@@ -244,5 +244,11 @@
     "commonLetters": "2 LETRAS MÁS USADAS",
     "newChallenges": "A MEDIDA QUE SUBAS DE NIVEL, ENCONTRARÁS NUEVOS RETOS...",
     "startPlaying": "COMIENZA A JUGAR AHORA Y DESCÚBRELOS TODOS. ¿LISTO PARA DOMINAR EL VOCABULARIO?"
+  },
+  "connection": {
+    "disconnected": "Conexión perdida",
+    "reconnecting": "Reconectando...",
+    "error": "Error de conexión. Recarga la página",
+    "connected": "Conectado"
   }
 }

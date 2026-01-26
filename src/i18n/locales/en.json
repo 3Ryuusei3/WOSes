@@ -255,5 +255,11 @@
     "commonLetters": "2 MOST COMMON LETTERS",
     "newChallenges": "AS YOU LEVEL UP, YOU'LL FIND NEW CHALLENGES...",
     "startPlaying": "START PLAYING NOW AND DISCOVER THEM ALL. READY TO MASTER THE VOCABULARY?"
+  },
+  "connection": {
+    "disconnected": "Connection lost",
+    "reconnecting": "Reconnecting...",
+    "error": "Connection error. Reload the page",
+    "connected": "Connected"
   }
 }
