@@ -3,6 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useNavigate } from "react-router-dom";
 import useGameStore from "../store/useGameStore";
 import useLanguageWords from "../hooks/useLanguageWords";
+import useRandomWords from "../hooks/useRandomWords";
 import {
   getRoomPlayers,
   subscribeToRoomPlayers,
@@ -40,6 +41,10 @@ export default function GameRoom() {
     setRoomCode,
   } = useGameStore();
   const { words } = useLanguageWords(gameDifficulty);
+
+  // Generate random word for multiplayer (respecting difficulty rules)
+  useRandomWords(gameDifficulty);
+
   const [roomPlayers, setRoomPlayers] = useState<
     { id: number; name: string; score: number; role: "host" | "player" }[]
   >([]);
@@ -118,7 +123,11 @@ export default function GameRoom() {
             const canFormWord = (wc: any, lc: any) =>
               Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
             const lettersCount = countLetters(currentWord);
-            const possible = (words || []).filter((w) =>
+            // Filter words by length first (same as useRandomWords)
+            const filteredWords = (words || []).filter(
+              (word) => word.length >= 4 && word.length <= 9,
+            );
+            const possible = filteredWords.filter((w) =>
               canFormWord(countLetters(w), lettersCount),
             );
             possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
@@ -189,6 +198,7 @@ export default function GameRoom() {
       let seedingSuccess = false;
       try {
         if (words && words.length > 0) {
+          // Use the same logic as useRandomWords to ensure possibleWords has proper range
           const countLetters = (w: string) =>
             w.split("").reduce((acc: any, l: string) => {
               acc[l] = (acc[l] || 0) + 1;
@@ -196,12 +206,19 @@ export default function GameRoom() {
             }, {});
           const canFormWord = (wc: any, lc: any) =>
             Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
-          const lettersCount = countLetters(currentWord);
-          const possible = (words || []).filter((w) =>
-            canFormWord(countLetters(w), lettersCount),
+          const wordCount = countLetters(currentWord);
+          // Filter words that can be formed and have proper length
+          const filteredWords = words.filter(
+            (word) => word.length >= 4 && word.length <= 9,
           );
-          possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-          const seedResult = await seedRoundWords(roomCode, possible);
+          const possibleWordsList = filteredWords.filter((w) =>
+            canFormWord(countLetters(w), wordCount),
+          );
+          possibleWordsList.sort(
+            (a, b) => a.length - b.length || a.localeCompare(b),
+          );
+
+          const seedResult = await seedRoundWords(roomCode, possibleWordsList);
           seedingSuccess = !seedResult.error;
 
           if (seedResult.error) {
@@ -371,7 +388,7 @@ export default function GameRoom() {
                     onClick={handleJoin}
                     disabled={!isValidPlayerName(playerName)}
                   >
-                    ENTRAR A LA SALA
+                    {t("game.joinRoom")}
                   </button>
                 </div>
               </div>
@@ -379,7 +396,7 @@ export default function GameRoom() {
               <div className="v-section gap-md f-jc-c">
                 <div className="score__container--box dark">
                   <div className="v-section gap-md">
-                    <p className="txt-center">ESPERANDO AL ANFITRIÓN...</p>
+                    <p className="txt-center">{t("game.waitingForHost")}</p>
                   </div>
                 </div>
               </div>

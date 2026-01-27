@@ -387,8 +387,13 @@ export default function GameScreen() {
     } else {
       endGameAndSaveScore(finalPoints);
       if (players === "multi" && role === "host" && roomCode) {
-        // En multiplayer no insertamos en TopScores; solo actualizamos room a 'lost'
-        finishRoundToLost(roomCode);
+        finishRoundToLost(
+          roomCode,
+          level,
+          finalPoints,
+          numberOfRounds,
+          numberOfPerfectRounds,
+        );
       }
     }
   }, [
@@ -754,10 +759,11 @@ export default function GameScreen() {
                 disabled={isSyncing}
                 title={
                   connectionStatus !== "connected"
-                    ? "Reconectar"
-                    : "Actualizar estado"
+                    ? t("game.reconnect")
+                    : t("common.updateState")
                 }
               >
+                <span className="sr-only">{t("game.reconnect")}</span>
                 <img
                   src={reloadIcon}
                   alt="reload"

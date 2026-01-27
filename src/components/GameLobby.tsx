@@ -91,7 +91,6 @@ export default function GameLobby() {
     };
   }, [volume]);
 
-  // Reset seeded flag when entering lobby (seeding now happens in handleAdvance)
   useEffect(() => {
     seededRef.current = false;
   }, []);
@@ -134,7 +133,10 @@ export default function GameLobby() {
         const canFormWord = (wc: any, lc: any) =>
           Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
         const lettersCount = countLetters(newState.current_word);
-        const possible = (words || []).filter((w) =>
+        const filteredWords = (words || []).filter(
+          (word) => word.length >= 4 && word.length <= 9,
+        );
+        const possible = filteredWords.filter((w) =>
           canFormWord(countLetters(w), lettersCount),
         );
         possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
@@ -201,12 +203,18 @@ export default function GameLobby() {
             }, {});
           const canFormWord = (wc: any, lc: any) =>
             Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
-          const lettersCount = countLetters(randomWord);
-          const possible = (words || []).filter((w) =>
-            canFormWord(countLetters(w), lettersCount),
+          const wordCount = countLetters(randomWord);
+          const filteredWords = (words || []).filter(
+            (word) => word.length >= 4 && word.length <= 9,
           );
-          possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-          const seedResult = await seedRoundWords(roomCode, possible);
+          const possibleWordsList = filteredWords.filter((w) =>
+            canFormWord(countLetters(w), wordCount),
+          );
+          possibleWordsList.sort(
+            (a, b) => a.length - b.length || a.localeCompare(b),
+          );
+
+          const seedResult = await seedRoundWords(roomCode, possibleWordsList);
           seedingSuccess = !seedResult.error;
 
           if (seedResult.error) {
@@ -262,7 +270,10 @@ export default function GameLobby() {
         const canFormWord = (wc: any, lc: any) =>
           Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
         const lettersCount = countLetters(currentWord);
-        const possible = (words || []).filter((w) =>
+        const filteredWords = (words || []).filter(
+          (word) => word.length >= 4 && word.length <= 9,
+        );
+        const possible = filteredWords.filter((w) =>
           canFormWord(countLetters(w), lettersCount),
         );
         possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
@@ -312,6 +323,7 @@ export default function GameLobby() {
                 : "Actualizar estado"
             }
           >
+            <span className="sr-only">{t("game.reconnect")}</span>
             <img src={reloadIcon} alt="reload" className="player-selector" />
           </button>
         </div>
@@ -492,6 +504,7 @@ export default function GameLobby() {
                 : "Actualizar estado"
             }
           >
+            <span className="sr-only">{t("game.reconnect")}</span>
             <img src={reloadIcon} alt="reload" className="player-selector" />
           </button>
         )}

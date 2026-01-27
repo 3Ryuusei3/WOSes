@@ -15,7 +15,11 @@ import useRealtimeConnection from "../hooks/useRealtimeConnection";
 
 import gameOverSound from "../assets/gameover.mp3";
 import { START_TIME } from "../constant";
-import { createRoomWithHost, setNewRoomCode, subscribeToRoom } from "../services/multiplayer";
+import {
+  createRoomWithHost,
+  setNewRoomCode,
+  subscribeToRoom,
+} from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
 
 export default function GameLost() {
@@ -63,24 +67,27 @@ export default function GameLost() {
   const generateNewWord = () => {
     if (!words || words.length === 0) return null;
 
-    const filteredWords = words.filter(word => word.length >= 4 && word.length <= 9);
-    const randomWord = filteredWords[Math.floor(Math.random() * filteredWords.length)];
-    
+    const filteredWords = words.filter(
+      (word) => word.length >= 4 && word.length <= 9,
+    );
+    const randomWord =
+      filteredWords[Math.floor(Math.random() * filteredWords.length)];
+
     const countLetters = (w: string) =>
       w.split("").reduce((acc: any, l: string) => {
         acc[l] = (acc[l] || 0) + 1;
         return acc;
       }, {});
-    
+
     const canFormWord = (wc: any, lc: any) =>
       Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
-    
+
     const lettersCount = countLetters(randomWord);
     const possible = filteredWords.filter((w) =>
-      canFormWord(countLetters(w), lettersCount)
+      canFormWord(countLetters(w), lettersCount),
     );
     possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-    
+
     return {
       word: randomWord,
       possibleWords: possible,
@@ -103,12 +110,15 @@ export default function GameLost() {
         setPossibleWords(newWordData.possibleWords);
         setHiddenLetterIndex(newWordData.hiddenIndex);
 
-        const newRoomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-        
+        const newRoomCode = Math.random()
+          .toString(36)
+          .substring(2, 8)
+          .toUpperCase();
+
         const { data, error } = await createRoomWithHost(
           newRoomCode,
           playerName,
-          gameDifficulty
+          gameDifficulty,
         );
 
         if (error || !data) {
@@ -116,8 +126,8 @@ export default function GameLost() {
           setIsCreatingRoom(false);
           return;
         }
-        
-        await new Promise(resolve => setTimeout(resolve, 500));
+
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         await setNewRoomCode(roomCode, newRoomCode);
 
@@ -219,7 +229,7 @@ export default function GameLost() {
 
         if (newRoomCode) {
           showToast("El anfitrión ha creado una nueva sala", "info", 3000);
-          
+
           setTotalPoints(0);
           setLevel(1);
           setGameMechanics({
@@ -238,11 +248,11 @@ export default function GameLost() {
           setRoomCode(newRoomCode);
           setRoomId(null);
           setPlayerId(null);
-          
+
           setRandomWord("");
           setPossibleWords([]);
           setHiddenLetterIndex(0);
-          
+
           setTimeout(() => {
             navigate(`/game?id=${newRoomCode}`);
           }, 1000);
@@ -284,16 +294,18 @@ export default function GameLost() {
         <PlayersPanel lastLevelWords={lastLevelWords} />
         <div className="v-section gap-md f-jc-c mt-sm">
           <div className="score__container--box dark">
-            <p className="txt-center">ESPERANDO AL ANFITRIÓN PARA CREAR UNA NUEVA SALA...</p>
+            <p className="txt-center">{t("game.waitingForHost")}</p>
           </div>
-          <small className="txt-center highlight">
-            Serás redirigido automáticamente cuando el anfitrión cree una nueva partida
-          </small>
-          {!isConnected && (
-            <button onClick={forceReconnect} className="btn btn--sm">
-              RECONECTAR
-            </button>
-          )}
+          <div className="h-section gap-xs f-jc-c">
+            <Link to="/game" className="btn btn--sm btn--lose">
+              {t("game.exit")}
+            </Link>
+            {!isConnected && (
+              <button onClick={forceReconnect} className="btn btn--sm">
+                {t("game.reconnect")}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -369,8 +381,11 @@ export default function GameLost() {
         </div>
       </div>
       <div className="h-section gap-xs f-jc-c mb-sm">
+        <Link to="/game" className="btn btn--sm btn--lose">
+          {t("game.exit")}
+        </Link>
         <button onClick={handlePlayAgain} disabled={isCreatingRoom}>
-          {isCreatingRoom ? "CREANDO NUEVA SALA..." : t("common.playAgain")}
+          {isCreatingRoom ? t("game.creatingNewRoom") : t("common.playAgain")}
         </button>
       </div>
       <GameSound />

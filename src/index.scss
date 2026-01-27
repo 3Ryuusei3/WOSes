@@ -158,6 +158,10 @@ a {
 
 button,
 .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   width: fit-content;
   padding: 12px 36px;
   color: var(--clr-text-primary) !important;
@@ -170,8 +174,13 @@ button,
     0 6px 0 0 var(--clr-text-primary);
   border-radius: 4px;
   text-decoration: none;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease;
+
+  span {
+    text-transform: uppercase;
+  }
 
   &:hover,
   &.selected {

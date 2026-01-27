@@ -373,7 +373,43 @@ export async function finishRoundToLobby(
 
 export async function finishRoundToLost(
   code: string,
+  level?: number,
+  score?: number,
+  rounds?: number,
+  perfects?: number,
 ): Promise<DbResponse<RoomRow>> {
+  if (
+    level !== undefined &&
+    score !== undefined &&
+    rounds !== undefined &&
+    perfects !== undefined
+  ) {
+    const { data, error } = await supabase.rpc("finish_round_to_lost", {
+      p_code: code,
+      p_level: level,
+      p_score: score,
+      p_rounds: rounds,
+      p_perfects: perfects,
+    });
+    if (error) return { data: null, error };
+    const payload = data as {
+      room_id: number;
+      code: string;
+      state: string;
+      players: string;
+    };
+    return {
+      data: {
+        id: payload.room_id,
+        code: payload.code,
+        state: payload.state,
+        players: payload.players,
+      },
+      error: null,
+    };
+  }
+
+  // Otherwise use the original function (backward compatibility)
   const { data, error } = await supabase.rpc("finish_round_to_lost", {
     p_code: code,
   });
@@ -431,7 +467,9 @@ export async function getCorrectCountForRound(
 export async function setNewRoomCode(
   oldCode: string,
   newCode: string,
-): Promise<DbResponse<{ room_id: number; old_code: string; new_room_code: string }>> {
+): Promise<
+  DbResponse<{ room_id: number; old_code: string; new_room_code: string }>
+> {
   const { data, error } = await supabase.rpc("set_new_room_code", {
     p_old_code: oldCode,
     p_new_code: newCode,
