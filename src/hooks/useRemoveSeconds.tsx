@@ -8,7 +8,8 @@ const useRemoveSeconds = () => {
     lastLevelWords,
     levelsToAdvance,
     setNumberOfPerfectRounds,
-    setNumberOfRounds
+    setNumberOfRounds,
+    gameDifficulty,
   } = useGameStore();
   const [secondsRemoved, setSecondsRemoved] = useState(0);
 
@@ -38,20 +39,25 @@ const useRemoveSeconds = () => {
     }
   };
 
-  const isPerfect = lastLevelWords.every(word => word.guessed);
+  const isPerfect = lastLevelWords.every((word) => word.guessed);
 
   useEffect(() => {
-    setNumberOfRounds(prev => prev + 1);
+    setNumberOfRounds((prev) => prev + 1);
+
+    if (gameDifficulty === "daily") {
+       return;
+    }
+
     if (isPerfect) {
-      setGameTime(prev => prev + 1);
-      setNumberOfPerfectRounds(prev => prev + 1);
+      setGameTime((prev) => prev + 1);
+      setNumberOfPerfectRounds((prev) => prev + 1);
       setSecondsRemoved(0);
       return;
     }
 
     const secondsToRemove = getRandomSeconds();
     if (gameTime - secondsToRemove > 5) {
-      setGameTime(prev => prev - secondsToRemove);
+      setGameTime((prev) => prev - secondsToRemove);
       setSecondsRemoved(secondsToRemove);
     }
     return () => {};

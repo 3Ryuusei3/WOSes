@@ -90,6 +90,24 @@ const getThisWeekDateRange = () => {
   };
 }
 
+const getDictionaryUrl = (word: string, language: string): string => {
+  if (language === "en") {
+    return `https://www.merriam-webster.com/dictionary/${word.toLowerCase()}`;
+  }
+  return `https://dle.rae.es/${word}`;
+};
+
+const countLetters = (word: string): { [key: string]: number } => {
+  return word.split("").reduce((acc: any, letter: string) => {
+    acc[letter] = (acc[letter] || 0) + 1;
+    return acc;
+  }, {});
+};
+
+const canFormWord = (wordCount: any, lettersCount: any): boolean => {
+  return Object.keys(wordCount).every((key) => (lettersCount[key] || 0) >= wordCount[key]);
+};
+
 export {
   generateRandomRoomCode,
   isValidPlayerName,
@@ -97,4 +115,7 @@ export {
   calculateProbability,
   getMostCommonLetter,
   getThisWeekDateRange,
+  getDictionaryUrl,
+  countLetters,
+  canFormWord,
 };
