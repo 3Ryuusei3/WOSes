@@ -1,3 +1,3 @@
-type Difficulty = 'easy' | 'medium' | 'hard';
+type Difficulty = "easy" | "medium" | "hard" | "daily";
 
 export default Difficulty;

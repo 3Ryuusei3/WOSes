@@ -2,6 +2,7 @@
   "common": {
     "play": "JUGAR",
     "playAgain": "JUGAR DE NUEVO",
+    "startNewGame": "EMPEZAR UNA PARTIDA NUEVA",
     "start": "EMPEZAR PARTIDA EN {{difficulty}}",
     "startMultiplayer": "CREAR SALA EN {{difficulty}}",
     "close": "CERRAR",
@@ -75,6 +76,7 @@
     "easy": "ESTÁNDAR",
     "medium": "DIFÍCIL",
     "hard": "EXPERTO",
+    "daily": "RETO DIARIO",
     "tooltip": "Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad \"EXPERTO\" contiene todas las palabras que existen en la RAE."
   },
   "players": {
@@ -98,6 +100,7 @@
     "possibleWords": "Palabras posibles",
     "minScore": "Puntuación mínima",
     "targetScore": "Objetivo",
+    "dailyTargetScore": "Puntuación",
     "currentScore": "Puntuación actual",
     "inputWord": "Introduce la palabra",
     "nextLevel": "Siguiente nivel",
@@ -255,5 +258,17 @@
     "reconnecting": "Reconectando...",
     "error": "Error de conexión. Recarga la página",
     "connected": "Conectado"
+  },
+  "dailyChallenge": {
+    "title": "RETO DIARIO",
+    "button": "RETO DIARIO",
+    "ranking": "RETO DIARIO",
+    "completed": "¡DESAFÍO COMPLETADO!",
+    "lost": "DESAFÍO PERDIDO",
+    "exit": "SALIR",
+    "retryNote": "YA JUGASTE ESTE RETO ANTES HOY",
+    "todayChallenge": "RETO DEL DÍA",
+    "challengeNumber": "RETO #{{number}}",
+    "description": "¡UN NUEVO RETO CADA DÍA!"
   }
 }

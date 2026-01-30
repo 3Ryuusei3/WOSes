@@ -2,6 +2,7 @@
   "common": {
     "play": "PLAY",
     "playAgain": "PLAY AGAIN",
+    "startNewGame": "START A NEW GAME",
     "start": "START GAME IN {{difficulty}}",
     "startMultiplayer": "CREATE ROOM IN {{difficulty}}",
     "close": "CLOSE",
@@ -75,6 +76,7 @@
     "easy": "STANDARD",
     "medium": "DIFFICULT",
     "hard": "EXPERT",
+    "daily": "DAILY CHALLENGE",
     "tooltip": "Words organized by levels according to the frequency of use perceived by users. The \"EXPERT\" difficulty contains all the words that exist in the dictionary."
   },
   "gameStart": {
@@ -94,6 +96,7 @@
     "possibleWords": "Possible words",
     "minScore": "Minimum score",
     "targetScore": "Target",
+    "dailyTargetScore": "Score",
     "currentScore": "Current score",
     "inputWord": "Enter a word",
     "nextLevel": "Next level",
@@ -266,5 +269,17 @@
     "reconnecting": "Reconnecting...",
     "error": "Connection error. Reload the page",
     "connected": "Connected"
+  },
+  "dailyChallenge": {
+    "title": "DAILY CHALLENGE",
+    "button": "DAILY CHALLENGE",
+    "ranking": "DAILY CHALLENGE",
+    "completed": "CHALLENGE COMPLETED!",
+    "lost": "CHALLENGE FAILED",
+    "exit": "EXIT",
+    "retryNote": "YOU ALREADY PLAYED THIS CHALLENGE TODAY",
+    "todayChallenge": "DAILY CHALLENGE",
+    "challengeNumber": "CHALLENGE #{{number}}",
+    "description": "A NEW CHALLENGE EVERY DAY!"
   }
 }

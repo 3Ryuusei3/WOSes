@@ -1,24 +1,32 @@
-import { useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
-import useCountdown from '../hooks/useCountdown';
-import { advanceRoomToGame, subscribeToRoom } from '../services/multiplayer';
-import useGameStore from '../store/useGameStore';
+import useCountdown from "../hooks/useCountdown";
+import useRandomWords from "../hooks/useRandomWords";
+import { advanceRoomToGame, subscribeToRoom } from "../services/multiplayer";
+import useGameStore from "../store/useGameStore";
 
-import countdownMusic from '../assets/countdown.mp3';
+import countdownMusic from "../assets/countdown.mp3";
 
 export default function GameLoading() {
   const { t } = useTranslation();
-  const { volume, role, players, roomCode, roomId, setMode } = useGameStore();
+  const { volume, role, players, roomCode, roomId, setMode, gameDifficulty } =
+    useGameStore();
   const countdown = useCountdown();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const roomChannelRef = useRef<ReturnType<typeof subscribeToRoom> | null>(null);
+  const roomChannelRef = useRef<ReturnType<typeof subscribeToRoom> | null>(
+    null,
+  );
+  // En multiplayer, la palabra ya está establecida por GameRoom o GameLobby
+  // Solo generar palabra en singleplayer
+  useRandomWords(gameDifficulty, players === "multi");
 
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio(countdownMusic);
-      const effectiveVolume = (players === 'multi' && role === 'player') ? 0 : volume;
+      const effectiveVolume =
+        players === "multi" && role === "player" ? 0 : volume;
       audioRef.current.volume = effectiveVolume;
 
       timeoutRef.current = setTimeout(() => {
@@ -42,8 +50,8 @@ export default function GameLoading() {
       if (!roomChannelRef.current) {
         roomChannelRef.current = subscribeToRoom(roomId, (payload) => {
           const newState = (payload.new as any)?.state;
-          if (newState === 'game') {
-            setMode('game');
+          if (newState === "game") {
+            setMode("game");
           }
         });
       }
@@ -55,24 +63,25 @@ export default function GameLoading() {
   }, [roomId, setMode]);
 
   useEffect(() => {
-    if (countdown <= 0 && role === 'host' && roomCode) {
+    if (countdown <= 0 && role === "host" && roomCode) {
       advanceRoomToGame(roomCode);
     }
   }, [countdown, role, roomCode]);
 
   useEffect(() => {
     if (audioRef.current) {
-      const effectiveVolume = (players === 'multi' && role === 'player') ? 0 : volume;
+      const effectiveVolume =
+        players === "multi" && role === "player" ? 0 : volume;
       audioRef.current.volume = effectiveVolume;
     }
   }, [volume, players, role]);
 
   return (
-    <div className='game__container'>
-      <h2 className='highlight'>{t('game.gameStartsIn')}</h2>
+    <div className="game__container">
+      <h2 className="highlight">{t("game.gameStartsIn")}</h2>
       <div className="loading__container">
-        <h2 className='highlight'>
-          {countdown <= 0 ? t('game.start') : Math.ceil(countdown)}
+        <h2 className="highlight">
+          {countdown <= 0 ? t("game.start") : Math.ceil(countdown)}
         </h2>
         <div className="loading__container--box loading__container--box-xl"></div>
         <div className="loading__container--box loading__container--box-lg"></div>
@@ -80,5 +89,5 @@ export default function GameLoading() {
         <div className="loading__container--box"></div>
       </div>
     </div>
-  )
+  );
 }

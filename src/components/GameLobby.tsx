@@ -106,7 +106,9 @@ export default function GameLobby() {
     setIsModalOpen(true);
   };
 
-  useSetMechanics(gameMechanics, level);
+  // Solo generar mecánicas y palabras aleatorias si NO es daily challenge
+  // Para daily challenge, estos valores ya están establecidos
+  useSetMechanics(gameMechanics, level, gameDifficulty !== "daily");
   useRandomWords(gameDifficulty);
   const secondsToRemove = useRemoveSeconds();
 

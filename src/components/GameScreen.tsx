@@ -19,6 +19,7 @@ import useGameStore from "../store/useGameStore";
 
 import { calculateLevelsToAdvance, calculateProbability } from "../utils";
 import { insertScoreWithNextId } from "../services/rooms";
+import { saveDailyChallengeScore } from "../services/dailyChallenge";
 
 import {
   RUNNING_OUT_OF_TIME_PERCENTAGE,
@@ -73,6 +74,7 @@ export default function GameScreen() {
     numberOfRounds,
     numberOfPerfectRounds,
     setPreviousRoundsWords,
+    currentChallengeNumber,
   } = useGameStore();
 
   const isPlayer = players === "multi" && role === "player";
@@ -108,6 +110,7 @@ export default function GameScreen() {
   const [hasPlayedGoalSound, setHasPlayedGoalSound] = useState(false);
   const [hasPlayedRevealSound, setHasPlayedRevealSound] = useState(false);
   const [hasPlayedEndSound, setHasPlayedEndSound] = useState(false);
+  const hasCalledEndOfLevelRef = useRef(false);
   const [playerAttempts, setPlayerAttempts] = useState<
     {
       word: string;
@@ -233,6 +236,7 @@ export default function GameScreen() {
   useEffect(() => {
     if (mode === "game") {
       isEndingLevelRef.current = false;
+      hasCalledEndOfLevelRef.current = false;
     }
   }, [mode]);
 
@@ -345,6 +349,8 @@ export default function GameScreen() {
       updateLastLevelWordsAndPoints();
       setMode("lobby");
       setPreviousRoundsWords((prevWords) => [...prevWords, randomWord]);
+      // No resetear el tiempo aquí - useRemoveSeconds en GameLobby lo modificará según el rendimiento
+      // El tiempo solo se resetea al inicio de una nueva partida en GameStart
     },
     [
       setLevelsToAdvance,
@@ -358,16 +364,53 @@ export default function GameScreen() {
   );
 
   const endGameAndSaveScore = useCallback(
-    (finalPoints: number) => {
+    (finalPoints: number, currentTimeRemaining?: number) => {
       updateLastLevelWordsAndPoints();
-      // Solo singleplayer inserta score en la tabla de TopScores
       if (players === "single") {
-        updateHighscoreDB(finalPoints);
+        if (gameDifficulty === "daily") {
+          // Obtener valores actuales del store
+          const { dailyChallengeInitialTime, gameTime: storeGameTime } =
+            useGameStore.getState();
+
+          // Usar el tiempo pasado como parámetro, o el del store como fallback
+          const actualTimeRemaining =
+            currentTimeRemaining !== undefined
+              ? currentTimeRemaining
+              : storeGameTime;
+
+          // El tiempo transcurrido es: tiempo_inicial - tiempo_restante_actual
+          const timeElapsed =
+            (dailyChallengeInitialTime || 0) - actualTimeRemaining;
+
+          saveDailyChallengeScore({
+            name: playerName,
+            score: finalPoints,
+            challenge_number: currentChallengeNumber!,
+            time_elapsed: timeElapsed,
+            language: i18n.language,
+            perfects: numberOfPerfectRounds,
+          }).catch((error) => {
+            console.error("Error saving daily challenge score:", error);
+          });
+        } else {
+          updateHighscoreDB(finalPoints);
+        }
       }
       setMode("lost");
       setPreviousRoundsWords([]);
     },
-    [updateLastLevelWordsAndPoints, updateHighscoreDB, setMode, players],
+    [
+      updateLastLevelWordsAndPoints,
+      updateHighscoreDB,
+      setMode,
+      players,
+      gameDifficulty,
+      playerName,
+      currentChallengeNumber,
+      i18n.language,
+      numberOfPerfectRounds,
+      setPreviousRoundsWords,
+    ],
   );
 
   const handleEndOfLevel = useCallback(async () => {
@@ -375,6 +418,11 @@ export default function GameScreen() {
     isEndingLevelRef.current = true;
 
     const finalPoints = totalPoints + correctWordsPoints();
+
+    if (gameDifficulty === "daily") {
+      endGameAndSaveScore(finalPoints);
+      return;
+    }
 
     if (await hasCompletedLevel()) {
       const completionPercentage = (correctWordsPoints() / levelPoints) * 100;
@@ -406,6 +454,7 @@ export default function GameScreen() {
     players,
     role,
     roomCode,
+    gameDifficulty,
   ]);
 
   useEffect(() => {
@@ -568,7 +617,14 @@ export default function GameScreen() {
       const allWordsGuessed =
         levelPoints > 0 && correctWords.length === possibleWords.length;
 
-      if (timeEnded || allWordsGuessed) {
+      if ((timeEnded || allWordsGuessed) && !hasCalledEndOfLevelRef.current) {
+        hasCalledEndOfLevelRef.current = true;
+
+        if (gameDifficulty === "daily") {
+          const timeRemainingSeconds = Math.floor(timeLeft / 1000);
+          useGameStore.setState({ gameTime: timeRemainingSeconds });
+        }
+
         handleEndOfLevel();
       }
     }

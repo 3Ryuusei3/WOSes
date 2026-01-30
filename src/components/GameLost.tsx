@@ -55,8 +55,14 @@ export default function GameLost() {
     setPossibleWords,
     setHiddenLetterIndex,
     setPreviousRoundsWords,
+    currentChallengeNumber,
+    gameTime,
   } = useGameStore();
 
+  const isDailyChallenge = gameDifficulty === "daily";
+  const isDailyChallengeCompleted = isDailyChallenge && 
+    lastLevelWords.length > 0 && 
+    lastLevelWords.every(word => word.guessed);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { columns } = useWindowSize();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
@@ -68,7 +74,7 @@ export default function GameLost() {
     if (!words || words.length === 0) return null;
 
     const filteredWords = words.filter(
-      (word) => word.length >= 4 && word.length <= 9,
+      (word: any) => word.length >= 4 && word.length <= 9,
     );
     const randomWord =
       filteredWords[Math.floor(Math.random() * filteredWords.length)];
@@ -83,10 +89,12 @@ export default function GameLost() {
       Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
 
     const lettersCount = countLetters(randomWord);
-    const possible = filteredWords.filter((w) =>
+    const possible = filteredWords.filter((w: any) =>
       canFormWord(countLetters(w), lettersCount),
     );
-    possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
+    possible.sort(
+      (a: any, b: any) => a.length - b.length || a.localeCompare(b),
+    );
 
     return {
       word: randomWord,
@@ -316,78 +324,154 @@ export default function GameLost() {
       <div className="difficulty-tag">
         <DifficultyTag gameDifficulty={gameDifficulty} />
       </div>
-      <h1 className="lost">{t("game.lost")}</h1>
-      <div className="h-section gap-md f-jc-c">
-        <div className="v-section">
-          <div className="score__container--box score__container--box-sm won">
-            <p>{t("common.reachedLevel")}</p>
-            <h3>{level}</h3>
-          </div>
-        </div>
-        <div className="v-section">
-          <div className="score__container--box score__container--box-sm won">
-            <p>{t("common.totalPoints")}</p>
-            <h3>{totalPoints}</h3>
-          </div>
-        </div>
-        <div className="v-section">
-          <div className="score__container--box score__container--box-sm won">
-            <p>{t("common.numberOfRounds")}</p>
-            <h3>{numberOfRounds}</h3>
-          </div>
-        </div>
-        <div className="v-section">
-          <div className="score__container--box score__container--box-sm won">
-            <p>{t("common.perfectRounds")}</p>
-            <h3>{numberOfPerfectRounds}</h3>
-          </div>
-        </div>
-      </div>
-      <div className="h-section gap-lg mx-auto">
-        <div className="v-section gap-md">
-          <div className="v-section score__container--box">
-            <Tooltip message={t("game.wordMeaning")}>
-              <div className="info-icon">i</div>
-            </Tooltip>
-            <p>{t("common.lastWords")}</p>
-            <div
-              className="v-section score__container--wordlist"
-              style={
-                {
-                  "--wordlist-rows": Math.ceil(lastLevelWords.length / columns),
-                  "--wordlist-columns": columns,
-                } as React.CSSProperties
-              }
-            >
-              {lastLevelWords.map((word, index) => (
-                <h4
-                  className={`${word.guessed ? "highlight" : "unguessed"}`}
-                  key={`${index}-${word}`}
-                >
-                  <Link
-                    to={getDictionaryUrl(word.word)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {word.word.toUpperCase()}
-                  </Link>
-                </h4>
-              ))}
+      {isDailyChallenge ? (
+        <>
+          <h1 className={isDailyChallengeCompleted ? "won" : "lost"}>
+            {isDailyChallengeCompleted
+              ? t("dailyChallenge.completed")
+              : t("dailyChallenge.lost")}
+          </h1>
+          <div className="h-section gap-md f-jc-c">
+            <div className="v-section">
+              <div className="score__container--box score__container--box-sm won">
+                <p>{t("common.totalPoints")}</p>
+                <h3>{totalPoints}</h3>
+              </div>
+            </div>
+            <div className="v-section">
+              <div className="score__container--box score__container--box-sm won">
+                <p>{t("common.remainingTime")}</p>
+                <h3>{gameTime}s</h3>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="score__container--box pos-rel">
-          <TopScores hasTooltip difficulty={gameDifficulty} />
-        </div>
-      </div>
-      <div className="h-section gap-xs f-jc-c mb-sm">
-        <Link to="/game" className="btn btn--sm btn--lose">
-          {t("game.exit")}
-        </Link>
-        <button onClick={handlePlayAgain} disabled={isCreatingRoom}>
-          {isCreatingRoom ? t("game.creatingNewRoom") : t("common.playAgain")}
-        </button>
-      </div>
+          <div className="h-section gap-lg mx-auto">
+            <div className="v-section score__container--box">
+              <Tooltip message={t("game.wordMeaning")}>
+                <div className="info-icon">i</div>
+              </Tooltip>
+              <p>{t("common.lastWords")}</p>
+              <div
+                className="v-section score__container--wordlist"
+                style={
+                  {
+                    "--wordlist-rows": Math.ceil(
+                      lastLevelWords.length / columns,
+                    ),
+                    "--wordlist-columns": columns,
+                  } as React.CSSProperties
+                }
+              >
+                {lastLevelWords.map((word, index) => (
+                  <h4
+                    className={`${word.guessed ? "highlight" : "unguessed"}`}
+                    key={`${index}-${word}`}
+                  >
+                    <Link
+                      to={getDictionaryUrl(word.word)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {word.word.toUpperCase()}
+                    </Link>
+                  </h4>
+                ))}
+              </div>
+            </div>
+            <div className="score__container--box pos-rel">
+              <TopScores 
+                hasTooltip 
+                difficulty="daily" 
+                challengeNumber={currentChallengeNumber!} 
+              />
+            </div>
+          </div>
+          <div className="h-section gap-xs f-jc-c mb-sm">
+            <button className="btn" onClick={handlePlayAgain}>
+              {t("common.startNewGame")}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h1 className="lost">{t("game.lost")}</h1>
+          <div className="h-section gap-md f-jc-c">
+            <div className="v-section">
+              <div className="score__container--box score__container--box-sm won">
+                <p>{t("common.reachedLevel")}</p>
+                <h3>{level}</h3>
+              </div>
+            </div>
+            <div className="v-section">
+              <div className="score__container--box score__container--box-sm won">
+                <p>{t("common.totalPoints")}</p>
+                <h3>{totalPoints}</h3>
+              </div>
+            </div>
+            <div className="v-section">
+              <div className="score__container--box score__container--box-sm won">
+                <p>{t("common.numberOfRounds")}</p>
+                <h3>{numberOfRounds}</h3>
+              </div>
+            </div>
+            <div className="v-section">
+              <div className="score__container--box score__container--box-sm won">
+                <p>{t("common.perfectRounds")}</p>
+                <h3>{numberOfPerfectRounds}</h3>
+              </div>
+            </div>
+          </div>
+          <div className="h-section gap-lg mx-auto">
+            <div className="v-section gap-md">
+              <div className="v-section score__container--box">
+                <Tooltip message={t("game.wordMeaning")}>
+                  <div className="info-icon">i</div>
+                </Tooltip>
+                <p>{t("common.lastWords")}</p>
+                <div
+                  className="v-section score__container--wordlist"
+                  style={
+                    {
+                      "--wordlist-rows": Math.ceil(
+                        lastLevelWords.length / columns,
+                      ),
+                      "--wordlist-columns": columns,
+                    } as React.CSSProperties
+                  }
+                >
+                  {lastLevelWords.map((word, index) => (
+                    <h4
+                      className={`${word.guessed ? "highlight" : "unguessed"}`}
+                      key={`${index}-${word}`}
+                    >
+                      <Link
+                        to={getDictionaryUrl(word.word)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {word.word.toUpperCase()}
+                      </Link>
+                    </h4>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="score__container--box pos-rel">
+              <TopScores hasTooltip difficulty={gameDifficulty} />
+            </div>
+          </div>
+          <div className="h-section gap-xs f-jc-c mb-sm">
+            <Link to="/game" className="btn btn--sm btn--lose">
+              {t("game.exit")}
+            </Link>
+            <button onClick={handlePlayAgain} disabled={isCreatingRoom}>
+              {isCreatingRoom
+                ? t("game.creatingNewRoom")
+                : t("common.playAgain")}
+            </button>
+          </div>
+        </>
+      )}
       <GameSound />
     </div>
   );

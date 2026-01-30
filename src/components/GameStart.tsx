@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -10,11 +10,13 @@ import LanguageSelector from "../atoms/LanguageSelector";
 import useRandomWords from "../hooks/useRandomWords";
 import useBackgroundAudio from "../hooks/useBackgroundAudio";
 import useSetMechanics from "../hooks/useSetMechanics";
+import useDailyChallenge from "../hooks/useDailyChallenge";
 
 import useGameStore from "../store/useGameStore";
 import GameSound from "../atoms/GameSound";
 import PlayersSelector from "../atoms/PlayersSelector";
 
+import Difficulty from "../types/Difficulty";
 import { generateRandomRoomCode, isValidPlayerName } from "../utils";
 import { createRoomWithHost } from "../services/multiplayer";
 import { START_TIME } from "../constant";
@@ -45,13 +47,31 @@ export default function GameStart() {
   } = useGameStore();
   const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
+  const [isDailyChallengeSelected, setIsDailyChallengeSelected] =
+    useState(false);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const enableMulti = searchParams.get("multi") === "true";
 
-  useSetMechanics(gameMechanics, level);
-  useRandomWords(gameDifficulty);
+  const {
+    dailyChallenge,
+    loading: loadingChallenge,
+    alreadyPlayed,
+    loadDailyChallenge,
+    startDailyChallenge,
+  } = useDailyChallenge();
+
+  useEffect(() => {
+    if (gameDifficulty === "daily" && !dailyChallenge && !loadingChallenge) {
+      loadDailyChallenge();
+      setIsDailyChallengeSelected(true);
+    }
+  }, [gameDifficulty, dailyChallenge, loadingChallenge, loadDailyChallenge]);
+
+  useSetMechanics(gameMechanics, level, gameDifficulty !== "daily");
+  // En multiplayer, no generar palabra en GameStart porque se genera en GameRoom
+  useRandomWords(gameDifficulty, players === "multi");
 
   useBackgroundAudio(volume);
 
@@ -60,6 +80,12 @@ export default function GameStart() {
       if (!enableMulti) {
         setPlayers("single");
       }
+
+      if (isDailyChallengeSelected && dailyChallenge) {
+        startDailyChallenge();
+        return;
+      }
+
       if (players === "single") {
         setMode("loading");
       } else {
@@ -111,12 +137,30 @@ export default function GameStart() {
   };
 
   const getButtonText = () => {
+    if (isDailyChallengeSelected) {
+      return t("common.start", { difficulty: t("difficulties.daily") });
+    }
     const difficultyLabel = t(`difficulties.${gameDifficulty}`);
     if (players === "multi") {
       return t("common.startMultiplayer", { difficulty: difficultyLabel });
     } else {
       return t("common.start", { difficulty: difficultyLabel });
     }
+  };
+
+  const handleDailyChallenge = async () => {
+    if (!isValidPlayerName(playerName)) {
+      setError(true);
+      return;
+    }
+
+    await loadDailyChallenge();
+    setIsDailyChallengeSelected(true);
+  };
+
+  const handleDifficultyChange = (difficulty: Difficulty) => {
+    setGameDifficulty(difficulty);
+    setIsDailyChallengeSelected(false);
   };
 
   return (
@@ -128,12 +172,17 @@ export default function GameStart() {
             <h2 className="highlight">{t("gameStart.nameAndDifficulty")}</h2>
             <DifficultySelector
               gameDifficulty={gameDifficulty}
-              onDifficultyChange={setGameDifficulty}
+              onDifficultyChange={handleDifficultyChange}
+              showDailyChallenge={players === "single"}
+              onDailyChallengeClick={handleDailyChallenge}
+              loadingDaily={loadingChallenge}
+              isDailyChallengeSelected={isDailyChallengeSelected}
             />
             <PlayersSelector
               players={players}
               setPlayers={setPlayers}
               enableMulti={enableMulti}
+              onDifficultyChange={handleDifficultyChange}
             />
             <div className="v-section gap-xs">
               <input
@@ -156,7 +205,15 @@ export default function GameStart() {
             </h6>
             <div className="h-section gap-xs f-jc-c">
               <button
-                className={`btn ${gameDifficulty === "easy" ? "btn--win" : gameDifficulty === "hard" ? "btn--lose" : ""}`}
+                className={`btn ${
+                  isDailyChallengeSelected
+                    ? "btn--daily"
+                    : gameDifficulty === "easy"
+                      ? "btn--win"
+                      : gameDifficulty === "hard"
+                        ? "btn--lose"
+                        : ""
+                }`}
                 onClick={handleSubmit}
               >
                 {getButtonText()}
@@ -165,7 +222,24 @@ export default function GameStart() {
           </div>
           <div className="ranking ranking--lg v-section gap-md top-scores">
             <div className="score__container--box dark">
-              <TopScores difficulty={gameDifficulty} />
+              {alreadyPlayed &&
+                (isDailyChallengeSelected || gameDifficulty === "daily") && (
+                  <p className="daily-retry-note">
+                    {t("dailyChallenge.retryNote")}
+                  </p>
+                )}
+              <TopScores
+                difficulty={
+                  isDailyChallengeSelected || gameDifficulty === "daily"
+                    ? "daily"
+                    : gameDifficulty
+                }
+                challengeNumber={
+                  isDailyChallengeSelected || gameDifficulty === "daily"
+                    ? dailyChallenge?.challenge_number
+                    : undefined
+                }
+              />
             </div>
           </div>
         </div>

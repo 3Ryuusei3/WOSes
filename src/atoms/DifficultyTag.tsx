@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 import Difficulty from "../types/Difficulty";
 
@@ -10,7 +10,9 @@ export default function DifficultyTag({ gameDifficulty }: DifficultyTagProps) {
   const { t } = useTranslation();
 
   return (
-    <button className={`btn btn--deco btn--xs mx-auto ${gameDifficulty === 'easy' ? 'btn--win' : gameDifficulty === 'hard' ? 'btn--lose' : ''}`}>
+    <button
+      className={`btn btn--deco btn--xs mx-auto ${gameDifficulty === "easy" ? "btn--win" : gameDifficulty === "hard" ? "btn--lose" : gameDifficulty === "daily" ? "btn--daily" : ""}`}
+    >
       {t(`difficulties.${gameDifficulty}`)}
     </button>
   );

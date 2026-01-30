@@ -32,8 +32,8 @@
   --clr-tip: #b3d7fb;
   --clr-tip-dim: #b3d7fb77;
   --clr-still: #1ae940;
-  --clr-still-dim: #00ff0077;
-  --clr-still-highlight: #07751b;
+  --clr-still-dim: #3ef35f;
+  --clr-still-highlight: #0196b4;
 
   --clr-progress-bg: #1c0c2f;
   --clr-progress-on-time: var(--clr-win);
@@ -199,6 +199,25 @@ button,
     cursor: not-allowed;
   }
 
+  &--sm {
+    font-size: 18px;
+    padding: 8px 20px;
+  }
+
+  &--xs {
+    font-size: 12px;
+    padding: 2px 10px;
+    box-shadow: 0 3px 0 0 var(--clr-accent-secondary);
+
+    &.btn--win {
+      box-shadow: 0 3px 0 0 var(--clr-win-highlight);
+    }
+
+    &.btn--lose {
+      box-shadow: 0 3px 0 0 var(--clr-lose-highlight);
+    }
+  }
+
   &--deco {
     pointer-events: none;
     cursor: pointer !important;
@@ -242,22 +261,22 @@ button,
     }
   }
 
-  &--sm {
-    font-size: 18px;
-    padding: 8px 20px;
-  }
+  &--daily {
+    background-color: var(--clr-still);
+    border: 1px solid var(--clr-still);
+    box-shadow:
+      0 3px 0 0 var(--clr-still-highlight),
+      0 -3px 0 0 var(--clr-still-dim),
+      0 6px 0 0 var(--clr-text-primary);
+    transition: all 0.3s ease;
 
-  &--xs {
-    font-size: 12px;
-    padding: 2px 10px;
-    box-shadow: 0 3px 0 0 var(--clr-accent-secondary);
-
-    &.btn--win {
-      box-shadow: 0 3px 0 0 var(--clr-win-highlight);
-    }
-
-    &.btn--lose {
-      box-shadow: 0 3px 0 0 var(--clr-lose-highlight);
+    &:hover,
+    &.selected {
+      border: 1px solid var(--clr-still-dim);
+      background-color: var(--clr-still-dim);
+      box-shadow:
+        0 3px 0 0 var(--clr-still-highlight),
+        0 -3px 0 0 var(--clr-still-dim);
     }
   }
 }
@@ -1317,6 +1336,10 @@ main {
   cursor: pointer;
 }
 
+.difficulty-tag {
+  width: fit-content;
+}
+
 .player-selector {
   padding: 5px;
   width: 30px;
@@ -1772,4 +1795,27 @@ main {
     font-size: 13px;
     padding: 10px 12px;
   }
+}
+
+// ============================================
+// DAILY CHALLENGE STYLES
+// ============================================
+
+// Badge para reintentos en ranking
+.daily-retry-badge {
+  font-size: 0.8em;
+  opacity: 0.7;
+  margin-left: 4px;
+  color: var(--clr-text-tertiary);
+}
+
+// Nota de reintento
+.daily-retry-note {
+  text-shadow: 0px 1px 0 var(--clr-accent-secondary);
+  font-size: 0.9em;
+  text-align: center;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-bottom: 1rem;
 }

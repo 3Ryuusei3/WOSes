@@ -1,42 +1,60 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import useGameStore from '../store/useGameStore';
+import useGameStore from "../store/useGameStore";
 
-import { calculateProbability } from '../utils';
+import { calculateProbability } from "../utils";
 
-import { LEVEL_RANGES } from '../constant';
+import { LEVEL_RANGES } from "../constant";
 
-import Mechanics from '../types/Mechanics';
+import Mechanics from "../types/Mechanics";
 
 type MechanicsType = keyof typeof LEVEL_RANGES;
 
-const calculateMechanicsProbability = (level: number, difficultyType: MechanicsType) => {
+const calculateMechanicsProbability = (
+  level: number,
+  difficultyType: MechanicsType,
+) => {
   const range = LEVEL_RANGES[difficultyType];
   return calculateProbability(level, {
     START: {
       LEVEL: range.START,
-      PERCENTAGE: 0
+      PERCENTAGE: 0,
     },
     END: {
       LEVEL: range.END,
-      PERCENTAGE: 100
-    }
+      PERCENTAGE: 100,
+    },
   });
 };
 
-const useSetMechanics = (gameMechanics: Mechanics, level: number) => {
-  const setGameMechanics = useGameStore(state => state.setGameMechanics);
+const useSetMechanics = (
+  gameMechanics: Mechanics,
+  level: number,
+  shouldGenerate: boolean = true,
+) => {
+  const setGameMechanics = useGameStore((state) => state.setGameMechanics);
 
   useEffect(() => {
-    const difficulties: MechanicsType[] = ['DARK_LETTER', 'FAKE_LETTER', 'HIDDEN_LETTER', 'FIRST_LETTER', 'STILL_LETTER'];
+    // No generar mecánicas si no se debe (ej: daily challenge)
+    if (!shouldGenerate) {
+      return;
+    }
+
+    const difficulties: MechanicsType[] = [
+      "DARK_LETTER",
+      "FAKE_LETTER",
+      "HIDDEN_LETTER",
+      "FIRST_LETTER",
+      "STILL_LETTER",
+    ];
     const newMechanics = difficulties.reduce((acc, type) => {
       const probability = calculateMechanicsProbability(level, type);
       const random = Math.floor(Math.random() * 100);
-      const key = type.split('_')[0].toLowerCase() as keyof Mechanics;
+      const key = type.split("_")[0].toLowerCase() as keyof Mechanics;
       return { ...acc, [key]: random < probability };
     }, {} as Mechanics);
     setGameMechanics({ ...gameMechanics, ...newMechanics });
-  }, []);
+  }, [shouldGenerate]);
 };
 
 export default useSetMechanics;

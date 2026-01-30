@@ -1,5 +1,9 @@
-import { supabase } from '../lib/supabase';
-import { PostgrestError, RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { supabase } from "../lib/supabase";
+import {
+  PostgrestError,
+  RealtimeChannel,
+  RealtimePostgresChangesPayload,
+} from "@supabase/supabase-js";
 
 interface ScoreRecord {
   id: number;
@@ -20,19 +24,24 @@ type DbResponse<T> = {
 };
 
 // Get all-time top scores for a specific difficulty and language
-export async function getAllTimeTopScores(difficulty: string, language: string, limit = 10): Promise<DbResponse<ScoreRecord[]>> {
+export async function getAllTimeTopScores(
+  difficulty: string,
+  language: string,
+  limit = 10,
+): Promise<DbResponse<ScoreRecord[]>> {
   return await supabase
-    .from('rooms')
-    .select('*')
-    .eq('difficulty', difficulty)
-    .eq('language', language)
-    .eq('state', 'lost')
-    .not('level', 'is', null)
-    .not('score', 'is', null)
-    .order('level', { ascending: false })
-    .order('rounds', { ascending: false })
-    .order('perfects', { ascending: false })
-    .order('score', { ascending: false })
+    .from("rooms")
+    .select("*")
+    .eq("difficulty", difficulty)
+    .eq("language", language)
+    .eq("state", "lost")
+    .neq("difficulty", "daily")
+    .not("level", "is", null)
+    .not("score", "is", null)
+    .order("level", { ascending: false })
+    .order("rounds", { ascending: false })
+    .order("perfects", { ascending: false })
+    .order("score", { ascending: false })
     .limit(limit);
 }
 
@@ -42,22 +51,23 @@ export async function getWeeklyTopScores(
   language: string,
   startDate: string,
   endDate: string,
-  limit = 10
+  limit = 10,
 ): Promise<DbResponse<ScoreRecord[]>> {
   return await supabase
-    .from('rooms')
-    .select('*')
-    .eq('difficulty', difficulty)
-    .eq('language', language)
-    .eq('state', 'lost')
-    .gte('created_at', startDate)
-    .lte('created_at', endDate)
-    .not('level', 'is', null)
-    .not('score', 'is', null)
-    .order('level', { ascending: false })
-    .order('rounds', { ascending: false })
-    .order('perfects', { ascending: false })
-    .order('score', { ascending: false })
+    .from("rooms")
+    .select("*")
+    .eq("difficulty", difficulty)
+    .eq("language", language)
+    .eq("state", "lost")
+    .neq("difficulty", "daily")
+    .gte("created_at", startDate)
+    .lte("created_at", endDate)
+    .not("level", "is", null)
+    .not("score", "is", null)
+    .order("level", { ascending: false })
+    .order("rounds", { ascending: false })
+    .order("perfects", { ascending: false })
+    .order("score", { ascending: false })
     .limit(limit);
 }
 
@@ -70,11 +80,11 @@ export async function insertScore(
   language: string,
   createdAt: string,
   rounds?: number,
-  perfects?: number
+  perfects?: number,
 ): Promise<DbResponse<ScoreRecord[]>> {
   try {
     return await supabase
-      .from('rooms')
+      .from("rooms")
       .insert([
         {
           name,
@@ -84,12 +94,12 @@ export async function insertScore(
           language,
           created_at: createdAt,
           ...(rounds !== undefined && { rounds }),
-          ...(perfects !== undefined && { perfects })
-        }
+          ...(perfects !== undefined && { perfects }),
+        },
       ])
       .select();
   } catch (error) {
-    console.error('Error in insertScore:', error);
+    console.error("Error in insertScore:", error);
     return { data: null, error: error as PostgrestError };
   }
 }
@@ -103,23 +113,22 @@ export async function insertScoreWithNextId(
   language: string,
   createdAt: string,
   rounds: number,
-  perfects: number
+  perfects: number,
 ): Promise<DbResponse<ScoreRecord[]>> {
   try {
     // Call the Supabase function that handles getting the next ID and inserting the record
-    return await supabase
-      .rpc('insert_score_with_next_id', {
-        p_name: name,
-        p_score: score,
-        p_level: level,
-        p_difficulty: difficulty,
-        p_language: language,
-        p_created_at: createdAt,
-        p_rounds: rounds,
-        p_perfects: perfects
-      });
+    return await supabase.rpc("insert_score_with_next_id", {
+      p_name: name,
+      p_score: score,
+      p_level: level,
+      p_difficulty: difficulty,
+      p_language: language,
+      p_created_at: createdAt,
+      p_rounds: rounds,
+      p_perfects: perfects,
+    });
   } catch (error) {
-    console.error('Error in insertScoreWithNextId:', error);
+    console.error("Error in insertScoreWithNextId:", error);
     return { data: null, error: error as PostgrestError };
   }
 }
@@ -139,10 +148,10 @@ type ScoreRealtimePayload = RealtimePostgresChangesPayload<{
 export function subscribeToScores(
   callback: (payload: ScoreRealtimePayload) => void,
   difficulty?: string,
-  language?: string
+  language?: string,
 ): RealtimeChannel {
   // Build filter string for multiple conditions
-  let filter = '';
+  let filter = "";
   if (difficulty && language) {
     filter = `difficulty=eq.${difficulty},language=eq.${language}`;
   } else if (difficulty) {
@@ -152,16 +161,16 @@ export function subscribeToScores(
   }
 
   const channel = supabase
-    .channel('rooms-changes')
+    .channel("rooms-changes")
     .on(
-      'postgres_changes',
+      "postgres_changes",
       {
-        event: '*',
-        schema: 'public',
-        table: 'rooms',
-        ...(filter ? { filter } : {})
+        event: "*",
+        schema: "public",
+        table: "rooms",
+        ...(filter ? { filter } : {}),
       },
-      callback
+      callback,
     )
     .subscribe();
 

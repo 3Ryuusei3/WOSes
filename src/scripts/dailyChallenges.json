@@ -1,0 +1,112 @@
+[
+  {
+    "challenge_number": 1,
+    "word": "abalara",
+    "difficulty": "easy",
+    "time_seconds": 74,
+    "has_hidden_letter": false,
+    "has_fake_letter": true,
+    "has_dark_mode": true,
+    "has_still_mode": false,
+    "has_first_letter": false
+  },
+  {
+    "challenge_number": 2,
+    "word": "abrazar",
+    "difficulty": "easy",
+    "time_seconds": 86,
+    "has_hidden_letter": false,
+    "has_fake_letter": false,
+    "has_dark_mode": false,
+    "has_still_mode": true,
+    "has_first_letter": false
+  },
+  {
+    "challenge_number": 3,
+    "word": "abarataba",
+    "difficulty": "easy",
+    "time_seconds": 76,
+    "has_hidden_letter": true,
+    "has_fake_letter": false,
+    "has_dark_mode": false,
+    "has_still_mode": false,
+    "has_first_letter": true
+  },
+  {
+    "challenge_number": 4,
+    "word": "anchaba",
+    "difficulty": "medium",
+    "time_seconds": 75,
+    "has_hidden_letter": false,
+    "has_fake_letter": false,
+    "has_dark_mode": true,
+    "has_still_mode": false,
+    "has_first_letter": true
+  },
+  {
+    "challenge_number": 5,
+    "word": "abalad",
+    "difficulty": "medium",
+    "time_seconds": 81,
+    "has_hidden_letter": false,
+    "has_fake_letter": false,
+    "has_dark_mode": true,
+    "has_still_mode": false,
+    "has_first_letter": false
+  },
+  {
+    "challenge_number": 6,
+    "word": "baraja",
+    "difficulty": "medium",
+    "time_seconds": 79,
+    "has_hidden_letter": true,
+    "has_fake_letter": true,
+    "has_dark_mode": false,
+    "has_still_mode": false,
+    "has_first_letter": false
+  },
+  {
+    "challenge_number": 7,
+    "word": "balabas",
+    "difficulty": "medium",
+    "time_seconds": 63,
+    "has_hidden_letter": true,
+    "has_fake_letter": true,
+    "has_dark_mode": false,
+    "has_still_mode": false,
+    "has_first_letter": true
+  },
+  {
+    "challenge_number": 8,
+    "word": "abacas",
+    "difficulty": "hard",
+    "time_seconds": 66,
+    "has_hidden_letter": true,
+    "has_fake_letter": true,
+    "has_dark_mode": false,
+    "has_still_mode": true,
+    "has_first_letter": false
+  },
+  {
+    "challenge_number": 9,
+    "word": "balaca",
+    "difficulty": "hard",
+    "time_seconds": 85,
+    "has_hidden_letter": true,
+    "has_fake_letter": true,
+    "has_dark_mode": false,
+    "has_still_mode": false,
+    "has_first_letter": true
+  },
+  {
+    "challenge_number": 10,
+    "word": "bajada",
+    "difficulty": "hard",
+    "time_seconds": 61,
+    "has_hidden_letter": false,
+    "has_fake_letter": true,
+    "has_dark_mode": true,
+    "has_still_mode": false,
+    "has_first_letter": false
+  }
+]
