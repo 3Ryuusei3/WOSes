@@ -66,10 +66,8 @@ interface GameState {
   setCurrentChallengeNumber: (num: number | null) => void;
   dailyChallengeWord: string | null;
   setDailyChallengeWord: (word: string | null) => void;
-  dailyChallengeOriginalDifficulty: "easy" | "medium" | "hard" | null;
-  setDailyChallengeOriginalDifficulty: (
-    diff: "easy" | "medium" | "hard" | null,
-  ) => void;
+  dailyChallengeOriginalDifficulty: Difficulty | null;
+  setDailyChallengeOriginalDifficulty: (diff: Difficulty | null) => void;
   dailyChallengeInitialTime: number | null;
   setDailyChallengeInitialTime: (time: number | null) => void;
 }

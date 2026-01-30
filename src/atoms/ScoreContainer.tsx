@@ -11,6 +11,7 @@ interface ScoreContainerProps {
   goalPoints: number;
   level: number;
   gameDifficulty: Difficulty;
+  dailyChallengeOriginalDifficulty: Difficulty | null;
 }
 
 export default function ScoreContainer({
@@ -19,6 +20,7 @@ export default function ScoreContainer({
   goalPoints,
   level,
   gameDifficulty,
+  dailyChallengeOriginalDifficulty,
 }: ScoreContainerProps) {
   const { t } = useTranslation();
   const guessedCount = words.filter((w) => w.guessed).length;
@@ -44,7 +46,12 @@ export default function ScoreContainer({
           )}
           <div className="v-section gap-2xs">
             <p>{t("common.difficulty").toUpperCase()}</p>
-            <DifficultyTag gameDifficulty={gameDifficulty} />
+            <DifficultyTag
+              gameDifficulty={gameDifficulty}
+              dailyChallengeOriginalDifficulty={
+                dailyChallengeOriginalDifficulty
+              }
+            />
           </div>
         </div>
       </div>

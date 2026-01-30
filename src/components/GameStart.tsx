@@ -44,6 +44,7 @@ export default function GameStart() {
     setNumberOfRounds,
     setLevelsToAdvance,
     setPreviousRoundsWords,
+    setDailyChallengeOriginalDifficulty,
   } = useGameStore();
   const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
@@ -88,6 +89,7 @@ export default function GameStart() {
 
       if (players === "single") {
         setMode("loading");
+        setDailyChallengeOriginalDifficulty(null);
       } else {
         setLevel(1);
         setTotalPoints(0);

@@ -49,7 +49,10 @@ const filterUsedWords = (words: string[], usedWords: string[]): string[] => {
   return words.filter((word) => !usedWords.includes(word.toLowerCase()));
 };
 
-const useRandomWords = (difficulty: Difficulty = "hard", skipGeneration: boolean = false) => {
+const useRandomWords = (
+  difficulty: Difficulty = "hard",
+  skipGeneration: boolean = false,
+) => {
   const { i18n } = useTranslation();
   const {
     setRandomWord,
@@ -66,9 +69,6 @@ const useRandomWords = (difficulty: Difficulty = "hard", skipGeneration: boolean
 
   useEffect(() => {
     if (words && words.length > 0) {
-      // En multiplayer, solo el player NO debe generar palabras
-      // El host necesita generar la palabra inicial
-      // Si skipGeneration es true, no generar (útil para GameLoading en multiplayer)
       if (players === "multi" && role === "player") {
         return;
       }

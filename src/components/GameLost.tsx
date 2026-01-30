@@ -56,13 +56,15 @@ export default function GameLost() {
     setHiddenLetterIndex,
     setPreviousRoundsWords,
     currentChallengeNumber,
+    dailyChallengeOriginalDifficulty,
     gameTime,
   } = useGameStore();
 
   const isDailyChallenge = gameDifficulty === "daily";
-  const isDailyChallengeCompleted = isDailyChallenge && 
-    lastLevelWords.length > 0 && 
-    lastLevelWords.every(word => word.guessed);
+  const isDailyChallengeCompleted =
+    isDailyChallenge &&
+    lastLevelWords.length > 0 &&
+    lastLevelWords.every((word) => word.guessed);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { columns } = useWindowSize();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
@@ -322,7 +324,10 @@ export default function GameLost() {
   return (
     <div className="game__container f-jc-c">
       <div className="difficulty-tag">
-        <DifficultyTag gameDifficulty={gameDifficulty} />
+        <DifficultyTag
+          gameDifficulty={gameDifficulty}
+          dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
+        />
       </div>
       {isDailyChallenge ? (
         <>
@@ -379,10 +384,10 @@ export default function GameLost() {
               </div>
             </div>
             <div className="score__container--box pos-rel">
-              <TopScores 
-                hasTooltip 
-                difficulty="daily" 
-                challengeNumber={currentChallengeNumber!} 
+              <TopScores
+                hasTooltip
+                difficulty="daily"
+                challengeNumber={currentChallengeNumber!}
               />
             </div>
           </div>

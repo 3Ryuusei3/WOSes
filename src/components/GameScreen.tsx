@@ -75,6 +75,7 @@ export default function GameScreen() {
     numberOfPerfectRounds,
     setPreviousRoundsWords,
     currentChallengeNumber,
+    dailyChallengeOriginalDifficulty,
   } = useGameStore();
 
   const isPlayer = players === "multi" && role === "player";
@@ -915,6 +916,7 @@ export default function GameScreen() {
             goalPoints={goalPoints}
             level={level}
             gameDifficulty={gameDifficulty}
+            dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
           />
           <div className="game__container">
             <div className="v-section gap-xs">
