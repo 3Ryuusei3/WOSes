@@ -53,7 +53,7 @@ export default function GameStart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const enableMulti = searchParams.get("multi") === "true";
+  void searchParams;
 
   const {
     dailyChallenge,
@@ -78,10 +78,6 @@ export default function GameStart() {
 
   const handleSubmit = async () => {
     if (isValidPlayerName(playerName)) {
-      if (!enableMulti) {
-        setPlayers("single");
-      }
-
       if (isDailyChallengeSelected && dailyChallenge) {
         startDailyChallenge();
         return;
@@ -183,7 +179,6 @@ export default function GameStart() {
             <PlayersSelector
               players={players}
               setPlayers={setPlayers}
-              enableMulti={enableMulti}
               onDifficultyChange={handleDifficultyChange}
             />
             <div className="v-section gap-xs">

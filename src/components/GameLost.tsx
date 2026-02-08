@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import TopScores from "../atoms/TopScores";
@@ -73,6 +73,20 @@ export default function GameLost() {
   const roomChannelRef = useRef<any>(null);
   const { words } = useLanguageWords(gameDifficulty);
   const { forceReconnect, isConnected } = useRealtimeConnection();
+
+  const handleExit = () => {
+    if (players === "multi") {
+      if (role === "host") {
+        setMode("start");
+        navigate("/game");
+      } else {
+        setMode("room");
+        navigate(`/game?id=${roomCode}`);
+      }
+    } else {
+      navigate("/game");
+    }
+  };
 
   const generateNewWord = () => {
     if (!words || words.length === 0) return null;
@@ -292,9 +306,9 @@ export default function GameLost() {
             <p className="txt-center">{t("game.waitingForHost")}</p>
           </div>
           <div className="h-section gap-xs f-jc-c">
-            <Link to="/game" className="btn btn--sm btn--lose">
+            <button className="btn btn--sm btn--lose" onClick={handleExit}>
               {t("game.exit")}
-            </Link>
+            </button>
             {!isConnected && (
               <button onClick={forceReconnect} className="btn btn--sm">
                 {t("game.reconnect")}
@@ -338,7 +352,10 @@ export default function GameLost() {
             </div>
           </div>
           <div className="h-section gap-lg mx-auto">
-            <WordListDisplay lastLevelWords={lastLevelWords} columns={columns} />
+            <WordListDisplay
+              lastLevelWords={lastLevelWords}
+              columns={columns}
+            />
             <div className="score__container--box pos-rel">
               <TopScores
                 hasTooltip
@@ -388,16 +405,19 @@ export default function GameLost() {
           </div>
           <div className="h-section gap-lg mx-auto">
             <div className="v-section gap-md">
-              <WordListDisplay lastLevelWords={lastLevelWords} columns={columns} />
+              <WordListDisplay
+                lastLevelWords={lastLevelWords}
+                columns={columns}
+              />
             </div>
             <div className="score__container--box pos-rel">
               <TopScores hasTooltip difficulty={gameDifficulty} />
             </div>
           </div>
           <div className="h-section gap-xs f-jc-c mb-sm">
-            <Link to="/game" className="btn btn--sm btn--lose">
+            <button className="btn btn--sm btn--lose" onClick={handleExit}>
               {t("game.exit")}
-            </Link>
+            </button>
             <button onClick={handlePlayAgain} disabled={isCreatingRoom}>
               {isCreatingRoom
                 ? t("game.creatingNewRoom")
