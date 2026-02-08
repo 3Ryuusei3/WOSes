@@ -3,7 +3,6 @@ const easyWords = require("../data/easy.json");
 const mediumWords = require("../data/medium.json");
 const hardWords = require("../data/hard.json");
 
-// Función para verificar si se pueden formar palabras
 const canFormWord = (word, letters) => {
   const lettersCount = letters.split("").reduce((acc, letter) => {
     acc[letter] = (acc[letter] || 0) + 1;
@@ -17,12 +16,10 @@ const canFormWord = (word, letters) => {
   return true;
 };
 
-// Función para contar palabras posibles
 const countPossibleWords = (word, wordList) => {
   return wordList.filter((w) => canFormWord(w, word)).length;
 };
 
-// Función para generar configuración de mecánicas
 const generateMechanics = () => {
   const mechanics = {
     has_hidden_letter: Math.random() < 0.4,
@@ -32,10 +29,8 @@ const generateMechanics = () => {
     has_first_letter: Math.random() < 0.3,
   };
 
-  // Limitar a máximo 2 mecánicas activas
   const activeCount = Object.values(mechanics).filter(Boolean).length;
   if (activeCount > 2) {
-    // Desactivar aleatoriamente hasta tener solo 2
     const keys = Object.keys(mechanics).filter((k) => mechanics[k]);
     while (Object.values(mechanics).filter(Boolean).length > 2) {
       const randomKey = keys[Math.floor(Math.random() * keys.length)];
@@ -46,8 +41,7 @@ const generateMechanics = () => {
   return mechanics;
 };
 
-// Seleccionar palabras para retos
-const generateChallenges = (count = 10) => {
+const generateChallenges = (count = 10, startId = 1) => {
   const challenges = [];
   const allWords = {
     easy: easyWords.words.filter((w) => w.length >= 4 && w.length <= 9),
@@ -62,27 +56,23 @@ const generateChallenges = (count = 10) => {
   while (challenges.length < count && attempts < maxAttempts) {
     attempts++;
 
-    // Seleccionar dificultad aleatoria
     const difficulty =
       difficulties[Math.floor(Math.random() * difficulties.length)];
     const wordList = allWords[difficulty];
 
-    // Seleccionar palabra aleatoria
     const word = wordList[Math.floor(Math.random() * wordList.length)];
 
-    // Verificar que no esté ya en la lista
     if (challenges.find((c) => c.word === word)) continue;
 
-    // Contar palabras posibles
     const possibleCount = countPossibleWords(word, wordList);
 
-    // Validar que tenga entre 15-30 palabras posibles
     if (possibleCount >= 15 && possibleCount <= 30) {
-      const timeSeconds = 60 + Math.floor(Math.random() * 31); // 60-90
+      const timeSeconds = 60 + Math.floor(Math.random() * 31);
       const mechanics = generateMechanics();
 
+      const challengeNumber = startId + challenges.length;
       challenges.push({
-        challenge_number: challenges.length + 1,
+        challenge_number: challengeNumber,
         word,
         difficulty,
         time_seconds: timeSeconds,
@@ -90,7 +80,7 @@ const generateChallenges = (count = 10) => {
       });
 
       console.log(
-        `Reto ${challenges.length}: ${word} (${difficulty}) - ${possibleCount} palabras - ${timeSeconds}s`,
+        `Reto ${challengeNumber}: ${word} (${difficulty}) - ${possibleCount} palabras - ${timeSeconds}s`,
       );
     }
   }
@@ -115,8 +105,23 @@ const generateSQL = (challenges) => {
   return sql;
 };
 
-// Ejecutar
-const challenges = generateChallenges(10);
+const args = process.argv.slice(2);
+let startId = 1101;
+let count = 1000;
+
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === "--startId" && args[i + 1]) {
+    startId = parseInt(args[i + 1], 10);
+    i++;
+  } else if (args[i] === "--count" && args[i + 1]) {
+    count = parseInt(args[i + 1], 10);
+    i++;
+  }
+}
+
+console.log(`\nGenerando ${count} retos empezando desde ID ${startId}...\n`);
+
+const challenges = generateChallenges(count, startId);
 const sql = generateSQL(challenges);
 
 fs.writeFileSync("dailyChallenges.sql", sql);
