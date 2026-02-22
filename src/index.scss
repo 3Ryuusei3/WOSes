@@ -817,6 +817,10 @@ main {
   display: flex;
   justify-content: center;
   gap: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .selectedLetter {
@@ -873,8 +877,9 @@ main {
   }
 
   &.dark {
+    color: transparent;
     background-color: var(--clr-text-primary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark-dim);
+    text-shadow: none;
     animation: darkSelectedLetter 0.5s linear forwards;
   }
 
@@ -953,20 +958,20 @@ main {
 
 @keyframes darkSelectedLetter {
   0% {
-    color: var(--clr-dark);
+    color: transparent;
     background-color: var(--clr-text-primary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark);
+    text-shadow: none;
     transform: rotateX(180deg);
   }
   50% {
-    color: var(--clr-dark);
+    color: transparent;
     background-color: var(--clr-text-primary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark);
+    text-shadow: none;
     transform: rotateX(90deg);
   }
   100% {
-    color: var(--clr-dark);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark);
+    color: transparent;
+    text-shadow: none;
     background-color: var(--clr-text-primary);
     transform: rotateX(0deg);
   }
