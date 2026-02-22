@@ -281,5 +281,23 @@
     "todayChallenge": "DAILY CHALLENGE",
     "challengeNumber": "CHALLENGE #{{number}}",
     "description": "A NEW CHALLENGE EVERY DAY!"
+  },
+  "wordFeedback": {
+    "buttonText": "MISSING A WORD?",
+    "buttonTitle": "Missing a word?",
+    "modalTitle": "MISSING A WORD?",
+    "modalDescription": "IF YOU THINK A WORD SHOULD BE HERE, OR A WORD FROM THE LIST DOESN'T EXIST, LET US KNOW AND WE'LL REVIEW IT.",
+    "inputPlaceholder": "Type the word",
+    "actionAdd": "ADD",
+    "actionRemove": "REMOVE",
+    "removeWarning": "IN THIS GAME WE DON'T USE ACCENTS, MAKE SURE WHEN SEARCHING IN THE DICTIONARY YOU'VE USED THE CORRESPONDING ACCENTS",
+    "addWarningNotHard": "THE WORD MAY ONLY BE IN THE HIGHER DIFFICULTY DICTIONARY OR MAY NOT EXIST IN THE DICTIONARY",
+    "addWarningHard": "THE WORD MAY NOT EXIST IN THE DICTIONARY",
+    "cancel": "CANCEL",
+    "submit": "SUBMIT",
+    "submitting": "SUBMITTING...",
+    "errorEmpty": "Please enter a word",
+    "errorSubmit": "Error submitting request",
+    "success": "Request submitted! Thank you for your help"
   }
 }

@@ -8,6 +8,8 @@ import GameSound from "../atoms/GameSound";
 import DifficultyTag from "../atoms/DifficultyTag";
 import WordListDisplay from "../atoms/WordListDisplay";
 import StatBox from "../atoms/StatBox";
+import WordFeedbackModal from "../atoms/WordFeedbackModal";
+import HelpButton from "../atoms/HelpButton";
 
 import useGameStore from "../store/useGameStore";
 import useWindowSize from "../hooks/useWindowSize";
@@ -53,6 +55,7 @@ export default function GameLost() {
     setRoomId,
     setPlayerId,
     roomId,
+    randomWord,
     setRandomWord,
     setPossibleWords,
     setHiddenLetterIndex,
@@ -70,6 +73,7 @@ export default function GameLost() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { columns } = useWindowSize();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const roomChannelRef = useRef<any>(null);
   const { words } = useLanguageWords(gameDifficulty);
   const { forceReconnect, isConnected } = useRealtimeConnection();
@@ -415,9 +419,11 @@ export default function GameLost() {
             </div>
           </div>
           <div className="h-section gap-xs f-jc-c mb-sm">
-            <button className="btn btn--sm btn--lose" onClick={handleExit}>
-              {t("game.exit")}
-            </button>
+            {players === "multi" && (
+              <button className="btn btn--sm btn--lose" onClick={handleExit}>
+                {t("game.exit")}
+              </button>
+            )}
             <button onClick={handlePlayAgain} disabled={isCreatingRoom}>
               {isCreatingRoom
                 ? t("game.creatingNewRoom")
@@ -427,6 +433,13 @@ export default function GameLost() {
         </>
       )}
       <GameSound />
+      <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
+      <WordFeedbackModal
+        isOpen={isFeedbackModalOpen}
+        setModalOpen={setIsFeedbackModalOpen}
+        originalWord={randomWord}
+        difficulty={gameDifficulty}
+      />
     </div>
   );
 }

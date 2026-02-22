@@ -270,5 +270,23 @@
     "todayChallenge": "RETO DEL DÍA",
     "challengeNumber": "RETO #{{number}}",
     "description": "¡UN NUEVO RETO CADA DÍA!"
+  },
+  "wordFeedback": {
+    "buttonText": "¿FALTA ALGUNA PALABRA?",
+    "buttonTitle": "¿Falta alguna palabra?",
+    "modalTitle": "¿FALTA ALGUNA PALABRA?",
+    "modalDescription": "SI CREES QUE ALGUNA PALABRA DEBERÍA ESTAR AQUÍ, O ALGUNA PALABRA DE LA LISTA NO EXISTE, AVÍSANOS Y LO REVISAREMOS.",
+    "inputPlaceholder": "Escribe la palabra",
+    "actionAdd": "AÑADIR",
+    "actionRemove": "BORRAR",
+    "removeWarning": "EN ESTE JUEGO NO USAMOS ACENTOS, ASEGÚRATE DE QUE AL BUSCARLO EN EL DICCIONARIO HAS USADO LOS ACENTOS CORRESPONDIENTES",
+    "addWarningNotHard": "ES POSIBLE QUE LA PALABRA SOLO ESTÉ EN EL DICCIONARIO DE MAYOR DIFICULTAD O NO EXISTA EN EL DICCIONARIO",
+    "addWarningHard": "ES POSIBLE QUE LA PALABRA NO EXISTA EN EL DICCIONARIO",
+    "cancel": "CANCELAR",
+    "submit": "ENVIAR",
+    "submitting": "ENVIANDO...",
+    "errorEmpty": "Por favor, introduce una palabra",
+    "errorSubmit": "Error al enviar la solicitud",
+    "success": "¡Solicitud enviada! Gracias por tu ayuda"
   }
 }

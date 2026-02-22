@@ -1819,3 +1819,103 @@ main {
   border-radius: 4px;
   margin-bottom: 1rem;
 }
+
+// ============================================
+// HELP BUTTON (WORD FEEDBACK)
+// ============================================
+
+.help-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  pointer-events: auto !important;
+  z-index: 1000;
+}
+
+// ============================================
+// CUSTOM RADIO BUTTONS
+// ============================================
+
+.custom-radio-group {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+
+  input[type="radio"] {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--clr-bg-terciary);
+    border-radius: 50%;
+    background-color: var(--clr-bg-primary);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow:
+      0 2px 0 0 var(--clr-bg-secondary),
+      inset 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      border-color: var(--clr-accent-primary);
+      transform: scale(1.1);
+    }
+
+    &:checked {
+      background: linear-gradient(
+        135deg,
+        var(--clr-bg-terciary) 0%,
+        var(--clr-accent-primary) 100%
+      );
+      border-color: var(--clr-accent-primary);
+      box-shadow:
+        0 2px 0 0 var(--clr-accent-secondary),
+        0 0 8px var(--clr-accent-primary),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    &:checked::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--clr-text-primary);
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--clr-text-secondary);
+    text-shadow: 0px 1px 0 var(--clr-bg-terciary);
+    transition: all 0.3s ease;
+  }
+
+  &:hover span {
+    color: var(--clr-accent-primary);
+    text-shadow: 0px 1px 0 var(--clr-accent-secondary);
+  }
+
+  input[type="radio"]:checked ~ span {
+    color: var(--clr-accent-primary);
+    text-shadow: 0px 1px 0 var(--clr-accent-secondary);
+  }
+}

@@ -5,6 +5,8 @@ import GameSound from "../atoms/GameSound";
 import DifficultyTag from "../atoms/DifficultyTag";
 import MechanicsModal from "../atoms/MechanicsModal";
 import WordListDisplay from "../atoms/WordListDisplay";
+import WordFeedbackModal from "../atoms/WordFeedbackModal";
+import HelpButton from "../atoms/HelpButton";
 import LobbyStatsContainer from "../atoms/LobbyStatsContainer";
 import NextChallengesSection from "../atoms/NextChallengesSection";
 import ReconnectButton from "../atoms/ReconnectButton";
@@ -68,6 +70,7 @@ export default function GameLobby() {
   const [canAdvance, setCanAdvance] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMechanic, setSelectedMechanic] = useState("");
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const seededRef = useRef<boolean>(false);
@@ -303,7 +306,10 @@ export default function GameLobby() {
       aria-label="Avanzar al siguiente nivel"
     >
       <div className="difficulty-tag">
-        <DifficultyTag gameDifficulty={gameDifficulty} dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}/>
+        <DifficultyTag
+          gameDifficulty={gameDifficulty}
+          dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
+        />
       </div>
       {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
         <h1 className="won">{t("lobby.perfect")}</h1>
@@ -378,6 +384,13 @@ export default function GameLobby() {
         )}
       </div>
       <GameSound />
+      <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
+      <WordFeedbackModal
+        isOpen={isFeedbackModalOpen}
+        setModalOpen={setIsFeedbackModalOpen}
+        originalWord={randomWord}
+        difficulty={gameDifficulty}
+      />
     </div>
   );
 }
