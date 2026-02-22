@@ -15,14 +15,11 @@ import useGameStore from "../store/useGameStore";
 import useWindowSize from "../hooks/useWindowSize";
 import useLanguageWords from "../hooks/useLanguageWords";
 import useRealtimeConnection from "../hooks/useRealtimeConnection";
+import useRoomManager from "../hooks/useRoomManager";
 
 import gameOverSound from "../assets/gameover.mp3";
 import { START_TIME } from "../constant";
-import {
-  createRoomWithHost,
-  setNewRoomCode,
-  subscribeToRoom,
-} from "../services/multiplayer";
+import { subscribeToRoom } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
 import { countLetters, canFormWord } from "../utils";
 
@@ -77,6 +74,25 @@ export default function GameLost() {
   const roomChannelRef = useRef<any>(null);
   const { words } = useLanguageWords(gameDifficulty);
   const { forceReconnect, isConnected } = useRealtimeConnection();
+  const roomManager = useRoomManager();
+
+  // Hook para resetear el estado del juego
+  const resetGameState = () => {
+    setTotalPoints(0);
+    setLevel(1);
+    setGameMechanics({
+      fake: false,
+      hidden: false,
+      first: false,
+      dark: false,
+      still: false,
+    });
+    setGameTime(START_TIME);
+    setNumberOfPerfectRounds(0);
+    setNumberOfRounds(0);
+    setLevelsToAdvance(0);
+    setPreviousRoundsWords([]);
+  };
 
   const handleExit = () => {
     if (players === "multi") {
@@ -131,44 +147,26 @@ export default function GameLost() {
         setPossibleWords(newWordData.possibleWords);
         setHiddenLetterIndex(newWordData.hiddenIndex);
 
-        const newRoomCode = Math.random()
-          .toString(36)
-          .substring(2, 8)
-          .toUpperCase();
-
-        const { data, error } = await createRoomWithHost(
+        // Usar RoomManager para crear nueva sala
+        const newRoomCode = roomManager.generateRoomCode();
+        const result = await roomManager.createNewRoomForRematch(
+          roomCode,
           newRoomCode,
           playerName,
           gameDifficulty,
         );
 
-        if (error || !data) {
+        if (result.error || !result.data) {
           showToast("Error al crear la nueva sala", "error");
           setIsCreatingRoom(false);
           return;
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        await setNewRoomCode(roomCode, newRoomCode);
+        setRoomCode(result.data.roomCode);
+        setRoomId(result.data.roomId);
+        setPlayerId(result.data.playerId);
 
-        setRoomCode(newRoomCode);
-        setRoomId(data.room.id);
-        setPlayerId(data.host.id);
-
-        setTotalPoints(0);
-        setLevel(1);
-        setGameMechanics({
-          fake: false,
-          hidden: false,
-          first: false,
-          dark: false,
-          still: false,
-        });
-        setGameTime(START_TIME);
-        setNumberOfPerfectRounds(0);
-        setNumberOfRounds(0);
-        setLevelsToAdvance(0);
-        setPreviousRoundsWords([]);
+        resetGameState();
 
         navigate(`/game?id=${newRoomCode}`);
         setMode("room");
@@ -180,19 +178,7 @@ export default function GameLost() {
       return;
     } else {
       setMode("start");
-      setTotalPoints(0);
-      setLevel(1);
-      setGameMechanics({
-        fake: false,
-        hidden: false,
-        first: false,
-        dark: false,
-        still: false,
-      });
-      setGameTime(START_TIME);
-      setNumberOfPerfectRounds(0);
-      setNumberOfRounds(0);
-      setLevelsToAdvance(0);
+      resetGameState();
     }
   };
 
@@ -243,20 +229,7 @@ export default function GameLost() {
         if (newRoomCode) {
           showToast("El anfitrión ha creado una nueva sala", "info", 3000);
 
-          setTotalPoints(0);
-          setLevel(1);
-          setGameMechanics({
-            fake: false,
-            hidden: false,
-            first: false,
-            dark: false,
-            still: false,
-          });
-          setGameTime(START_TIME);
-          setNumberOfPerfectRounds(0);
-          setNumberOfRounds(0);
-          setLevelsToAdvance(0);
-          setPreviousRoundsWords([]);
+          resetGameState();
           setMode("room");
           setRoomCode(newRoomCode);
           setRoomId(null);

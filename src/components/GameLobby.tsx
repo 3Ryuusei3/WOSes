@@ -17,6 +17,7 @@ import useSetMechanics from "../hooks/useSetMechanics";
 import useWindowSize from "../hooks/useWindowSize";
 import useRoomStateSync from "../hooks/useRoomStateSync";
 import useRealtimeConnection from "../hooks/useRealtimeConnection";
+import useSyncManager from "../hooks/useSyncManager";
 
 import useGameStore from "../store/useGameStore";
 
@@ -24,11 +25,7 @@ import levelPassedSound from "../assets/win.mp3";
 
 import { LEVELS_TO_ADVANCE } from "../constant";
 import PlayersPanel from "../atoms/PlayersPanel";
-import {
-  subscribeToRoom,
-  startRoomWithWord,
-  seedRoundWords,
-} from "../services/multiplayer";
+import { subscribeToRoom, startRoomWithWord } from "../services/multiplayer";
 import useLanguageWords from "../hooks/useLanguageWords";
 import { showToast } from "../atoms/Toast";
 import Difficulty from "../types/Difficulty";
@@ -61,6 +58,7 @@ export default function GameLobby() {
   } = useGameStore();
 
   const { words } = useLanguageWords(gameDifficulty);
+  const syncManager = useSyncManager();
 
   const isPlayer = players === "multi" && role === "player";
 
@@ -193,20 +191,14 @@ export default function GameLobby() {
           return;
         }
 
+        // Usar SyncManager para sembrar palabras
         let seedingSuccess = false;
         try {
-          const wordCount = countLetters(randomWord);
-          const filteredWords = (words || []).filter(
-            (word) => word.length >= 4 && word.length <= 9,
+          const seedResult = await syncManager.seedWords(
+            roomCode,
+            randomWord,
+            words || [],
           );
-          const possibleWordsList = filteredWords.filter((w) =>
-            canFormWord(countLetters(w), wordCount),
-          );
-          possibleWordsList.sort(
-            (a, b) => a.length - b.length || a.localeCompare(b),
-          );
-
-          const seedResult = await seedRoundWords(roomCode, possibleWordsList);
           seedingSuccess = !seedResult.error;
 
           if (seedResult.error) {
@@ -238,7 +230,16 @@ export default function GameLobby() {
     } else {
       setMode("loading");
     }
-  }, [canAdvance, players, role, roomCode, randomWord, setMode, words]);
+  }, [
+    canAdvance,
+    players,
+    role,
+    roomCode,
+    randomWord,
+    setMode,
+    words,
+    syncManager,
+  ]);
 
   useEffect(() => {
     if (!roomId) return;

@@ -11,14 +11,13 @@ import useRandomWords from "../hooks/useRandomWords";
 import useBackgroundAudio from "../hooks/useBackgroundAudio";
 import useSetMechanics from "../hooks/useSetMechanics";
 import useDailyChallenge from "../hooks/useDailyChallenge";
+import useRoomManager from "../hooks/useRoomManager";
 
 import useGameStore from "../store/useGameStore";
 import GameSound from "../atoms/GameSound";
 import PlayersSelector from "../atoms/PlayersSelector";
 
 import Difficulty from "../types/Difficulty";
-import { generateRandomRoomCode, isValidPlayerName } from "../utils";
-import { createRoomWithHost } from "../services/multiplayer";
 import { START_TIME } from "../constant";
 
 export default function GameStart() {
@@ -54,6 +53,25 @@ export default function GameStart() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   void searchParams;
+  const roomManager = useRoomManager();
+
+  // Función para resetear el estado del juego
+  const resetGameState = () => {
+    setLevel(1);
+    setTotalPoints(0);
+    setGameMechanics({
+      fake: false,
+      hidden: false,
+      first: false,
+      dark: false,
+      still: false,
+    });
+    setGameTime(START_TIME);
+    setNumberOfPerfectRounds(0);
+    setNumberOfRounds(0);
+    setLevelsToAdvance(0);
+    setPreviousRoundsWords([]);
+  };
 
   const {
     dailyChallenge,
@@ -77,48 +95,42 @@ export default function GameStart() {
   useBackgroundAudio(volume);
 
   const handleSubmit = async () => {
-    if (isValidPlayerName(playerName)) {
-      if (isDailyChallengeSelected && dailyChallenge) {
-        startDailyChallenge();
-        return;
-      }
-
-      if (players === "single") {
-        setMode("loading");
-        setDailyChallengeOriginalDifficulty(null);
-      } else {
-        setLevel(1);
-        setTotalPoints(0);
-        setGameMechanics({
-          fake: false,
-          hidden: false,
-          first: false,
-          dark: false,
-          still: false,
-        });
-        setGameTime(START_TIME);
-        setNumberOfPerfectRounds(0);
-        setNumberOfRounds(0);
-        setLevelsToAdvance(0);
-        setPreviousRoundsWords([]);
-
-        const roomCode = generateRandomRoomCode();
-        setRoomCode(roomCode);
-        const { data, error } = await createRoomWithHost(
-          roomCode,
-          playerName,
-          gameDifficulty,
-        );
-        if (!error && data) {
-          setRole("host");
-          setRoomId(data.room.id);
-          navigate(`/game?id=${roomCode}`);
-        } else {
-          setError(true);
-        }
-      }
-    } else {
+    // Validar nombre usando RoomManager
+    const nameValidation = roomManager.validatePlayerName(playerName);
+    if (!nameValidation.valid) {
       setError(true);
+      return;
+    }
+
+    if (isDailyChallengeSelected && dailyChallenge) {
+      startDailyChallenge();
+      return;
+    }
+
+    if (players === "single") {
+      setMode("loading");
+      setDailyChallengeOriginalDifficulty(null);
+    } else {
+      // Resetear estado del juego
+      resetGameState();
+
+      // Usar RoomManager para crear sala
+      const roomCode = roomManager.generateRoomCode();
+      setRoomCode(roomCode);
+
+      const result = await roomManager.createRoom(
+        roomCode,
+        playerName,
+        gameDifficulty,
+      );
+
+      if (!result.error && result.data) {
+        setRole("host");
+        setRoomId(result.data.roomId);
+        navigate(`/game?id=${roomCode}`);
+      } else {
+        setError(true);
+      }
     }
   };
 
@@ -147,7 +159,9 @@ export default function GameStart() {
   };
 
   const handleDailyChallenge = async () => {
-    if (!isValidPlayerName(playerName)) {
+    // Validar nombre usando RoomManager
+    const nameValidation = roomManager.validatePlayerName(playerName);
+    if (!nameValidation.valid) {
       setError(true);
       return;
     }
