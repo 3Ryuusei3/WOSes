@@ -817,6 +817,10 @@ main {
   display: flex;
   justify-content: center;
   gap: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .selectedLetter {
