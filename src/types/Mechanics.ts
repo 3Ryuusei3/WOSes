@@ -4,6 +4,7 @@ interface Mechanics {
   hidden: boolean;
   first: boolean;
   still: boolean;
+  mirrored: boolean;
 }
 
 export default Mechanics;

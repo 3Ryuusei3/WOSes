@@ -127,6 +127,7 @@ const useGameStore = create<GameState>()(
         hidden: false,
         first: false,
         still: false,
+        mirrored: false,
       },
       setGameMechanics: (difficulty) => set({ gameMechanics: difficulty }),
       gameDifficulty: "medium",

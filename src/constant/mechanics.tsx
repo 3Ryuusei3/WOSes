@@ -140,6 +140,28 @@ const MECHANICS_INFO: Record<MechanicKey, Omit<MechanicInfo, "key">> = {
       </div>
     ),
   },
+  mirrored: {
+    label: "LETRAS ESPEJADAS",
+    cssClass: "mirrored",
+    description: "LAS LETRAS APARECERÁN ESPEJADAS",
+    show: "LAS LETRAS ESPEJADAS NO SE MARCAN DE NINGÚN COLOR",
+    example: (
+      <div className="selectedWord">
+        <span className="selectedLetter mirrored">
+          A<span className="letterPoints">1</span>
+        </span>
+        <span className="selectedLetter mirrored">
+          B<span className="letterPoints">3</span>
+        </span>
+        <span className="selectedLetter mirrored">
+          L<span className="letterPoints">1</span>
+        </span>
+        <span className="selectedLetter mirrored">
+          A<span className="letterPoints">1</span>
+        </span>
+      </div>
+    ),
+  },
 };
 
 export const getMechanicInfo = (key: string): MechanicInfo | null => {

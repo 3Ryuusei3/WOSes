@@ -46,6 +46,7 @@ const useSetMechanics = (
       "HIDDEN_LETTER",
       "FIRST_LETTER",
       "STILL_LETTER",
+      "MIRRORED_LETTER",
     ];
     const newMechanics = difficulties.reduce((acc, type) => {
       const probability = calculateMechanicsProbability(level, type);

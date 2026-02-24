@@ -1,27 +1,49 @@
-import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
-import useGameStore from '../store/useGameStore';
+import useGameStore from "../store/useGameStore";
 
-import { getMostCommonLetter } from '../utils';
+import { getMostCommonLetter } from "../utils";
 
-import { getLanguageConstants, LEVELS_TO_ADVANCE } from '../constant';
+import { getLanguageConstants, LEVELS_TO_ADVANCE } from "../constant";
 
-import ShuffledWordObjectType from '../types/ShuffledWordObject';
-import Mechanics from '../types/Mechanics';
-import Word from '../types/Word';
+import ShuffledWordObjectType from "../types/ShuffledWordObject";
+import Mechanics from "../types/Mechanics";
+import Word from "../types/Word";
 
-import shuffleSound from '../assets/shuffle.mp3';
+import shuffleSound from "../assets/shuffle.mp3";
 
-const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: string, hiddenLetterIndex: number, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number, stillLetterIndex: number, fakeLetterIndex: number, finalStillPosition: number, initialDarkIndex: number) => {
-  const mostCommonLetter = getMostCommonLetter(possibleWords, lastLevelWords, levelsToAdvance);
+const createLetterObject = (
+  word: string,
+  gameMechanics: Mechanics,
+  fakeLetter: string,
+  hiddenLetterIndex: number,
+  possibleWords: string[],
+  lastLevelWords: Word[],
+  levelsToAdvance: number,
+  stillLetterIndex: number,
+  fakeLetterIndex: number,
+  finalStillPosition: number,
+  initialDarkIndex: number,
+) => {
+  const mostCommonLetter = getMostCommonLetter(
+    possibleWords,
+    lastLevelWords,
+    levelsToAdvance,
+  );
 
-  let commonLetterFlags = levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? 2 : (levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR ? 1 : 0);
+  let commonLetterFlags =
+    levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR
+      ? 2
+      : levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR
+        ? 1
+        : 0;
 
-  const letterObject = word.split('').map((letter, index) => {
-    const shouldBeCommon = commonLetterFlags > 0 &&
-                           mostCommonLetter.includes(letter) &&
-                           index !== hiddenLetterIndex;
+  const letterObject = word.split("").map((letter, index) => {
+    const shouldBeCommon =
+      commonLetterFlags > 0 &&
+      mostCommonLetter.includes(letter) &&
+      index !== hiddenLetterIndex;
 
     if (shouldBeCommon) {
       commonLetterFlags--;
@@ -33,7 +55,8 @@ const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: 
       isHidden: index === hiddenLetterIndex,
       isDark: gameMechanics.dark && index === initialDarkIndex,
       isCommon: shouldBeCommon,
-      isStill: gameMechanics.still && index === stillLetterIndex
+      isStill: gameMechanics.still && index === stillLetterIndex,
+      isMirrored: gameMechanics.mirrored,
     };
   });
 
@@ -46,17 +69,18 @@ const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: 
       isHidden: false,
       isDark: gameMechanics.dark && insertIndex === initialDarkIndex,
       isCommon: false,
-      isStill: gameMechanics.still && insertIndex === stillLetterIndex
+      isStill: gameMechanics.still && insertIndex === stillLetterIndex,
+      isMirrored: gameMechanics.mirrored,
     });
   }
 
   const shuffledLetters = [...letterObject];
 
   if (gameMechanics.still) {
-    const stillLetters = shuffledLetters.filter(letter => letter.isStill);
+    const stillLetters = shuffledLetters.filter((letter) => letter.isStill);
     if (stillLetters.length > 1) {
       let foundFirst = false;
-      shuffledLetters.forEach(letter => {
+      shuffledLetters.forEach((letter) => {
         if (letter.isStill && !foundFirst) {
           foundFirst = true;
         } else if (letter.isStill) {
@@ -67,15 +91,20 @@ const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: 
   }
 
   if (gameMechanics.still && finalStillPosition >= 0) {
-    const stillLetterObj = shuffledLetters.find(letter => letter.isStill);
+    const stillLetterObj = shuffledLetters.find((letter) => letter.isStill);
 
     if (stillLetterObj) {
-      const stillLetterCurrentIndex = shuffledLetters.findIndex(letter => letter.isStill);
+      const stillLetterCurrentIndex = shuffledLetters.findIndex(
+        (letter) => letter.isStill,
+      );
       shuffledLetters.splice(stillLetterCurrentIndex, 1);
 
       for (let i = shuffledLetters.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [shuffledLetters[i], shuffledLetters[j]] = [shuffledLetters[j], shuffledLetters[i]];
+        [shuffledLetters[i], shuffledLetters[j]] = [
+          shuffledLetters[j],
+          shuffledLetters[i],
+        ];
       }
 
       shuffledLetters.splice(finalStillPosition, 0, stillLetterObj);
@@ -83,26 +112,33 @@ const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: 
   } else if (!gameMechanics.still) {
     for (let i = shuffledLetters.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffledLetters[i], shuffledLetters[j]] = [shuffledLetters[j], shuffledLetters[i]];
+      [shuffledLetters[i], shuffledLetters[j]] = [
+        shuffledLetters[j],
+        shuffledLetters[i],
+      ];
     }
   }
 
   if (gameMechanics.dark) {
-    shuffledLetters.forEach(letter => letter.isDark = false);
+    shuffledLetters.forEach((letter) => (letter.isDark = false));
 
-    const stillLetter = shuffledLetters.find(letter => letter.isStill);
-    const wasStillLetterOriginallyDark = gameMechanics.still && stillLetterIndex === initialDarkIndex;
+    const stillLetter = shuffledLetters.find((letter) => letter.isStill);
+    const wasStillLetterOriginallyDark =
+      gameMechanics.still && stillLetterIndex === initialDarkIndex;
 
     if (wasStillLetterOriginallyDark && stillLetter) {
       stillLetter.isDark = true;
     } else {
       let availableIndices = shuffledLetters.map((_, index) => index);
       if (gameMechanics.still && finalStillPosition >= 0) {
-        availableIndices = availableIndices.filter(index => index !== finalStillPosition);
+        availableIndices = availableIndices.filter(
+          (index) => index !== finalStillPosition,
+        );
       }
 
       if (availableIndices.length > 0) {
-        const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+        const randomIndex =
+          availableIndices[Math.floor(Math.random() * availableIndices.length)];
         shuffledLetters[randomIndex].isDark = true;
       }
     }
@@ -111,14 +147,25 @@ const createLetterObject = (word: string, gameMechanics: Mechanics, fakeLetter: 
   return shuffledLetters;
 };
 
-const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: number, shouldShuffle: boolean, possibleWords: string[], lastLevelWords: Word[], levelsToAdvance: number, volume: number) => {
+const useShuffledWord = (
+  word: string,
+  gameMechanics: Mechanics,
+  intervalTime: number,
+  shouldShuffle: boolean,
+  possibleWords: string[],
+  lastLevelWords: Word[],
+  levelsToAdvance: number,
+  volume: number,
+) => {
   const { i18n } = useTranslation();
   const { LETTERS } = getLanguageConstants(i18n.language);
   const { level, hiddenLetterIndex } = useGameStore();
 
-  const [shuffledWordObject, setShuffledWordObject] = useState<ShuffledWordObjectType[]>([]);
+  const [shuffledWordObject, setShuffledWordObject] = useState<
+    ShuffledWordObjectType[]
+  >([]);
   const [initialShuffledWord, setInitialShuffledWord] = useState<string[]>([]);
-  const [fakeLetter, setFakeLetter] = useState<string>('');
+  const [fakeLetter, setFakeLetter] = useState<string>("");
   const [initialDarkIndex, setInitialDarkIndex] = useState<number>(0);
   const [stillLetterIndex, setStillLetterIndex] = useState<number>(-1);
   const [fakeLetterIndex, setFakeLetterIndex] = useState<number>(-1);
@@ -131,11 +178,11 @@ const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: n
 
   useEffect(() => {
     if (initialShuffledWord.length === 0) {
-      const shuffledArray = word.split('').sort(() => Math.random() - 0.5);
+      const shuffledArray = word.split("").sort(() => Math.random() - 0.5);
       setInitialShuffledWord(shuffledArray);
     }
 
-    if (fakeLetter === '') {
+    if (fakeLetter === "") {
       let newFakeLetter;
       do {
         newFakeLetter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
@@ -167,26 +214,68 @@ const useShuffledWord = (word: string, gameMechanics: Mechanics, intervalTime: n
       setFinalStillPosition(position);
     }
 
-    const initialLetterObject = createLetterObject(word, gameMechanics, fakeLetter, hiddenLetterIndex, possibleWords, lastLevelWords, levelsToAdvance, stillLetterIndex, fakeLetterIndex, finalStillPosition, initialDarkIndex);
+    const initialLetterObject = createLetterObject(
+      word,
+      gameMechanics,
+      fakeLetter,
+      hiddenLetterIndex,
+      possibleWords,
+      lastLevelWords,
+      levelsToAdvance,
+      stillLetterIndex,
+      fakeLetterIndex,
+      finalStillPosition,
+      initialDarkIndex,
+    );
     setShuffledWordObject(initialLetterObject);
 
     if (!shouldShuffle) return;
 
     const shuffleAndAddLetter = () => {
-      const letterObject = createLetterObject(word, gameMechanics, fakeLetter, hiddenLetterIndex, possibleWords, lastLevelWords, levelsToAdvance, stillLetterIndex, fakeLetterIndex, finalStillPosition, initialDarkIndex);
+      const letterObject = createLetterObject(
+        word,
+        gameMechanics,
+        fakeLetter,
+        hiddenLetterIndex,
+        possibleWords,
+        lastLevelWords,
+        levelsToAdvance,
+        stillLetterIndex,
+        fakeLetterIndex,
+        finalStillPosition,
+        initialDarkIndex,
+      );
       setShuffledWordObject(letterObject);
 
       // Mute shuffle for players in multiplayer
       const audio = new Audio(shuffleSound);
       const { players, role } = useGameStore.getState();
-      const effectiveVol = (players === 'multi' && role === 'player') ? 0 : volumeRef.current;
+      const effectiveVol =
+        players === "multi" && role === "player" ? 0 : volumeRef.current;
       audio.volume = effectiveVol;
       if (effectiveVol > 0) audio.play();
     };
 
     const interval = setInterval(shuffleAndAddLetter, intervalTime);
     return () => clearInterval(interval);
-  }, [word, intervalTime, shouldShuffle, initialShuffledWord, fakeLetter, level, hiddenLetterIndex, initialDarkIndex, gameMechanics, lastLevelWords, levelsToAdvance, possibleWords, stillLetterIndex, fakeLetterIndex, finalStillPosition, LETTERS]);
+  }, [
+    word,
+    intervalTime,
+    shouldShuffle,
+    initialShuffledWord,
+    fakeLetter,
+    level,
+    hiddenLetterIndex,
+    initialDarkIndex,
+    gameMechanics,
+    lastLevelWords,
+    levelsToAdvance,
+    possibleWords,
+    stillLetterIndex,
+    fakeLetterIndex,
+    finalStillPosition,
+    LETTERS,
+  ]);
 
   return shuffledWordObject;
 };

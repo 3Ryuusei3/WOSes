@@ -34,6 +34,9 @@
   --clr-still: #1ae940;
   --clr-still-dim: #3ef35f;
   --clr-still-highlight: #0196b4;
+  --clr-mirrored: #c88efe;
+  --clr-mirrored-dim: #dda9ff;
+  --clr-mirrored-highlight: #9b5fd4;
 
   --clr-progress-bg: #1c0c2f;
   --clr-progress-on-time: var(--clr-win);
@@ -527,6 +530,11 @@ main {
     color: var(--clr-win);
     text-shadow: 0px var(--text-shadow-position) 0 var(--clr-win-highlight);
   }
+
+  &.mirrored {
+    color: var(--clr-mirrored);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-mirrored-highlight);
+  }
 }
 
 .title {
@@ -558,6 +566,11 @@ main {
 .dark {
   color: var(--clr-dark);
   text-shadow: 0px var(--text-shadow-position) 0 var(--clr-dark-dim);
+}
+
+.mirrored {
+  color: var(--clr-mirrored);
+  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-mirrored-highlight);
 }
 
 .unguessed {
@@ -843,6 +856,11 @@ main {
   transform: rotateX(0deg);
   animation: selectedLetter 0.5s linear forwards;
 
+  &.mirrored {
+    animation: mirroredSelectedLetter 0.5s linear forwards;
+    transform: scaleX(-1);
+  }
+
   &.still {
     background-color: var(--clr-still);
     border: 2px solid var(--clr-still-highlight);
@@ -995,6 +1013,24 @@ main {
     background-color: var(--clr-tip);
     text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
     transform: rotateX(0deg);
+  }
+}
+
+@keyframes mirroredSelectedLetter {
+  0% {
+    color: var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    transform: rotateX(180deg) scaleX(-1);
+  }
+  50% {
+    color: var(--clr-text-secondary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    transform: rotateX(90deg) scaleX(-1);
+  }
+  100% {
+    color: var(--clr-text-primary);
+    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
+    transform: rotateX(0deg) scaleX(-1);
   }
 }
 

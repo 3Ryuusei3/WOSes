@@ -5,6 +5,7 @@ interface ShuffledWordObjectType {
   isDark: boolean;
   isCommon: boolean;
   isStill: boolean;
+  isMirrored: boolean;
 }
 
 export default ShuffledWordObjectType;

@@ -1,8 +1,8 @@
-import { useTranslation } from 'react-i18next';
-import { getLanguageConstants } from '../constant';
+import { useTranslation } from "react-i18next";
+import { getLanguageConstants } from "../constant";
 
-import ShuffledWordObjectType from '../types/ShuffledWordObject';
-import Mechanics from '../types/Mechanics';
+import ShuffledWordObjectType from "../types/ShuffledWordObject";
+import Mechanics from "../types/Mechanics";
 
 interface SelectedWordProps {
   shuffledWordObject: ShuffledWordObjectType[];
@@ -21,45 +21,60 @@ export default function SelectedWord({
   const { POINTS_PER_LETTER } = getLanguageConstants(i18n.language);
 
   const getLetterClasses = (letter: ShuffledWordObjectType) => {
-    const classes = ['selectedLetter'];
+    const classes = ["selectedLetter"];
 
     if (letter.isDark && gameMechanics.dark) {
       if (percentage < SHOW_LETTERS_PERCENTAGE) {
-        classes.push('dark-outline');
+        classes.push("dark-outline");
       } else {
-        classes.push('dark');
+        classes.push("dark");
       }
     }
 
     if (letter.isFake && percentage < SHOW_LETTERS_PERCENTAGE) {
-      classes.push('fake');
+      classes.push("fake");
     }
 
     if (letter.isHidden && gameMechanics.hidden) {
-      classes.push('hidden');
+      classes.push("hidden");
     }
 
-    if (letter.isCommon && (!letter.isDark || percentage < SHOW_LETTERS_PERCENTAGE)) {
-      classes.push('common');
+    if (
+      letter.isCommon &&
+      (!letter.isDark || percentage < SHOW_LETTERS_PERCENTAGE)
+    ) {
+      classes.push("common");
     }
 
     if (letter.isStill && gameMechanics.still) {
-      classes.push('still');
+      classes.push("still");
     }
 
-    return classes.join(' ');
+    if (
+      letter.isMirrored &&
+      gameMechanics.mirrored &&
+      percentage > SHOW_LETTERS_PERCENTAGE
+    ) {
+      classes.push("mirrored");
+    }
+
+    return classes.join(" ");
   };
 
   const getDisplayLetter = (letter: ShuffledWordObjectType) => {
-    if (letter.isHidden && gameMechanics.hidden && percentage > SHOW_LETTERS_PERCENTAGE) {
-      return '?';
+    if (
+      letter.isHidden &&
+      gameMechanics.hidden &&
+      percentage > SHOW_LETTERS_PERCENTAGE
+    ) {
+      return "?";
     }
     return letter.letter;
   };
 
   return (
     <div
-      key={shuffledWordObject.map(letter => letter.letter).join('')}
+      key={shuffledWordObject.map((letter) => letter.letter).join("")}
       className="selectedWord"
     >
       {shuffledWordObject.map((letter, index) => (
@@ -68,8 +83,10 @@ export default function SelectedWord({
           className={getLetterClasses(letter)}
         >
           {getDisplayLetter(letter)}
-          <span className='letterPoints'>
-            {POINTS_PER_LETTER[letter.letter as keyof typeof POINTS_PER_LETTER] || 1}
+          <span className="letterPoints">
+            {POINTS_PER_LETTER[
+              letter.letter as keyof typeof POINTS_PER_LETTER
+            ] || 1}
           </span>
         </span>
       ))}
