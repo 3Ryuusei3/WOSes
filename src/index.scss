@@ -1058,6 +1058,17 @@ main {
   transition: all 0.1s linear;
 }
 
+.progress__reveal-marker {
+  position: absolute;
+  left: var(--reveal-percentage);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--clr-progress-bg);
+  z-index: 1;
+  pointer-events: none;
+}
+
 .progress__time {
   font-size: 16px;
   padding-block: 4px;

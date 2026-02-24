@@ -19,11 +19,11 @@ const RUNNING_OUT_OF_TIME_PERCENTAGE = 15;
 const SHOW_LETTERS_RANGE = {
   START: {
     LEVEL: 6,
-    PERCENTAGE: 55,
+    PERCENTAGE: 60,
   },
   END: {
-    LEVEL: 50,
-    PERCENTAGE: 35,
+    LEVEL: 60,
+    PERCENTAGE: 40,
   },
 };
 
