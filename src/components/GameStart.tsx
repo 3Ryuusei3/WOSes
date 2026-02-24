@@ -65,6 +65,7 @@ export default function GameStart() {
       first: false,
       dark: false,
       still: false,
+      mirrored: false,
     });
     setGameTime(START_TIME);
     setNumberOfPerfectRounds(0);

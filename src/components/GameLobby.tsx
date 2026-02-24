@@ -33,6 +33,7 @@ import { countLetters, canFormWord } from "../utils";
 
 export default function GameLobby() {
   const {
+    playerName,
     setMode,
     totalPoints,
     level,
@@ -389,8 +390,9 @@ export default function GameLobby() {
       <WordFeedbackModal
         isOpen={isFeedbackModalOpen}
         setModalOpen={setIsFeedbackModalOpen}
-        originalWord={randomWord}
+        lastLevelWords={lastLevelWords}
         difficulty={gameDifficulty}
+        roomName={playerName}
       />
     </div>
   );

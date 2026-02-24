@@ -10,6 +10,7 @@ interface WordRequestParams {
   difficulty: string;
   originalWord: string;
   action: "add" | "remove";
+  roomName?: string;
 }
 
 export async function submitWordRequest(
@@ -22,6 +23,7 @@ export async function submitWordRequest(
       original_word: params.originalWord,
       action: params.action,
       state: "to_do",
+      room_name: params.roomName || null,
     },
   ]);
 

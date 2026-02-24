@@ -1,25 +1,38 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { submitWordRequest } from "../services/wordRequests";
 import { showToast } from "./Toast";
+import Word from "../types/Word";
 
 interface WordFeedbackModalProps {
   isOpen: boolean;
   setModalOpen: Dispatch<SetStateAction<boolean>>;
-  originalWord: string;
+  lastLevelWords: Word[];
   difficulty: string;
+  roomName?: string;
 }
 
 export default function WordFeedbackModal({
   isOpen,
   setModalOpen,
-  originalWord,
+  lastLevelWords,
   difficulty,
+  roomName,
 }: WordFeedbackModalProps) {
   const { t } = useTranslation();
   const [word, setWord] = useState("");
   const [action, setAction] = useState<"add" | "remove">("add");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const originalWord = useMemo(() => {
+    if (!lastLevelWords || lastLevelWords.length === 0) return "";
+    const longestWord = lastLevelWords.reduce(
+      (longest, current) =>
+        current.word.length > longest.word.length ? current : longest,
+      lastLevelWords[0],
+    );
+    return longestWord.word;
+  }, [lastLevelWords]);
 
   const handleClose = () => {
     setModalOpen(false);
@@ -41,6 +54,7 @@ export default function WordFeedbackModal({
         difficulty,
         originalWord: originalWord.toLowerCase(),
         action,
+        roomName,
       });
 
       if (error) {

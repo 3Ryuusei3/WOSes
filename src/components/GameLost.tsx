@@ -52,7 +52,6 @@ export default function GameLost() {
     setRoomId,
     setPlayerId,
     roomId,
-    randomWord,
     setRandomWord,
     setPossibleWords,
     setHiddenLetterIndex,
@@ -86,6 +85,7 @@ export default function GameLost() {
       first: false,
       dark: false,
       still: false,
+      mirrored: false,
     });
     setGameTime(START_TIME);
     setNumberOfPerfectRounds(0);
@@ -410,8 +410,9 @@ export default function GameLost() {
       <WordFeedbackModal
         isOpen={isFeedbackModalOpen}
         setModalOpen={setIsFeedbackModalOpen}
-        originalWord={randomWord}
+        lastLevelWords={lastLevelWords}
         difficulty={gameDifficulty}
+        roomName={playerName}
       />
     </div>
   );

@@ -75,6 +75,7 @@ export default function useDailyChallenge() {
       dark: dailyChallenge.has_dark_mode,
       still: dailyChallenge.has_still_mode,
       first: dailyChallenge.has_first_letter,
+      mirrored: false,
     });
 
     setGameTime(dailyChallenge.time_seconds);

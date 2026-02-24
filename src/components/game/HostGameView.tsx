@@ -22,6 +22,7 @@ interface HostGameViewProps {
     first: boolean;
     dark: boolean;
     still: boolean;
+    mirrored: boolean;
   };
   shuffledWordObject: any;
   percentage: number;
