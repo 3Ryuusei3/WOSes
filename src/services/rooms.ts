@@ -39,9 +39,9 @@ export async function getAllTimeTopScores(
     .not("level", "is", null)
     .not("score", "is", null)
     .order("level", { ascending: false })
-    .order("rounds", { ascending: false })
+    .order("score", { ascending: true })
+    .order("rounds", { ascending: true })
     .order("perfects", { ascending: false })
-    .order("score", { ascending: false })
     .limit(limit);
 }
 
@@ -65,9 +65,9 @@ export async function getWeeklyTopScores(
     .not("level", "is", null)
     .not("score", "is", null)
     .order("level", { ascending: false })
-    .order("rounds", { ascending: false })
+    .order("score", { ascending: true })
+    .order("rounds", { ascending: true })
     .order("perfects", { ascending: false })
-    .order("score", { ascending: false })
     .limit(limit);
 }
 
