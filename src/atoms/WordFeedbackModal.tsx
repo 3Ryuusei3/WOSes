@@ -1,4 +1,11 @@
-import { useState, Dispatch, SetStateAction, useMemo } from "react";
+import {
+  useState,
+  useRef,
+  Dispatch,
+  SetStateAction,
+  useMemo,
+  KeyboardEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { submitWordRequest } from "../services/wordRequests";
 import { showToast } from "./Toast";
@@ -20,6 +27,7 @@ export default function WordFeedbackModal({
   roomName,
 }: WordFeedbackModalProps) {
   const { t } = useTranslation();
+  const wordInputRef = useRef<HTMLInputElement>(null);
   const [word, setWord] = useState("");
   const [action, setAction] = useState<"add" | "remove">("add");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,8 +80,19 @@ export default function WordFeedbackModal({
     }
   };
 
+  const handleModalKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "Enter") return;
+    e.stopPropagation();
+    if (e.target !== wordInputRef.current || isSubmitting) return;
+    e.preventDefault();
+    void handleSubmit();
+  };
+
   return (
-    <div className={`modal ${isOpen ? "open" : ""}`}>
+    <div
+      className={`modal ${isOpen ? "open" : ""}`}
+      onKeyDown={handleModalKeyDown}
+    >
       <div className="modal__content">
         <div className="modal__close">
           <span className="" onClick={handleClose}>
@@ -86,6 +105,7 @@ export default function WordFeedbackModal({
 
           <div className="v-section gap-sm">
             <input
+              ref={wordInputRef}
               type="text"
               className="mx-auto"
               placeholder={t("wordFeedback.inputPlaceholder")}
