@@ -1,18 +1,23 @@
-import { useState, Dispatch, SetStateAction } from "react";
-import { useTranslation } from 'react-i18next';
+import { useState, Dispatch, SetStateAction, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 
-import Instructions from './Instructions';
-import arrowLeft from '../assets/arrow-left.svg';
-import arrowRight from '../assets/arrow-right.svg';
+import Instructions from "./Instructions";
+import arrowLeft from "../assets/arrow-left.svg";
+import arrowRight from "../assets/arrow-right.svg";
+import closeIcon from "../assets/close.svg";
 
-import useWindowSize from '../hooks/useWindowSize';
+import useWindowSize from "../hooks/useWindowSize";
 
 interface HowToPlayModalProps {
   isOpen: boolean;
   setHowToPlayModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function HowToPlayModal({ isOpen, setHowToPlayModal }: HowToPlayModalProps) {
+export default function HowToPlayModal({
+  isOpen,
+  setHowToPlayModal,
+}: HowToPlayModalProps) {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const instructions = Instructions();
@@ -23,39 +28,66 @@ export default function HowToPlayModal({ isOpen, setHowToPlayModal }: HowToPlayM
   };
 
   const handleNext = () => {
-    setCurrentStep((prev) => prev < instructions.length - 1 ? prev + 1 : prev);
+    setCurrentStep((prev) =>
+      prev < instructions.length - 1 ? prev + 1 : prev,
+    );
   };
 
   const handlePrev = () => {
-    setCurrentStep((prev) => prev > 0 ? prev - 1 : prev);
+    setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
   };
 
-  return (
-    <div className={`modal ${isOpen ? 'open' : ''}`}>
-      <div className='modal__content' style={{ '--wordlist-columns': columns } as React.CSSProperties}>
-        <div className='modal__close'>
-          <span className='' onClick={handleClose}>
-            <h4 className='sr-only lost'>ｘ</h4>
-          </span>
-        </div>
+  if (!isOpen) {
+    return null;
+  }
+
+  return createPortal(
+    <div className="modal open">
+      <div
+        className="modal__content"
+        style={{ "--wordlist-columns": columns } as CSSProperties}
+      >
+        <button
+          type="button"
+          className="modal__close btn btn--lost btn--xs"
+          onClick={handleClose}
+          aria-label={t("common.close")}
+        >
+          <img src={closeIcon} alt="close" width={16} height={16} />
+        </button>
         <div className="instruction-slide__arrows">
-          <img src={arrowLeft} alt="arrow-left" onClick={handlePrev} style={{ opacity: currentStep === 0 ? 0.5 : 1 }} />
-          <img src={arrowRight} alt="arrow-right" onClick={handleNext} style={{ opacity: currentStep === instructions.length - 1 ? 0.5 : 1 }} />
+          <img
+            src={arrowLeft}
+            alt="arrow-left"
+            onClick={handlePrev}
+            style={{ opacity: currentStep === 0 ? 0.5 : 1 }}
+          />
+          <img
+            src={arrowRight}
+            alt="arrow-right"
+            onClick={handleNext}
+            style={{
+              opacity: currentStep === instructions.length - 1 ? 0.5 : 1,
+            }}
+          />
         </div>
         <div className="v-section gap-md pos-rel">
           <h2 className="won">
-            {currentStep === instructions.length - 1 ? t('howToPlay.ready') : t('howToPlay.title')}
+            {currentStep === instructions.length - 1
+              ? t("howToPlay.ready")
+              : t("howToPlay.title")}
           </h2>
           <div className="instruction-slide">
             {instructions[currentStep].content}
             {currentStep === instructions.length - 1 && (
-              <button onClick={handleClose} className="btn--win mx-auto">
-                {t('howToPlay.startNow')}
+              <button onClick={handleClose} className="btn btn--win mx-auto">
+                {t("howToPlay.startNow")}
               </button>
             )}
-            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

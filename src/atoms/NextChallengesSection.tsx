@@ -33,7 +33,7 @@ export default function NextChallengesSection({
           <h4 className="highlight">{t("common.loading")}</h4>
         ) : areAllMechanicsFalse ? (
           <h4
-            className="won"
+            className="won no-challenges-info"
             dangerouslySetInnerHTML={{
               __html: t("lobby.noChallenges"),
             }}

@@ -14,7 +14,6 @@ import ReconnectButton from "../atoms/ReconnectButton";
 import useRemoveSeconds from "../hooks/useRemoveSeconds";
 import useRandomWords from "../hooks/useRandomWords";
 import useSetMechanics from "../hooks/useSetMechanics";
-import useWindowSize from "../hooks/useWindowSize";
 import useRoomStateSync from "../hooks/useRoomStateSync";
 import useRealtimeConnection from "../hooks/useRealtimeConnection";
 import useSyncManager from "../hooks/useSyncManager";
@@ -63,7 +62,6 @@ export default function GameLobby() {
 
   const isPlayer = players === "multi" && role === "player";
 
-  const { columns } = useWindowSize();
   const { t } = useTranslation();
 
   const [canAdvance, setCanAdvance] = useState(false);
@@ -327,7 +325,7 @@ export default function GameLobby() {
         )}
         {levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
       </h3>
-      <div className="h-section gap-lg mx-auto">
+      <div className="game__summary">
         <LobbyStatsContainer
           level={level}
           levelsToAdvance={levelsToAdvance}
@@ -338,7 +336,7 @@ export default function GameLobby() {
           numberOfPerfectRounds={numberOfPerfectRounds}
           secondsToRemove={secondsToRemove}
         />
-        <WordListDisplay lastLevelWords={lastLevelWords} columns={columns} />
+        <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
         {gameMechanics && (
           <>
             <NextChallengesSection
@@ -373,7 +371,7 @@ export default function GameLobby() {
         <button
           onClick={handleAdvance}
           disabled={!canAdvance}
-          className={!canAdvance ? "button-disabled" : ""}
+          className={!canAdvance ? "btn button-disabled" : "btn"}
         >
           {t("lobby.playLevel", { level })}
         </button>

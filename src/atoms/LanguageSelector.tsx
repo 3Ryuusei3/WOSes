@@ -1,15 +1,14 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 export default function LanguageSelector() {
   const { i18n } = useTranslation();
 
   const toggleLanguage = () => {
-    const newLanguage = i18n.language === 'es' ? 'en' : 'es';
+    const newLanguage = i18n.language === "es" ? "en" : "es";
     i18n.changeLanguage(newLanguage);
   };
 
-  // Asegurar que el idioma esté definido correctamente
-  const currentLanguage = i18n.language || 'es';
+  const currentLanguage = i18n.language || "es";
 
   return (
     <div className="language-selector">
@@ -17,7 +16,7 @@ export default function LanguageSelector() {
         onClick={toggleLanguage}
         className="btn btn--sta btn--xs language-toggle"
       >
-        {currentLanguage === 'es' ? 'ES' : 'EN'}
+        {currentLanguage === "es" ? "ES" : "EN"}
       </button>
     </div>
   );

@@ -37,15 +37,12 @@ export default function LobbyStatsContainer({
 
   return (
     <div className="score__container--box f-jc-c">
-      <div className="v-section gap-xs">
+      <div className="score__container--stats">
         <LobbyStatsRow
           label={t("common.levelPoints", { level: level - levelsToAdvance })}
           value={lastRoundPoints}
         />
-        <LobbyStatsRow
-          label={t("common.totalPoints")}
-          value={totalPoints}
-        />
+        <LobbyStatsRow label={t("common.totalPoints")} value={totalPoints} />
         <LobbyStatsRow
           label={t("common.remainingTime")}
           value={`${gameTime}${t("common.seconds")}`}

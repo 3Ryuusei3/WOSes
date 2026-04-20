@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import TopScores from "../atoms/TopScores";
+import {
+  MobileRankingOpenButton,
+  RankingPopupModal,
+} from "../atoms/RankingPopup";
 import PlayersPanel from "../atoms/PlayersPanel";
 import GameSound from "../atoms/GameSound";
 import DifficultyTag from "../atoms/DifficultyTag";
@@ -12,7 +16,7 @@ import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import HelpButton from "../atoms/HelpButton";
 
 import useGameStore from "../store/useGameStore";
-import useWindowSize from "../hooks/useWindowSize";
+import useMobileUserAgent from "../hooks/useMobileUserAgent";
 import useLanguageWords from "../hooks/useLanguageWords";
 import useRealtimeConnection from "../hooks/useRealtimeConnection";
 import useRoomManager from "../hooks/useRoomManager";
@@ -67,9 +71,10 @@ export default function GameLost() {
     lastLevelWords.length > 0 &&
     lastLevelWords.every((word) => word.guessed);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { columns } = useWindowSize();
+  const isMobileUa = useMobileUserAgent();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [rankingPopupOpen, setRankingPopupOpen] = useState(false);
   const roomChannelRef = useRef<any>(null);
   const { words } = useLanguageWords(gameDifficulty);
   const { forceReconnect, isConnected } = useRealtimeConnection();
@@ -312,7 +317,7 @@ export default function GameLost() {
               ? t("dailyChallenge.completed")
               : t("dailyChallenge.lost")}
           </h1>
-          <div className="h-section gap-md f-jc-c">
+          <div className="game__review">
             <div className="v-section">
               <StatBox
                 label={t("common.totalPoints")}
@@ -328,19 +333,37 @@ export default function GameLost() {
               />
             </div>
           </div>
-          <div className="h-section gap-lg mx-auto">
-            <WordListDisplay
-              lastLevelWords={lastLevelWords}
-              columns={columns}
-            />
-            <div className="score__container--box pos-rel">
-              <TopScores
-                hasTooltip
-                difficulty="daily"
-                challengeNumber={currentChallengeNumber!}
-              />
-            </div>
+          <div className="game__summary">
+            <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
+            {!isMobileUa && (
+              <div className="score__container--box pos-rel">
+                <TopScores
+                  hasTooltip
+                  difficulty="daily"
+                  challengeNumber={currentChallengeNumber!}
+                />
+              </div>
+            )}
           </div>
+          {isMobileUa && (
+            <>
+              <MobileRankingOpenButton
+                onClick={() => setRankingPopupOpen(true)}
+              />
+              <RankingPopupModal
+                isOpen={rankingPopupOpen}
+                onClose={() => setRankingPopupOpen(false)}
+              >
+                <div className="score__container--box pos-rel w100">
+                  <TopScores
+                    hasTooltip
+                    difficulty="daily"
+                    challengeNumber={currentChallengeNumber!}
+                  />
+                </div>
+              </RankingPopupModal>
+            </>
+          )}
           <div className="h-section gap-xs f-jc-c mb-sm">
             <button className="btn" onClick={handlePlayAgain}>
               {t("common.startNewGame")}
@@ -350,7 +373,7 @@ export default function GameLost() {
       ) : (
         <>
           <h1 className="lost">{t("game.lost")}</h1>
-          <div className="h-section gap-md f-jc-c">
+          <div className="game__review">
             <div className="v-section">
               <StatBox
                 label={t("common.reachedLevel")}
@@ -380,24 +403,42 @@ export default function GameLost() {
               />
             </div>
           </div>
-          <div className="h-section gap-lg mx-auto">
+          <div className="game__summary">
             <div className="v-section gap-md">
-              <WordListDisplay
-                lastLevelWords={lastLevelWords}
-                columns={columns}
-              />
+              <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
             </div>
-            <div className="score__container--box pos-rel">
-              <TopScores hasTooltip difficulty={gameDifficulty} />
-            </div>
+            {!isMobileUa && (
+              <div className="score__container--box pos-rel">
+                <TopScores hasTooltip difficulty={gameDifficulty} />
+              </div>
+            )}
           </div>
+          {isMobileUa && (
+            <>
+              <MobileRankingOpenButton
+                onClick={() => setRankingPopupOpen(true)}
+              />
+              <RankingPopupModal
+                isOpen={rankingPopupOpen}
+                onClose={() => setRankingPopupOpen(false)}
+              >
+                <div className="score__container--box pos-rel w100">
+                  <TopScores hasTooltip difficulty={gameDifficulty} />
+                </div>
+              </RankingPopupModal>
+            </>
+          )}
           <div className="h-section gap-xs f-jc-c mb-sm">
             {players === "multi" && (
               <button className="btn btn--sm btn--lose" onClick={handleExit}>
                 {t("game.exit")}
               </button>
             )}
-            <button onClick={handlePlayAgain} disabled={isCreatingRoom}>
+            <button
+              className="btn"
+              onClick={handlePlayAgain}
+              disabled={isCreatingRoom}
+            >
               {isCreatingRoom
                 ? t("game.creatingNewRoom")
                 : t("common.playAgain")}

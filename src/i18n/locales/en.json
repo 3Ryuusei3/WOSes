@@ -99,6 +99,8 @@
     "dailyTargetScore": "Score",
     "currentScore": "Current score",
     "inputWord": "Enter a word",
+    "virtualKeyboardDelete": "Delete last letter",
+    "virtualKeyboardSend": "Send word",
     "nextLevel": "Next level",
     "gameCompleted": "Game completed!",
     "finalScore": "Final score",
@@ -142,7 +144,10 @@
     "globalBest": "Global best score",
     "rank": "Rank",
     "player": "Player",
-    "date": "Date"
+    "date": "Date",
+    "columnScore": "Pts",
+    "columnLevel": "Lvl",
+    "columnTime": "Time"
   },
   "mechanics": {
     "title": "GAME MECHANICS",
@@ -216,7 +221,7 @@
     "levels": "LEVELS",
     "nextChallenges": "NEXT CHALLENGES",
     "challengeTooltip": "Click on each challenge to see more information",
-    "noChallenges": "THE NEXT<br/>LEVEL WILL<br/>HAVE NO<br/>CHALLENGES",
+    "noChallenges": "THE NEXT LEVEL WILL HAVE NO CHALLENGES",
     "lessTime": "YOU WILL HAVE <span class=\"lost\">{{seconds}}s</span> LESS IN THE NEXT LEVEL",
     "perfectBonus": "THE <span class=\"tip\">2 MOST USED LETTERS</span> WILL BE <span class=\"tip\">HIGHLIGHTED</span> AND YOU WILL HAVE <span class=\"won\">1s EXTRA</span>",
     "threeStarBonus": "THE MOST USED LETTER WILL BE <span class=\"tip\">HIGHLIGHTED</span>",

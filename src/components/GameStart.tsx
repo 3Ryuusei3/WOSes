@@ -5,15 +5,19 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import TopScores from "../atoms/TopScores";
 import HowToPlayModal from "../atoms/HowToPlayModal";
 import DifficultySelector from "../atoms/DifficultySelector";
-import LanguageSelector from "../atoms/LanguageSelector";
 
 import useRandomWords from "../hooks/useRandomWords";
 import useBackgroundAudio from "../hooks/useBackgroundAudio";
 import useSetMechanics from "../hooks/useSetMechanics";
 import useDailyChallenge from "../hooks/useDailyChallenge";
 import useRoomManager from "../hooks/useRoomManager";
+import useMobileUserAgent from "../hooks/useMobileUserAgent";
 
 import useGameStore from "../store/useGameStore";
+import {
+  MobileRankingOpenButton,
+  RankingPopupModal,
+} from "../atoms/RankingPopup";
 import GameSound from "../atoms/GameSound";
 import PlayersSelector from "../atoms/PlayersSelector";
 
@@ -47,8 +51,10 @@ export default function GameStart() {
   } = useGameStore();
   const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
+  const [rankingPopupOpen, setRankingPopupOpen] = useState(false);
   const [isDailyChallengeSelected, setIsDailyChallengeSelected] =
     useState(false);
+  const isMobileUa = useMobileUserAgent();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -90,13 +96,11 @@ export default function GameStart() {
   }, [gameDifficulty, dailyChallenge, loadingChallenge, loadDailyChallenge]);
 
   useSetMechanics(gameMechanics, level, gameDifficulty !== "daily");
-  // En multiplayer, no generar palabra en GameStart porque se genera en GameRoom
   useRandomWords(gameDifficulty, players === "multi");
 
   useBackgroundAudio(volume);
 
   const handleSubmit = async () => {
-    // Validar nombre usando RoomManager
     const nameValidation = roomManager.validatePlayerName(playerName);
     if (!nameValidation.valid) {
       setError(true);
@@ -112,10 +116,8 @@ export default function GameStart() {
       setMode("loading");
       setDailyChallengeOriginalDifficulty(null);
     } else {
-      // Resetear estado del juego
       resetGameState();
 
-      // Usar RoomManager para crear sala
       const roomCode = roomManager.generateRoomCode();
       setRoomCode(roomCode);
 
@@ -176,12 +178,33 @@ export default function GameStart() {
     setIsDailyChallengeSelected(false);
   };
 
+  const rankingDifficulty =
+    isDailyChallengeSelected || gameDifficulty === "daily"
+      ? "daily"
+      : gameDifficulty;
+  const rankingChallengeNumber =
+    isDailyChallengeSelected || gameDifficulty === "daily"
+      ? dailyChallenge?.challenge_number
+      : undefined;
+
+  const rankingPanel = (
+    <>
+      {alreadyPlayed &&
+        (isDailyChallengeSelected || gameDifficulty === "daily") && (
+          <p className="daily-retry-note">{t("dailyChallenge.retryNote")}</p>
+        )}
+      <TopScores
+        difficulty={rankingDifficulty}
+        challengeNumber={rankingChallengeNumber}
+      />
+    </>
+  );
+
   return (
     <>
       <div className="game__container f-jc-c pos-rel">
-        <LanguageSelector />
-        <div className="h-section gap-sm">
-          <div className="v-section gap-md w100 f-jc-c">
+        <div className="h-section gap-lg">
+          <div className="home__container">
             <h2 className="highlight">{t("gameStart.nameAndDifficulty")}</h2>
             <DifficultySelector
               gameDifficulty={gameDifficulty}
@@ -232,28 +255,25 @@ export default function GameStart() {
               </button>
             </div>
           </div>
-          <div className="ranking ranking--lg v-section gap-md top-scores">
-            <div className="score__container--box dark">
-              {alreadyPlayed &&
-                (isDailyChallengeSelected || gameDifficulty === "daily") && (
-                  <p className="daily-retry-note">
-                    {t("dailyChallenge.retryNote")}
-                  </p>
-                )}
-              <TopScores
-                difficulty={
-                  isDailyChallengeSelected || gameDifficulty === "daily"
-                    ? "daily"
-                    : gameDifficulty
-                }
-                challengeNumber={
-                  isDailyChallengeSelected || gameDifficulty === "daily"
-                    ? dailyChallenge?.challenge_number
-                    : undefined
-                }
+          {isMobileUa ? (
+            <>
+              <MobileRankingOpenButton
+                onClick={() => setRankingPopupOpen(true)}
               />
+              <RankingPopupModal
+                isOpen={rankingPopupOpen}
+                onClose={() => setRankingPopupOpen(false)}
+              >
+                <div className="score__container--box dark w100">
+                  {rankingPanel}
+                </div>
+              </RankingPopupModal>
+            </>
+          ) : (
+            <div className="ranking ranking--lg v-section gap-md top-scores">
+              <div className="score__container--box dark">{rankingPanel}</div>
             </div>
-          </div>
+          )}
         </div>
         <GameSound />
       </div>

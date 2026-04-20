@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import reloadIcon from "../../assets/reload.svg";
 import { submitWord } from "../../services/multiplayer";
@@ -44,10 +44,17 @@ export default function PlayerGameView({
 }: PlayerGameViewProps) {
   const { t } = useTranslation();
   const [playerAttempts, setPlayerAttempts] = useState<PlayerAttempt[]>([]);
+  const inputWordRef = useRef(inputWord);
 
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && inputWord.trim() !== "") {
-      const attempt = inputWord.trim().toLowerCase();
+  useEffect(() => {
+    inputWordRef.current = inputWord;
+  }, [inputWord]);
+
+  const submitCurrentWord = useCallback(
+    async (snapshot?: string) => {
+      const raw = (snapshot ?? inputWordRef.current).trim();
+      if (raw === "") return;
+      const attempt = raw.toLowerCase();
       if (attempt.length < 4) {
         clearInput();
         return;
@@ -85,27 +92,31 @@ export default function PlayerGameView({
         if (!error && data && (data as any).status === "correct") {
           setPlayerAttempts((prev) =>
             prev.map((it) =>
-              it.word === localWord
-                ? { ...it, status: "correct" }
-                : it,
+              it.word === localWord ? { ...it, status: "correct" } : it,
             ),
           );
           markWordGuessed(localWord);
         } else {
           setPlayerAttempts((prev) =>
             prev.map((it) =>
-              it.word === localWord
-                ? { ...it, status: "rejected" }
-                : it,
+              it.word === localWord ? { ...it, status: "rejected" } : it,
             ),
           );
         }
       }
+    },
+    [clearInput, markWordGuessed, playerId, possibleWords, roomCode, words],
+  );
+
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const snap = (e.currentTarget as HTMLInputElement).value;
+      await submitCurrentWord(snap);
     }
   };
 
   return (
-    <div className="game__container">
+    <div className="game__container game__container--player">
       <div className="h-section gap-xs">
         <button className="btn btn--deco btn--xs">
           {t("common.points")} {playerRoundPoints}
@@ -122,11 +133,7 @@ export default function PlayerGameView({
             }
           >
             <span className="sr-only">{t("game.reconnect")}</span>
-            <img
-              src={reloadIcon}
-              alt="reload"
-              className="player-selector"
-            />
+            <img src={reloadIcon} alt="reload" className="player-selector" />
           </button>
         )}
       </div>

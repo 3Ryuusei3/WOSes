@@ -1,13 +1,20 @@
 import { Dispatch, SetStateAction } from "react";
+import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 import { getMechanicInfo } from "../constant/mechanics";
-
+import closeIcon from "../assets/close.svg";
 interface MechanicsModalProps {
   isOpen: boolean;
   setModalOpen: Dispatch<SetStateAction<boolean>>;
   mechanicType: string;
 }
 
-export default function MechanicsModal({ isOpen, setModalOpen, mechanicType }: MechanicsModalProps) {
+export default function MechanicsModal({
+  isOpen,
+  setModalOpen,
+  mechanicType,
+}: MechanicsModalProps) {
+  const { t } = useTranslation();
   const handleClose = () => {
     setModalOpen(false);
   };
@@ -20,7 +27,9 @@ export default function MechanicsModal({ isOpen, setModalOpen, mechanicType }: M
         <>
           <h2>MECÁNICA DESCONOCIDA</h2>
           <div className="instruction-slide">
-            <h4 className="highlight">No hay información disponible para esta mecánica</h4>
+            <h4 className="highlight">
+              No hay información disponible para esta mecánica
+            </h4>
           </div>
         </>
       );
@@ -38,14 +47,21 @@ export default function MechanicsModal({ isOpen, setModalOpen, mechanicType }: M
     );
   };
 
-  return (
-    <div className={`modal ${isOpen ? 'open' : ''}`}>
-      <div className='modal__content'>
-        <div className='modal__close'>
-          <span className='' onClick={handleClose}>
-            <h4 className='sr-only lost'>ｘ</h4>
-          </span>
-        </div>
+  if (!isOpen) {
+    return null;
+  }
+
+  return createPortal(
+    <div className="modal open">
+      <div className="modal__content">
+        <button
+          type="button"
+          className="modal__close btn btn--lost btn--xs"
+          onClick={handleClose}
+          aria-label={t("common.close")}
+        >
+          <img src={closeIcon} alt="close" width={16} height={16} />
+        </button>
         <div className="v-section gap-md pos-rel">
           {getMechanicInstructions()}
           <button onClick={handleClose} className="btn mx-auto">
@@ -53,6 +69,7 @@ export default function MechanicsModal({ isOpen, setModalOpen, mechanicType }: M
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

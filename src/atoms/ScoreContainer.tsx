@@ -27,9 +27,41 @@ export default function ScoreContainer({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.style.top = `${containerRef.current.offsetHeight * -1 - 15}px`;
-    }
+    const el = containerRef.current;
+    if (!el) return;
+
+    const gapPx = 4;
+    const getLogo = () =>
+      el.closest("main")?.querySelector<HTMLElement>(".logo-container");
+
+    const updateTop = () => {
+      const logo = getLogo();
+      const marginBottom = logo
+        ? parseFloat(getComputedStyle(logo).marginBottom) || 0
+        : 0;
+      const logoBlock = (logo?.offsetHeight ?? 0) + marginBottom;
+      if (logoBlock > 0) {
+        el.style.top = `${-logoBlock - gapPx}px`;
+      } else {
+        el.style.top = `${-el.offsetHeight - gapPx}px`;
+      }
+    };
+
+    updateTop();
+    const raf = requestAnimationFrame(updateTop);
+
+    const logo = getLogo();
+    const ro = new ResizeObserver(updateTop);
+    ro.observe(el);
+    if (logo) ro.observe(logo);
+
+    window.addEventListener("resize", updateTop);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("resize", updateTop);
+    };
   }, []);
 
   return (
@@ -37,7 +69,7 @@ export default function ScoreContainer({
       <div
         className={`score__container--box ${guessedCount === words.length ? "won" : ""}`}
       >
-        <div className="h-section gap-md">
+        <div className="score__info">
           {gameDifficulty !== "daily" && (
             <div className="v-section">
               <p>{t("common.level").toUpperCase()}</p>
@@ -58,7 +90,7 @@ export default function ScoreContainer({
       <div
         className={`score__container--box ${correctWordsPoints() >= goalPoints ? "won" : ""}`}
       >
-        <div className="h-section gap-md">
+        <div className="score__info">
           <div className="v-section">
             {gameDifficulty === "daily" ? (
               <div className="v-section">
@@ -66,7 +98,7 @@ export default function ScoreContainer({
                 <h3>{correctWordsPoints()}</h3>
               </div>
             ) : (
-              <div className="h-section gap-md">
+              <div className="score__info">
                 <div className="v-section">
                   <p>{t("game.targetScore").toUpperCase()}</p>
                   <h3>

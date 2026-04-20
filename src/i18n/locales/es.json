@@ -103,6 +103,8 @@
     "dailyTargetScore": "Puntuación",
     "currentScore": "Puntuación actual",
     "inputWord": "Introduce la palabra",
+    "virtualKeyboardDelete": "Borrar última letra",
+    "virtualKeyboardSend": "ENVIAR PALABRA",
     "nextLevel": "Siguiente nivel",
     "gameCompleted": "¡Juego completado!",
     "finalScore": "Puntuación final",
@@ -146,7 +148,10 @@
     "globalBest": "Mejor puntuación global",
     "rank": "Rango",
     "player": "Jugador",
-    "date": "Fecha"
+    "date": "Fecha",
+    "columnScore": "Pts",
+    "columnLevel": "Nv.",
+    "columnTime": "Tpo"
   },
   "mechanics": {
     "title": "MECÁNICAS DEL JUEGO",
@@ -205,7 +210,7 @@
     "levels": "NIVELES",
     "nextChallenges": "PRÓXIMOS RETOS",
     "challengeTooltip": "Haz clic sobre cada reto para ver más información",
-    "noChallenges": "EL SIGUIENTE<br/>NIVEL NO<br/>CONTENDRÁ<br/>NINGÚN RETO",
+    "noChallenges": "EL SIGUIENTE NIVEL NO CONTENDRÁ NINGÚN RETO",
     "lessTime": "DISPONDRÁS DE <span class=\"lost\">{{seconds}}s</span> MENOS EN EL SIGUIENTE NIVEL",
     "perfectBonus": "LAS <span class=\"tip\">2 LETRAS</span> MÁS USADAS ESTARÁN <span class=\"tip\">RESALTADAS</span> y TENDRÁS <span class=\"won\">1s EXTRA</span>",
     "threeStarBonus": "LA LETRA MÁS USADA ESTARÁ <span class=\"tip\">RESALTADA</span>",
@@ -275,7 +280,7 @@
     "description": "¡UN NUEVO RETO CADA DÍA!"
   },
   "wordFeedback": {
-    "buttonText": "¿FALTA ALGUNA PALABRA?",
+    "buttonText": "¿FALTA ALGO?",
     "buttonTitle": "¿Falta alguna palabra?",
     "modalTitle": "¿FALTA ALGUNA PALABRA?",
     "modalDescription": "SI CREES QUE ALGUNA PALABRA DEBERÍA ESTAR AQUÍ, O ALGUNA PALABRA DE LA LISTA NO EXISTE, AVÍSANOS Y LO REVISAREMOS.",

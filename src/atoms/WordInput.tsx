@@ -1,7 +1,20 @@
-import { useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import {
+  useRef,
+  useEffect,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import { flushSync } from "react-dom";
+import { useTranslation } from "react-i18next";
 
-import useInputResponse from '../hooks/useInputResponse';
+import useInputResponse from "../hooks/useInputResponse";
+import useMobileUserAgent from "../hooks/useMobileUserAgent";
+
+export type WordInputHandle = {
+  applyValue: (next: string) => void;
+  submitEnter: () => void;
+};
 
 interface WordInputProps {
   inputWord: string;
@@ -13,37 +26,82 @@ interface WordInputProps {
   volume: number;
 }
 
-export default function WordInput({
-  inputWord,
-  handleChange,
-  handleKeyDown,
-  possibleWords,
-  correctWords,
-  percentage,
-  volume
-}: WordInputProps) {
-  const { t } = useTranslation();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } =
-    useInputResponse(possibleWords, inputWord, correctWords, handleKeyDown, volume);
+const WordInput = forwardRef<WordInputHandle, WordInputProps>(
+  function WordInput(
+    {
+      inputWord,
+      handleChange,
+      handleKeyDown,
+      possibleWords,
+      correctWords,
+      percentage,
+      volume,
+    },
+    ref,
+  ) {
+    const { t } = useTranslation();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const isMobile = useMobileUserAgent();
+    const { animateError, animateSuccess, animateRepeated, handleKeyDownWithShake } =
+      useInputResponse(
+        possibleWords,
+        inputWord,
+        correctWords,
+        handleKeyDown,
+        volume,
+      );
 
-  useEffect(() => {
-    if (percentage > 0) {
-      inputRef.current?.focus();
-    }
-  }, [percentage]);
+    const applyValue = useCallback(
+      (next: string) => {
+        flushSync(() => {
+          handleChange({
+            target: { value: next },
+          } as React.ChangeEvent<HTMLInputElement>);
+        });
+      },
+      [handleChange],
+    );
 
-  return (
-    <input
-      type="text"
-      className={`mx-auto mt-auto ${animateError ? 'animate-error' : ''} ${animateSuccess ? 'animate-success' : ''} ${animateRepeated ? 'animate-repeated' : ''}`}
-      placeholder={t('game.inputWord')}
-      value={inputWord}
-      onChange={handleChange}
-      onKeyDown={handleKeyDownWithShake}
-      disabled={percentage === 0}
-      ref={inputRef}
-      autoFocus
-    />
-  );
-}
+    const enterEvent = {
+      key: "Enter",
+      preventDefault: () => {},
+      stopPropagation: () => {},
+    } as React.KeyboardEvent<HTMLInputElement>;
+
+    const submitEnter = useCallback(() => {
+      handleKeyDownWithShake(enterEvent);
+    }, [handleKeyDownWithShake]);
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        applyValue,
+        submitEnter,
+      }),
+      [applyValue, submitEnter],
+    );
+
+    useEffect(() => {
+      if (percentage > 0 && !isMobile) {
+        inputRef.current?.focus();
+      }
+    }, [percentage, isMobile]);
+
+    return (
+      <input
+        type="text"
+        className={`mx-auto mt-auto ${animateError ? "animate-error" : ""} ${animateSuccess ? "animate-success" : ""} ${animateRepeated ? "animate-repeated" : ""}`}
+        placeholder={t("game.inputWord")}
+        value={inputWord}
+        onChange={handleChange}
+        onKeyDown={handleKeyDownWithShake}
+        disabled={percentage === 0}
+        inputMode={isMobile ? "none" : undefined}
+        ref={inputRef}
+        autoFocus={!isMobile}
+      />
+    );
+  },
+);
+
+export default WordInput;

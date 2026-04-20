@@ -28,7 +28,7 @@ export default function DifficultySelector({
   };
 
   return (
-    <div className="h-section gap-xs f-jc-c pos-rel w-fit mx-auto">
+    <div className="difficulty-selector">
       <button
         className={`btn ${gameDifficulty === "easy" && !isDailyChallengeSelected ? "selected" : ""} btn--sm btn--win`}
         onClick={() => handleDifficulty("easy")}

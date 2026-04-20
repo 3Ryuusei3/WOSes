@@ -20,9 +20,7 @@ export default function ReconnectButton({
       disabled={disabled}
       className={`btn btn--xs ${connectionStatus !== "connected" ? "btn--lose" : ""}`}
       title={
-        connectionStatus !== "connected"
-          ? "Reconectar"
-          : "Actualizar estado"
+        connectionStatus !== "connected" ? "Reconectar" : "Actualizar estado"
       }
     >
       <span className="sr-only">{t("game.reconnect")}</span>

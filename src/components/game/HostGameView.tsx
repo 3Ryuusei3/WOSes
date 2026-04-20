@@ -1,5 +1,9 @@
+import { useRef } from "react";
+
 import ScoreContainer from "../../atoms/ScoreContainer";
-import WordInput from "../../atoms/WordInput";
+import WordInput, { type WordInputHandle } from "../../atoms/WordInput";
+import MobileGameKeyboard from "../../atoms/MobileGameKeyboard";
+import useMobileUserAgent from "../../hooks/useMobileUserAgent";
 import WarningMessage from "../../atoms/WarningMessage";
 import WordList from "../../atoms/WordList";
 import ProgressBar from "../../atoms/ProgressBar";
@@ -59,6 +63,9 @@ export default function HostGameView({
   correctWords,
   volume,
 }: HostGameViewProps) {
+  const wordInputRef = useRef<WordInputHandle>(null);
+  const isMobile = useMobileUserAgent();
+
   return (
     <>
       <ScoreContainer
@@ -70,8 +77,8 @@ export default function HostGameView({
         dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
       />
       <div className="game__container">
-        <div className="v-section gap-xs">
-          <div className="v-section gap-sm">
+        <div className="game__header">
+          <div className="v-section">
             <WarningMessage gameMechanics={gameMechanics} />
             <SelectedWord
               shuffledWordObject={shuffledWordObject}
@@ -96,6 +103,7 @@ export default function HostGameView({
         />
         {players === "single" && (
           <WordInput
+            ref={wordInputRef}
             inputWord={inputWord}
             handleChange={handleChange}
             handleKeyDown={handleKeyDown}
@@ -107,6 +115,18 @@ export default function HostGameView({
         )}
         <GameSound />
       </div>
+      {isMobile && players === "single" && (
+        <MobileGameKeyboard
+          disabled={percentage === 0}
+          value={inputWord}
+          onValueChange={(next) => wordInputRef.current?.applyValue(next)}
+          onEnter={() => wordInputRef.current?.submitEnter()}
+          shuffledWordObject={shuffledWordObject}
+          gameMechanics={gameMechanics}
+          percentage={percentage}
+          showLettersPercentage={showLettersPercentage}
+        />
+      )}
     </>
   );
 }

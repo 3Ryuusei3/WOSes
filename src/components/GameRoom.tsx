@@ -286,14 +286,14 @@ export default function GameRoom() {
   };
 
   return (
-    <div className="game__container f-jc-c f-ai-c pos-rel">
-      <div className="h-section gap-xl">
+    <div className="game__container game__container--join">
+      <div className="game__room">
         {isHost ? (
           <>
             <div className="v-section gap-md f-jc-c">
               <div className="v-section gap-md">
                 <div className="score__container--box dark">
-                  <div className="v-section gap-sm">
+                  <div className="v-section gap-sm f-jc-c f-ai-c">
                     <QRCodeSVG
                       value={window.location.href}
                       bgColor="#420072"
@@ -308,7 +308,7 @@ export default function GameRoom() {
                     </button>
                   </div>
                 </div>
-                <div className="v-section gap-sm">
+                <div className="v-section gap-sm f-jc-c f-ai-c">
                   <button
                     className={`btn ${canStart ? "btn--win" : "btn--lose"}`}
                     disabled={!canStart}

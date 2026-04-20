@@ -6,11 +6,12 @@ import {
   useMemo,
   KeyboardEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { submitWordRequest } from "../services/wordRequests";
 import { showToast } from "./Toast";
 import Word from "../types/Word";
-
+import closeIcon from "../assets/close.svg";
 interface WordFeedbackModalProps {
   isOpen: boolean;
   setModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -88,17 +89,21 @@ export default function WordFeedbackModal({
     void handleSubmit();
   };
 
-  return (
-    <div
-      className={`modal ${isOpen ? "open" : ""}`}
-      onKeyDown={handleModalKeyDown}
-    >
+  if (!isOpen) {
+    return null;
+  }
+
+  return createPortal(
+    <div className="modal open" onKeyDown={handleModalKeyDown}>
       <div className="modal__content">
-        <div className="modal__close">
-          <span className="" onClick={handleClose}>
-            <h4 className="sr-only lost">ｘ</h4>
-          </span>
-        </div>
+        <button
+          type="button"
+          className="modal__close btn btn--lost btn--xs"
+          onClick={handleClose}
+          aria-label={t("common.close")}
+        >
+          <img src={closeIcon} alt="close" width={16} height={16} />
+        </button>
         <div className="v-section gap-md pos-rel">
           <h2 className="highlight">{t("wordFeedback.modalTitle")}</h2>
           <h4 className="highlight">{t("wordFeedback.modalDescription")}</h4>
@@ -161,7 +166,7 @@ export default function WordFeedbackModal({
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="btn"
+              className="btn btn--sm"
             >
               {isSubmitting
                 ? t("wordFeedback.submitting")
@@ -170,6 +175,7 @@ export default function WordFeedbackModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
