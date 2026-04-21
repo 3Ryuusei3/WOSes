@@ -303,7 +303,7 @@ export default function GameLost() {
   }
 
   return (
-    <div className="game__container f-jc-c">
+    <div className="game__container game__container--lost f-jc-c">
       <div className="difficulty-tag">
         <DifficultyTag
           gameDifficulty={gameDifficulty}

@@ -851,6 +851,12 @@ main {
     align-items: center;
     padding-block: 2rem !important;
   }
+
+  &--lost {
+    .ranking {
+      min-width: 400px;
+    }
+  }
 }
 
 .game__header {
@@ -1275,7 +1281,6 @@ main {
 
 .ranking {
   width: 100%;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
