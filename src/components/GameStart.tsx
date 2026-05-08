@@ -10,6 +10,7 @@ import useRandomWords from "../hooks/useRandomWords";
 import useBackgroundAudio from "../hooks/useBackgroundAudio";
 import useSetMechanics from "../hooks/useSetMechanics";
 import useDailyChallenge from "../hooks/useDailyChallenge";
+import useAlexRun from "../hooks/useAlexRun";
 import useRoomManager from "../hooks/useRoomManager";
 import useMobileUserAgent from "../hooks/useMobileUserAgent";
 
@@ -58,7 +59,7 @@ export default function GameStart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  void searchParams;
+  const isAlexMode = searchParams.get("mode") === "alex";
   const roomManager = useRoomManager();
 
   // Función para resetear el estado del juego
@@ -88,6 +89,8 @@ export default function GameStart() {
     startDailyChallenge,
   } = useDailyChallenge();
 
+  const { startAlexRun } = useAlexRun();
+
   useEffect(() => {
     if (gameDifficulty === "daily" && !dailyChallenge && !loadingChallenge) {
       loadDailyChallenge();
@@ -104,6 +107,11 @@ export default function GameStart() {
     const nameValidation = roomManager.validatePlayerName(playerName);
     if (!nameValidation.valid) {
       setError(true);
+      return;
+    }
+
+    if (isAlexMode) {
+      startAlexRun();
       return;
     }
 
@@ -150,6 +158,9 @@ export default function GameStart() {
   };
 
   const getButtonText = () => {
+    if (isAlexMode) {
+      return t("alex.startButton");
+    }
     if (isDailyChallengeSelected) {
       return t("common.start", { difficulty: t("difficulties.daily") });
     }
@@ -205,20 +216,28 @@ export default function GameStart() {
       <div className="game__container f-jc-c pos-rel">
         <div className="h-section gap-lg">
           <div className="home__container">
-            <h2 className="highlight">{t("gameStart.nameAndDifficulty")}</h2>
-            <DifficultySelector
-              gameDifficulty={gameDifficulty}
-              onDifficultyChange={handleDifficultyChange}
-              showDailyChallenge={players === "single"}
-              onDailyChallengeClick={handleDailyChallenge}
-              loadingDaily={loadingChallenge}
-              isDailyChallengeSelected={isDailyChallengeSelected}
-            />
-            <PlayersSelector
-              players={players}
-              setPlayers={setPlayers}
-              onDifficultyChange={handleDifficultyChange}
-            />
+            <h2 className="highlight">
+              {isAlexMode
+                ? t("alex.welcome")
+                : t("gameStart.nameAndDifficulty")}
+            </h2>
+            {!isAlexMode && (
+              <>
+                <DifficultySelector
+                  gameDifficulty={gameDifficulty}
+                  onDifficultyChange={handleDifficultyChange}
+                  showDailyChallenge={players === "single"}
+                  onDailyChallengeClick={handleDailyChallenge}
+                  loadingDaily={loadingChallenge}
+                  isDailyChallengeSelected={isDailyChallengeSelected}
+                />
+                <PlayersSelector
+                  players={players}
+                  setPlayers={setPlayers}
+                  onDifficultyChange={handleDifficultyChange}
+                />
+              </>
+            )}
             <div className="v-section gap-xs">
               <input
                 className="mx-auto"
@@ -232,22 +251,26 @@ export default function GameStart() {
                 {t("gameStart.nameError")}
               </small>
             </div>
-            <h6
-              className="highlight cursor"
-              onClick={() => setHowToPlayModal(true)}
-            >
-              <u>{t("gameStart.learnToPlay")}</u>
-            </h6>
+            {!isAlexMode && (
+              <h6
+                className="highlight cursor"
+                onClick={() => setHowToPlayModal(true)}
+              >
+                <u>{t("gameStart.learnToPlay")}</u>
+              </h6>
+            )}
             <div className="h-section gap-xs f-jc-c">
               <button
                 className={`btn ${
-                  isDailyChallengeSelected
+                  isAlexMode
                     ? "btn--daily"
-                    : gameDifficulty === "easy"
-                      ? "btn--win"
-                      : gameDifficulty === "hard"
-                        ? "btn--lose"
-                        : ""
+                    : isDailyChallengeSelected
+                      ? "btn--daily"
+                      : gameDifficulty === "easy"
+                        ? "btn--win"
+                        : gameDifficulty === "hard"
+                          ? "btn--lose"
+                          : ""
                 }`}
                 onClick={handleSubmit}
               >
@@ -255,25 +278,26 @@ export default function GameStart() {
               </button>
             </div>
           </div>
-          {isMobileUa ? (
-            <>
-              <MobileRankingOpenButton
-                onClick={() => setRankingPopupOpen(true)}
-              />
-              <RankingPopupModal
-                isOpen={rankingPopupOpen}
-                onClose={() => setRankingPopupOpen(false)}
-              >
-                <div className="score__container--box dark w100">
-                  {rankingPanel}
-                </div>
-              </RankingPopupModal>
-            </>
-          ) : (
-            <div className="ranking ranking--lg v-section gap-md top-scores">
-              <div className="score__container--box dark">{rankingPanel}</div>
-            </div>
-          )}
+          {!isAlexMode &&
+            (isMobileUa ? (
+              <>
+                <MobileRankingOpenButton
+                  onClick={() => setRankingPopupOpen(true)}
+                />
+                <RankingPopupModal
+                  isOpen={rankingPopupOpen}
+                  onClose={() => setRankingPopupOpen(false)}
+                >
+                  <div className="score__container--box dark w100">
+                    {rankingPanel}
+                  </div>
+                </RankingPopupModal>
+              </>
+            ) : (
+              <div className="ranking ranking--lg v-section gap-md top-scores">
+                <div className="score__container--box dark">{rankingPanel}</div>
+              </div>
+            ))}
         </div>
         <GameSound />
       </div>

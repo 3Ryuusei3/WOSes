@@ -44,7 +44,7 @@ const useRemoveSeconds = () => {
   useEffect(() => {
     setNumberOfRounds((prev) => prev + 1);
 
-    if (gameDifficulty === "daily") {
+    if (gameDifficulty === "daily" || gameDifficulty === "alex") {
        return;
     }
 

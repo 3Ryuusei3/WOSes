@@ -8,6 +8,7 @@ import Mechanics from "../types/Mechanics";
 import Difficulty from "../types/Difficulty";
 
 import { START_TIME } from "../constant";
+import { AlexLevel } from "../constant/alex";
 
 interface GameState {
   mode: Mode;
@@ -70,6 +71,14 @@ interface GameState {
   setDailyChallengeOriginalDifficulty: (diff: Difficulty | null) => void;
   dailyChallengeInitialTime: number | null;
   setDailyChallengeInitialTime: (time: number | null) => void;
+  alexLevels: AlexLevel[];
+  setAlexLevels: (levels: AlexLevel[]) => void;
+  alexCurrentLevelIndex: number;
+  setAlexCurrentLevelIndex: (
+    index: number | ((prev: number) => number),
+  ) => void;
+  alexCompleted: boolean;
+  setAlexCompleted: (completed: boolean) => void;
 }
 
 const useGameStore = create<GameState>()(
@@ -168,6 +177,18 @@ const useGameStore = create<GameState>()(
       dailyChallengeInitialTime: null,
       setDailyChallengeInitialTime: (time) =>
         set({ dailyChallengeInitialTime: time }),
+      alexLevels: [],
+      setAlexLevels: (levels) => set({ alexLevels: levels }),
+      alexCurrentLevelIndex: 0,
+      setAlexCurrentLevelIndex: (index) =>
+        set((state) => ({
+          alexCurrentLevelIndex:
+            typeof index === "function"
+              ? index(state.alexCurrentLevelIndex)
+              : index,
+        })),
+      alexCompleted: false,
+      setAlexCompleted: (completed) => set({ alexCompleted: completed }),
     }),
     {
       name: "woses-game-storage",

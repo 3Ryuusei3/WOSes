@@ -15,7 +15,7 @@ export default function DifficultyTag({
 
   return (
     <button
-      className={`btn btn--deco btn--xs mx-auto ${gameDifficulty === "easy" ? "btn--win" : gameDifficulty === "hard" ? "btn--lose" : gameDifficulty === "daily" ? "btn--daily" : ""}`}
+      className={`btn btn--deco btn--xs mx-auto ${gameDifficulty === "easy" ? "btn--win" : gameDifficulty === "hard" ? "btn--lose" : gameDifficulty === "daily" || gameDifficulty === "alex" ? "btn--daily" : ""}`}
     >
       {t(`difficulties.${gameDifficulty}`)}{" "}
       {dailyChallengeOriginalDifficulty &&

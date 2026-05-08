@@ -25,21 +25,21 @@ const useLanguageWords = (difficulty: Difficulty) => {
   const { dailyChallengeOriginalDifficulty } = useGameStore();
 
   const getWordsForLanguage = () => {
-    const effectiveDifficulty =
-      difficulty === "daily" && dailyChallengeOriginalDifficulty
-        ? dailyChallengeOriginalDifficulty
-        : difficulty === "daily"
-          ? "medium"
-          : difficulty;
+    let effectiveDifficulty: "easy" | "medium" | "hard";
+    if (difficulty === "alex") {
+      effectiveDifficulty = "medium";
+    } else if (difficulty === "daily") {
+      effectiveDifficulty =
+        (dailyChallengeOriginalDifficulty as "easy" | "medium" | "hard") ||
+        "medium";
+    } else {
+      effectiveDifficulty = difficulty as "easy" | "medium" | "hard";
+    }
 
     if (i18n.language === "en") {
-      return DIFFICULTY_WORDS_EN[
-        effectiveDifficulty as "easy" | "medium" | "hard"
-      ].words;
+      return DIFFICULTY_WORDS_EN[effectiveDifficulty].words;
     }
-    return DIFFICULTY_WORDS_ES[
-      effectiveDifficulty as "easy" | "medium" | "hard"
-    ].words;
+    return DIFFICULTY_WORDS_ES[effectiveDifficulty].words;
   };
 
   return {

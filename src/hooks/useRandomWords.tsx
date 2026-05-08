@@ -64,6 +64,8 @@ const useRandomWords = (
     dailyChallengeOriginalDifficulty,
     players,
     role,
+    alexLevels,
+    alexCurrentLevelIndex,
   } = useGameStore();
   const { words } = useLanguageWords(difficulty);
 
@@ -83,6 +85,31 @@ const useRandomWords = (
         }
 
         const word = dailyChallengeWord;
+        const wordCount = countLetters(word);
+        const filteredWords = words.filter(
+          (w) => w.length >= 4 && w.length <= 9,
+        );
+        const possibleWordsList = filteredWords.filter((w) =>
+          canFormWord(countLetters(w), wordCount),
+        );
+
+        possibleWordsList.sort(
+          (a, b) => a.length - b.length || a.localeCompare(b),
+        );
+
+        setRandomWord(word);
+        setPossibleWords(possibleWordsList);
+        setHiddenLetterIndex(Math.floor(Math.random() * word.length));
+        return;
+      }
+
+      if (difficulty === "alex") {
+        const currentLevel = alexLevels[alexCurrentLevelIndex];
+        if (!currentLevel) {
+          return;
+        }
+
+        const word = currentLevel.word.toLowerCase();
         const wordCount = countLetters(word);
         const filteredWords = words.filter(
           (w) => w.length >= 4 && w.length <= 9,
@@ -183,6 +210,8 @@ const useRandomWords = (
     players,
     role,
     skipGeneration,
+    alexLevels,
+    alexCurrentLevelIndex,
   ]);
 };
 

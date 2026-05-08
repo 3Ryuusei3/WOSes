@@ -17,6 +17,7 @@ import useSetMechanics from "../hooks/useSetMechanics";
 import useRoomStateSync from "../hooks/useRoomStateSync";
 import useRealtimeConnection from "../hooks/useRealtimeConnection";
 import useSyncManager from "../hooks/useSyncManager";
+import useAlexRun from "../hooks/useAlexRun";
 
 import useGameStore from "../store/useGameStore";
 
@@ -55,10 +56,16 @@ export default function GameLobby() {
     volume,
     setGameDifficulty,
     dailyChallengeOriginalDifficulty,
+    alexLevels,
+    alexCurrentLevelIndex,
   } = useGameStore();
 
   const { words } = useLanguageWords(gameDifficulty);
   const syncManager = useSyncManager();
+  const { advanceAlexLevel } = useAlexRun();
+  const isAlex = gameDifficulty === "alex";
+  const totalAlexLevels = alexLevels.length;
+  const completedAlexLevel = isAlex ? alexCurrentLevelIndex + 1 : 0;
 
   const isPlayer = players === "multi" && role === "player";
 
@@ -108,9 +115,13 @@ export default function GameLobby() {
     setIsModalOpen(true);
   };
 
-  // Solo generar mecánicas y palabras aleatorias si NO es daily challenge
-  // Para daily challenge, estos valores ya están establecidos
-  useSetMechanics(gameMechanics, level, gameDifficulty !== "daily");
+  // Solo generar mecánicas y palabras aleatorias si NO es daily challenge ni alex
+  // Para daily challenge / alex, estos valores ya están establecidos
+  useSetMechanics(
+    gameMechanics,
+    level,
+    gameDifficulty !== "daily" && gameDifficulty !== "alex",
+  );
   useRandomWords(gameDifficulty);
   const secondsToRemove = useRemoveSeconds();
 
@@ -177,6 +188,11 @@ export default function GameLobby() {
   const handleAdvance = useCallback(async () => {
     if (!canAdvance) return;
 
+    if (isAlex) {
+      advanceAlexLevel();
+      return;
+    }
+
     if (players === "multi" && role === "host" && roomCode && randomWord) {
       try {
         const { error } = await startRoomWithWord(roomCode, randomWord);
@@ -238,6 +254,8 @@ export default function GameLobby() {
     setMode,
     words,
     syncManager,
+    isAlex,
+    advanceAlexLevel,
   ]);
 
   useEffect(() => {
@@ -311,20 +329,35 @@ export default function GameLobby() {
           dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
         />
       </div>
-      {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
-        <h1 className="won">{t("lobby.perfect")}</h1>
+      {isAlex ? (
+        <>
+          <h1 className="highlight">{t("alex.levelCompleted")}</h1>
+          <h3>
+            {t("alex.progress", {
+              current: completedAlexLevel,
+              total: totalAlexLevels,
+            })}
+          </h3>
+        </>
+      ) : levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
+        <>
+          <h1 className="won">{t("lobby.perfect")}</h1>
+          <h3>
+            {t("lobby.youAdvanced")}
+            <span className="won"> {levelsToAdvance} </span>
+            {levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
+          </h3>
+        </>
       ) : (
-        <h1 className="highlight">{t("lobby.congratulations")}</h1>
+        <>
+          <h1 className="highlight">{t("lobby.congratulations")}</h1>
+          <h3>
+            {t("lobby.youAdvanced")}
+            <span className="highlight"> {levelsToAdvance} </span>
+            {levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
+          </h3>
+        </>
       )}
-      <h3>
-        {t("lobby.youAdvanced")}
-        {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
-          <span className="won"> {levelsToAdvance} </span>
-        ) : (
-          <span className="highlight"> {levelsToAdvance} </span>
-        )}
-        {levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
-      </h3>
       <div className="game__summary">
         <LobbyStatsContainer
           level={level}
@@ -337,7 +370,7 @@ export default function GameLobby() {
           secondsToRemove={secondsToRemove}
         />
         <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
-        {gameMechanics && (
+        {!isAlex && gameMechanics && (
           <>
             <NextChallengesSection
               gameMechanics={gameMechanics}
@@ -352,17 +385,17 @@ export default function GameLobby() {
           </>
         )}
       </div>
-      {secondsToRemove > 0 && (
+      {!isAlex && secondsToRemove > 0 && (
         <h3
           dangerouslySetInnerHTML={{
             __html: t("lobby.lessTime", { seconds: secondsToRemove }),
           }}
         ></h3>
       )}
-      {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR && (
+      {!isAlex && levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR && (
         <h3 dangerouslySetInnerHTML={{ __html: t("lobby.perfectBonus") }}></h3>
       )}
-      {levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR && (
+      {!isAlex && levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR && (
         <h3
           dangerouslySetInnerHTML={{ __html: t("lobby.threeStarBonus") }}
         ></h3>
@@ -373,7 +406,9 @@ export default function GameLobby() {
           disabled={!canAdvance}
           className={!canAdvance ? "btn button-disabled" : "btn"}
         >
-          {t("lobby.playLevel", { level })}
+          {isAlex
+            ? t("alex.playNextLevel", { level: completedAlexLevel + 1 })
+            : t("lobby.playLevel", { level })}
         </button>
         {showReconnectButton && (
           <ReconnectButton

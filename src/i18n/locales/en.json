@@ -77,6 +77,7 @@
     "medium": "DIFFICULT",
     "hard": "EXPERT",
     "daily": "DAILY CHALLENGE",
+    "alex": "ALEX",
     "tooltip": "Words organized by levels according to the frequency of use perceived by users. The \"EXPERT\" difficulty contains all the words that exist in the dictionary."
   },
   "gameStart": {
@@ -289,6 +290,14 @@
     "todayChallenge": "DAILY CHALLENGE",
     "challengeNumber": "CHALLENGE #{{number}}",
     "description": "A NEW CHALLENGE EVERY DAY!"
+  },
+  "alex": {
+    "welcome": "ALEX SPECIAL MODE",
+    "startButton": "START THE 7 LEVELS",
+    "levelCompleted": "LEVEL PASSED!",
+    "progress": "LEVEL {{current}} OF {{total}} COMPLETED",
+    "playNextLevel": "PLAY LEVEL {{level}}",
+    "exit": "BACK TO HOME"
   },
   "wordFeedback": {
     "buttonText": "MISSING A WORD?",

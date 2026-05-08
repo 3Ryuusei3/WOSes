@@ -77,6 +77,7 @@
     "medium": "DIFÍCIL",
     "hard": "EXPERTO",
     "daily": "RETO DIARIO",
+    "alex": "ALEX",
     "tooltip": "Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad \"EXPERTO\" contiene todas las palabras que existen en la RAE."
   },
   "players": {
@@ -278,6 +279,14 @@
     "todayChallenge": "RETO DEL DÍA",
     "challengeNumber": "RETO #{{number}}",
     "description": "¡UN NUEVO RETO CADA DÍA!"
+  },
+  "alex": {
+    "welcome": "MODO ESPECIAL ALEX",
+    "startButton": "EMPEZAR LOS 7 NIVELES",
+    "levelCompleted": "¡NIVEL SUPERADO!",
+    "progress": "NIVEL {{current}} DE {{total}} COMPLETADO",
+    "playNextLevel": "JUGAR AL NIVEL {{level}}",
+    "exit": "VOLVER AL INICIO"
   },
   "wordFeedback": {
     "buttonText": "¿FALTA ALGO?",

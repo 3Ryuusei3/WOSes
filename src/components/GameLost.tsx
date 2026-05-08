@@ -22,10 +22,13 @@ import useRealtimeConnection from "../hooks/useRealtimeConnection";
 import useRoomManager from "../hooks/useRoomManager";
 
 import gameOverSound from "../assets/gameover.mp3";
+import winSound from "../assets/win.mp3";
 import { START_TIME } from "../constant";
+import { ALEX_FINAL_TITLE, ALEX_FINAL_SUBTITLE } from "../constant/alex";
 import { subscribeToRoom } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
 import { countLetters, canFormWord } from "../utils";
+import useAlexRun from "../hooks/useAlexRun";
 
 export default function GameLost() {
   const { t } = useTranslation();
@@ -63,8 +66,12 @@ export default function GameLost() {
     currentChallengeNumber,
     dailyChallengeOriginalDifficulty,
     gameTime,
+    alexCompleted,
   } = useGameStore();
 
+  const { resetAlexRun } = useAlexRun();
+  const isAlex = gameDifficulty === "alex";
+  const isAlexCompleted = isAlex && alexCompleted;
   const isDailyChallenge = gameDifficulty === "daily";
   const isDailyChallengeCompleted =
     isDailyChallenge &&
@@ -137,7 +144,18 @@ export default function GameLost() {
     };
   };
 
+  const handleAlexExit = () => {
+    resetAlexRun();
+    resetGameState();
+    setMode("start");
+    navigate("/game");
+  };
+
   const handlePlayAgain = async () => {
+    if (isAlex) {
+      handleAlexExit();
+      return;
+    }
     if (players === "multi" && role === "host") {
       setIsCreatingRoom(true);
       try {
@@ -189,7 +207,7 @@ export default function GameLost() {
 
   useEffect(() => {
     if (!audioRef.current) {
-      audioRef.current = new Audio(gameOverSound);
+      audioRef.current = new Audio(isAlexCompleted ? winSound : gameOverSound);
       audioRef.current.volume = volume;
 
       audioRef.current.addEventListener(
@@ -310,7 +328,21 @@ export default function GameLost() {
           dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
         />
       </div>
-      {isDailyChallenge ? (
+      {isAlex ? (
+        <>
+          <h1 className={isAlexCompleted ? "won" : "lost"}>
+            {ALEX_FINAL_TITLE}
+          </h1>
+          {isAlexCompleted && (
+            <h3 className="highlight txt-center">{ALEX_FINAL_SUBTITLE}</h3>
+          )}
+          <div className="h-section gap-xs f-jc-c mb-sm mt-sm">
+            <button className="btn" onClick={handleAlexExit}>
+              {t("alex.exit")}
+            </button>
+          </div>
+        </>
+      ) : isDailyChallenge ? (
         <>
           <h1 className={isDailyChallengeCompleted ? "won" : "lost"}>
             {isDailyChallengeCompleted

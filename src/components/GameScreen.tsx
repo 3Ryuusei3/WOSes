@@ -65,6 +65,9 @@ export default function GameScreen() {
     setPreviousRoundsWords,
     currentChallengeNumber,
     dailyChallengeOriginalDifficulty,
+    alexLevels,
+    alexCurrentLevelIndex,
+    setAlexCompleted,
   } = useGameStore();
 
   const isPlayer = players === "multi" && role === "player";
@@ -347,6 +350,20 @@ export default function GameScreen() {
       return;
     }
 
+    if (gameDifficulty === "alex") {
+      const isLastLevel = alexCurrentLevelIndex >= alexLevels.length - 1;
+
+      if (isLastLevel) {
+        setAlexCompleted(true);
+        updateLastLevelWordsAndPoints();
+        setMode("lost");
+        return;
+      }
+
+      advanceToNextLevel(1);
+      return;
+    }
+
     if (await hasCompletedLevel()) {
       const levelsAdded = gameEngine.getLevelAdvanceInfo(
         levelStats.completionPercentage,
@@ -383,6 +400,11 @@ export default function GameScreen() {
     roomCode,
     gameDifficulty,
     gameEngine,
+    alexCurrentLevelIndex,
+    alexLevels.length,
+    setAlexCompleted,
+    setMode,
+    updateLastLevelWordsAndPoints,
   ]);
 
   useEffect(() => {
