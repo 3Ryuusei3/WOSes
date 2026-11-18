@@ -40,6 +40,7 @@ export default function GameStart() {
     setRoomCode,
     setRole,
     setRoomId,
+    setPlayerId,
     setTotalPoints,
     setGameMechanics,
     setGameTime,
@@ -130,6 +131,7 @@ export default function GameStart() {
       if (!result.error && result.data) {
         setRole("host");
         setRoomId(result.data.roomId);
+        setPlayerId(result.data.playerId);
         navigate(`/game?id=${roomCode}`);
       } else {
         setError(true);

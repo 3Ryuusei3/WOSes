@@ -14,9 +14,7 @@ import ReconnectButton from "../atoms/ReconnectButton";
 import useRemoveSeconds from "../hooks/useRemoveSeconds";
 import useRandomWords from "../hooks/useRandomWords";
 import useSetMechanics from "../hooks/useSetMechanics";
-import useRoomStateSync from "../hooks/useRoomStateSync";
 import useRealtimeConnection from "../hooks/useRealtimeConnection";
-import useSyncManager from "../hooks/useSyncManager";
 
 import useGameStore from "../store/useGameStore";
 
@@ -24,11 +22,8 @@ import levelPassedSound from "../assets/win.mp3";
 
 import { LEVELS_TO_ADVANCE } from "../constant";
 import PlayersPanel from "../atoms/PlayersPanel";
-import { subscribeToRoom, startRoomWithWord } from "../services/multiplayer";
-import useLanguageWords from "../hooks/useLanguageWords";
+import { startRound } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
-import Difficulty from "../types/Difficulty";
-import { countLetters, canFormWord } from "../utils";
 
 export default function GameLobby() {
   const {
@@ -44,21 +39,13 @@ export default function GameLobby() {
     gameDifficulty,
     players,
     role,
-    roomId,
     roomCode,
     randomWord,
-    setRandomWord,
-    setPossibleWords,
-    setHiddenLetterIndex,
     numberOfRounds,
     numberOfPerfectRounds,
     volume,
-    setGameDifficulty,
     dailyChallengeOriginalDifficulty,
   } = useGameStore();
-
-  const { words } = useLanguageWords(gameDifficulty);
-  const syncManager = useSyncManager();
 
   const isPlayer = players === "multi" && role === "player";
 
@@ -70,7 +57,7 @@ export default function GameLobby() {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const seededRef = useRef<boolean>(false);
+  const [isAdvancing, setIsAdvancing] = useState(false);
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -94,10 +81,6 @@ export default function GameLobby() {
   }, [volume]);
 
   useEffect(() => {
-    seededRef.current = false;
-  }, []);
-
-  useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
@@ -114,72 +97,23 @@ export default function GameLobby() {
   useRandomWords(gameDifficulty);
   const secondsToRemove = useRemoveSeconds();
 
-  const handleStateSync = useCallback(
-    (newState: {
-      state?: string;
-      current_word?: string;
-      difficulty?: string;
-    }) => {
-      if (newState.difficulty) {
-        setGameDifficulty(newState.difficulty as Difficulty);
-      }
-
-      if (
-        newState.current_word &&
-        (newState.state === "loading" || newState.state === "game")
-      ) {
-        setRandomWord(newState.current_word);
-        const lettersCount = countLetters(newState.current_word);
-        const filteredWords = (words || []).filter(
-          (word) => word.length >= 4 && word.length <= 9,
-        );
-        const possible = filteredWords.filter((w) =>
-          canFormWord(countLetters(w), lettersCount),
-        );
-        possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-        setPossibleWords(possible);
-        setHiddenLetterIndex(
-          Math.floor(Math.random() * newState.current_word.length),
-        );
-      }
-
-      if (newState.state === "loading") {
-        setMode("loading");
-      } else if (newState.state === "game") {
-        setMode("game");
-      } else if (newState.state === "lost") {
-        setMode("lost");
-      }
-    },
-    [
-      words,
-      setGameDifficulty,
-      setRandomWord,
-      setPossibleWords,
-      setHiddenLetterIndex,
-      setMode,
-    ],
-  );
-
-  const { syncNow, isSyncing } = useRoomStateSync(roomId, handleStateSync);
-
-  // Detectar estado de conexión y auto-sincronizar al reconectar
-  const { status: connectionStatus } = useRealtimeConnection({
-    onReconnect: () => {
-      if (isPlayer) {
-        syncNow();
-      }
-    },
-  });
+  const {
+    status: connectionStatus,
+    syncNow,
+    isSyncing,
+  } = useRealtimeConnection();
 
   const showReconnectButton = isPlayer;
 
   const handleAdvance = useCallback(async () => {
-    if (!canAdvance) return;
+    if (!canAdvance || isAdvancing) return;
 
     if (players === "multi" && role === "host" && roomCode && randomWord) {
+      setIsAdvancing(true);
       try {
-        const { error } = await startRoomWithWord(roomCode, randomWord);
+        // gameTime ya incluye los segundos ganados/perdidos de esta ronda
+        const { gameTime: duration } = useGameStore.getState();
+        const { error } = await startRound(roomCode, randomWord, duration);
 
         if (error) {
           showToast(
@@ -190,96 +124,17 @@ export default function GameLobby() {
           return;
         }
 
-        // Usar SyncManager para sembrar palabras
-        let seedingSuccess = false;
-        try {
-          const seedResult = await syncManager.seedWords(
-            roomCode,
-            randomWord,
-            words || [],
-          );
-          seedingSuccess = !seedResult.error;
-
-          if (seedResult.error) {
-            console.error("Error seeding words in lobby:", seedResult.error);
-            showToast(
-              "Advertencia: algunas palabras podrían no sincronizarse",
-              "warning",
-              3000,
-            );
-          }
-        } catch (err) {
-          console.error("Error seeding words in lobby:", err);
-          showToast(
-            "Advertencia: problema al sincronizar palabras",
-            "warning",
-            3000,
-          );
-        }
-
-        if (seedingSuccess) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-
         setMode("loading");
       } catch (err) {
         console.error("Unexpected error advancing round:", err);
         showToast("Error inesperado al avanzar de nivel", "error");
+      } finally {
+        setIsAdvancing(false);
       }
     } else {
       setMode("loading");
     }
-  }, [
-    canAdvance,
-    players,
-    role,
-    roomCode,
-    randomWord,
-    setMode,
-    words,
-    syncManager,
-  ]);
-
-  useEffect(() => {
-    if (!roomId) return;
-    const channel = subscribeToRoom(roomId, (payload: any) => {
-      const newRoom = payload.new as any;
-      const newState = newRoom?.state;
-      const currentWord = newRoom?.current_word as string | null;
-
-      if (newState === "lobby") {
-        return;
-      }
-
-      if (currentWord && (newState === "loading" || newState === "game")) {
-        setRandomWord(currentWord);
-        const lettersCount = countLetters(currentWord);
-        const filteredWords = (words || []).filter(
-          (word) => word.length >= 4 && word.length <= 9,
-        );
-        const possible = filteredWords.filter((w) =>
-          canFormWord(countLetters(w), lettersCount),
-        );
-        possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-        setPossibleWords(possible);
-        setHiddenLetterIndex(Math.floor(Math.random() * currentWord.length));
-      }
-
-      if (newState === "loading") setMode("loading");
-      else if (newState === "game") setMode("game");
-      else if (newState === "lost") setMode("lost");
-    });
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [
-    roomId,
-    setMode,
-    setRandomWord,
-    setPossibleWords,
-    setHiddenLetterIndex,
-    words,
-  ]);
+  }, [canAdvance, isAdvancing, players, role, roomCode, randomWord, setMode]);
 
   if (players === "multi" && role === "player") {
     return (
@@ -370,8 +225,8 @@ export default function GameLobby() {
       <div className="h-section gap-xs f-jc-c mb-sm">
         <button
           onClick={handleAdvance}
-          disabled={!canAdvance}
-          className={!canAdvance ? "btn button-disabled" : "btn"}
+          disabled={!canAdvance || isAdvancing}
+          className={!canAdvance || isAdvancing ? "btn button-disabled" : "btn"}
         >
           {t("lobby.playLevel", { level })}
         </button>

@@ -7,10 +7,8 @@ import HostGameView from "./game/HostGameView";
 import useShuffledWord from "./../hooks/useShuffledWord";
 import useInputWords from "./../hooks/useInputWords";
 import useProgressBar from "./../hooks/useProgressBar";
-import useRoomStateSync from "../hooks/useRoomStateSync";
 import useRealtimeConnection from "../hooks/useRealtimeConnection";
 import useGameEngine from "../hooks/useGameEngine";
-import useSyncManager from "../hooks/useSyncManager";
 
 import useGameStore from "../store/useGameStore";
 
@@ -25,14 +23,17 @@ import goalSound from "../assets/goal.mp3";
 import revealSound from "../assets/reveal.mp3";
 import endSound from "../assets/end.mp3";
 import {
-  subscribeToCorrectWords,
-  getPlayerNameById,
   finishRoundToLobby,
   finishRoundToLost,
-  getLatestRoundId,
-  getRoundWords,
-  subscribeToRoom,
+  withRetry,
 } from "../services/multiplayer";
+import {
+  roomRealtime,
+  useRoomRealtimeStore,
+  selectCurrentRoundWords,
+  serverIsoToLocalMs,
+} from "../realtime/roomRealtime";
+import { showToast } from "../atoms/Toast";
 
 export default function GameScreen() {
   const { i18n } = useTranslation();
@@ -42,7 +43,6 @@ export default function GameScreen() {
     role,
     players,
     roomCode,
-    roomId,
     playerId,
     setMode,
     gameTime,
@@ -72,7 +72,21 @@ export default function GameScreen() {
 
   const showLettersPercentage = calculateProbability(level, SHOW_LETTERS_RANGE);
 
-  const { percentage, timeLeft } = useProgressBar(gameTime);
+  // Multijugador: todos los dispositivos cuentan desde la hora de inicio de la
+  // ronda en el servidor y con la misma duración (la que fijó el host).
+  const rtRound = useRoomRealtimeStore((s) => s.round);
+  const clockOffsetMs = useRoomRealtimeStore((s) => s.clockOffsetMs);
+  const isMulti = players === "multi";
+  const roundDuration =
+    isMulti && rtRound?.duration_seconds ? rtRound.duration_seconds : gameTime;
+  const roundStartedAtMs =
+    isMulti && rtRound?.started_at
+      ? serverIsoToLocalMs(rtRound.started_at, clockOffsetMs)
+      : undefined;
+  const { percentage, timeLeft } = useProgressBar(
+    roundDuration,
+    roundStartedAtMs,
+  );
   const shuffledWordObject = useShuffledWord(
     randomWord,
     gameMechanics,
@@ -93,7 +107,6 @@ export default function GameScreen() {
     clearInput,
   } = useInputWords(possibleWords);
   const gameEngine = useGameEngine();
-  const syncManager = useSyncManager();
 
   // Calcular estadísticas del nivel usando GameEngine
   const levelStats = useMemo(() => {
@@ -107,78 +120,22 @@ export default function GameScreen() {
   const [hasPlayedRevealSound, setHasPlayedRevealSound] = useState(false);
   const [hasPlayedEndSound, setHasPlayedEndSound] = useState(false);
   const hasCalledEndOfLevelRef = useRef(false);
-  const wordsChannelRef = useRef<ReturnType<
-    typeof subscribeToCorrectWords
-  > | null>(null);
-  const roomChannelRef = useRef<ReturnType<typeof subscribeToRoom> | null>(
-    null,
-  );
-  const markWordGuessedRef = useRef(markWordGuessed);
-  const currentRoundIdRef = useRef<number | null>(null);
   const hostPrevGuessedRef = useRef<number>(0);
   const isEndingLevelRef = useRef<boolean>(false);
   const wordsRef = useRef(words);
 
   const playerRoundPoints = 0; // Ahora se calcula en PlayerGameView
 
-  // Mantener refs actualizados
   useEffect(() => {
-    markWordGuessedRef.current = markWordGuessed;
     wordsRef.current = words;
-  }, [markWordGuessed, words]);
+  }, [words]);
 
-  // Sincronización MANUAL para jugadores (solo cuando presionan botón)
-  const handleGameStateSync = useCallback(
-    async (newState: {
-      state?: string;
-      current_word?: string;
-      difficulty?: string;
-    }) => {
-      if (newState.state === "lobby" || newState.state === "lost") {
-        if (currentRoundIdRef.current && roomId) {
-          try {
-            // Usar SyncManager para sincronizar estado completo
-            const updatedWords = await syncManager.syncCompleteRoundState(
-              roomId,
-              currentRoundIdRef.current,
-              wordsRef.current,
-              [],
-            );
-
-            setLastLevelWords(updatedWords);
-          } catch (error) {
-            setLastLevelWords(wordsRef.current);
-          }
-        }
-        setLastRoundPoints(0);
-      }
-
-      if (newState.state === "lobby") {
-        setMode("lobby");
-      } else if (newState.state === "lost") {
-        setMode("lost");
-      }
-    },
-    [setMode, roomId, setLastLevelWords, setLastRoundPoints, syncManager],
-  );
-
-  const { syncNow, isSyncing } = useRoomStateSync(roomId, handleGameStateSync);
-
-  // Detectar estado de conexión y auto-sincronizar al reconectar
-  const { status: connectionStatus } = useRealtimeConnection({
-    onReconnect: () => {
-      if (isPlayer) {
-        syncNow();
-      }
-    },
-  });
-
-  // Mostrar botón siempre para jugadores
+  const {
+    status: connectionStatus,
+    syncNow,
+    isSyncing,
+  } = useRealtimeConnection();
   const showReconnectButton = isPlayer;
-
-  useEffect(() => {
-    markWordGuessedRef.current = markWordGuessed;
-  }, [markWordGuessed]);
 
   // Resetear la bandera al entrar en modo game (nueva ronda)
   useEffect(() => {
@@ -229,40 +186,26 @@ export default function GameScreen() {
   );
 
   const hasCompletedLevel = useCallback(async () => {
-    // En multiplayer, el host debe verificar el conteo del servidor, no su estado local
-    if (players === "multi" && role === "host" && roomId) {
-      try {
-        const { data: roundId } = await getLatestRoundId(roomId);
-        if (roundId) {
-          const { data: roundWords } = await getRoundWords(roomId, roundId);
-          if (roundWords) {
-            const serverCorrectWords = roundWords
-              .filter((w) => w.status === "correct")
-              .map((w) => w.word);
-
-            const serverStats = gameEngine.getCurrentLevelStats(
-              possibleWords,
-              serverCorrectWords,
-            );
-
-            return serverStats.hasReachedGoal || serverStats.isPerfect;
-          }
-        }
-      } catch (error) {
-        console.error("Error checking server completion status:", error);
-      }
+    // En multijugador el host comprueba con las palabras del servidor
+    if (players === "multi" && role === "host") {
+      await roomRealtime.resync();
+      const serverCorrect = selectCurrentRoundWords(
+        useRoomRealtimeStore.getState(),
+      ).map((w) => w.word);
+      const merged = Array.from(new Set([...serverCorrect, ...correctWords]));
+      const serverStats = gameEngine.getCurrentLevelStats(possibleWords, merged);
+      return serverStats.hasReachedGoal || serverStats.isPerfect;
     }
 
-    // Fallback para singleplayer o en caso de error
     return hasReachedGoal || levelStats.isPerfect;
   }, [
     hasReachedGoal,
     levelStats.isPerfect,
     players,
     role,
-    roomId,
     gameEngine,
     possibleWords,
+    correctWords,
   ]);
 
   const advanceToNextLevel = useCallback(
@@ -356,18 +299,26 @@ export default function GameScreen() {
       advanceToNextLevel(levelsAdded);
 
       if (players === "multi" && role === "host" && roomCode) {
-        finishRoundToLobby(roomCode);
+        const { error } = await withRetry(() => finishRoundToLobby(roomCode));
+        if (error) {
+          showToast("No se pudo avisar a los jugadores del fin de ronda", "error");
+        }
       }
     } else {
       endGameAndSaveScore(finalPoints);
       if (players === "multi" && role === "host" && roomCode) {
-        finishRoundToLost(
-          roomCode,
-          level,
-          finalPoints,
-          numberOfRounds,
-          numberOfPerfectRounds,
+        const { error } = await withRetry(() =>
+          finishRoundToLost(
+            roomCode,
+            level,
+            finalPoints,
+            numberOfRounds,
+            numberOfPerfectRounds,
+          ),
         );
+        if (error) {
+          showToast("No se pudo avisar a los jugadores del fin de partida", "error");
+        }
       }
     }
   }, [
@@ -383,6 +334,8 @@ export default function GameScreen() {
     roomCode,
     gameDifficulty,
     gameEngine,
+    numberOfRounds,
+    numberOfPerfectRounds,
   ]);
 
   useEffect(() => {
@@ -446,71 +399,19 @@ export default function GameScreen() {
     }
   }, [words, players, role, effectiveVolume]);
 
-  // Suscripción a correct words para la ronda actual únicamente
+  // Palabras acertadas de la ronda (vienen del servidor vía roomRealtime)
+  const roundCorrectWords = useRoomRealtimeStore(selectCurrentRoundWords);
   useEffect(() => {
-    (async () => {
-      if (roomId && !wordsChannelRef.current) {
-        const { data: currentRoundId } = await getLatestRoundId(roomId);
-        currentRoundIdRef.current = currentRoundId ?? null;
-
-        if (currentRoundIdRef.current) {
-          // Usar SyncManager para cargar palabras con retry
-          const roundWords = await syncManager.loadRoundWordsWithRetry(
-            roomId,
-            currentRoundIdRef.current,
-          );
-
-          if (roundWords) {
-            // Marcar las correctas de inicio
-            for (const rw of roundWords) {
-              if (rw.status === "correct") {
-                markWordGuessedRef.current(rw.word, "");
-              }
-            }
-          } else {
-            console.warn("Failed to load round words after multiple attempts");
-          }
-        }
-        wordsChannelRef.current = subscribeToCorrectWords(
-          roomId,
-          async (payload: any) => {
-            const newRow = payload.new;
-            if (
-              newRow &&
-              newRow.status === "correct" &&
-              newRow.round_id === currentRoundIdRef.current
-            ) {
-              let name = "";
-              if (newRow.player_id) {
-                const { data } = await getPlayerNameById(newRow.player_id);
-                name = (data as any)?.name || "";
-              }
-              // Host: play success sound immediately on new correct
-              const state = useGameStore.getState();
-              if (state.players === "multi" && state.role === "host") {
-                if (!hitAudioRef.current) {
-                  hitAudioRef.current = new Audio(hitSound);
-                }
-                if (hitAudioRef.current && effectiveVolume > 0) {
-                  try {
-                    hitAudioRef.current.currentTime = 0;
-                    await hitAudioRef.current.play();
-                  } catch (_) {}
-                }
-              }
-              markWordGuessedRef.current(newRow.word, name);
-            }
-          },
-        );
-      }
-    })();
-    return () => {
-      if (wordsChannelRef.current) {
-        wordsChannelRef.current.unsubscribe();
-        wordsChannelRef.current = null;
-      }
-    };
-  }, [roomId]);
+    if (players !== "multi") return;
+    const guessed = new Set(
+      wordsRef.current.filter((w) => w.guessed).map((w) => w.word),
+    );
+    for (const cw of roundCorrectWords) {
+      if (!guessed.has(cw.word)) markWordGuessed(cw.word, cw.player_name);
+    }
+    // markWordGuessed cambia en cada render; solo nos interesan palabras nuevas
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roundCorrectWords, players]);
 
   // Gestión principal de fin de nivel y sonidos
   useEffect(() => {
@@ -588,78 +489,6 @@ export default function GameScreen() {
     handleEndOfLevel,
     players,
     role,
-  ]);
-
-  // Sincronización en tiempo real del estado de la room (para multiplayer)
-  useEffect(() => {
-    if (!roomId || players !== "multi") return;
-
-    if (!roomChannelRef.current) {
-      roomChannelRef.current = subscribeToRoom(roomId, async (payload: any) => {
-        const newState = (payload.new as any)?.state as string | undefined;
-
-        if (!newState) return;
-
-        // Prevenir transiciones redundantes
-        if (
-          (newState === "loading" && mode === "loading") ||
-          (newState === "game" && mode === "game") ||
-          (newState === "lobby" && mode === "lobby") ||
-          (newState === "lost" && mode === "lost")
-        ) {
-          return;
-        }
-
-        // Players: cargar palabras del servidor antes de cambiar a lobby/lost
-        if (
-          role === "player" &&
-          (newState === "lobby" || newState === "lost")
-        ) {
-          if (currentRoundIdRef.current) {
-            try {
-              // Usar SyncManager para sincronizar estado completo
-              const updatedWords = await syncManager.syncCompleteRoundState(
-                roomId,
-                currentRoundIdRef.current,
-                wordsRef.current,
-                [],
-              );
-
-              setLastLevelWords(updatedWords);
-            } catch (error) {
-              setLastLevelWords(wordsRef.current);
-            }
-          }
-          setLastRoundPoints(playerRoundPoints);
-        }
-
-        if (newState === "loading") {
-          setMode("loading");
-        } else if (newState === "game") {
-          setMode("game");
-        } else if (newState === "lobby") {
-          setMode("lobby");
-        } else if (newState === "lost") {
-          setMode("lost");
-        }
-      });
-    }
-
-    return () => {
-      if (roomChannelRef.current) {
-        roomChannelRef.current.unsubscribe();
-        roomChannelRef.current = null;
-      }
-    };
-  }, [
-    roomId,
-    players,
-    role,
-    mode,
-    setMode,
-    playerRoundPoints,
-    setLastLevelWords,
-    setLastRoundPoints,
   ]);
 
   return (

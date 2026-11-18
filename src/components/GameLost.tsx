@@ -23,7 +23,6 @@ import useRoomManager from "../hooks/useRoomManager";
 
 import gameOverSound from "../assets/gameover.mp3";
 import { START_TIME } from "../constant";
-import { subscribeToRoom } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
 import { countLetters, canFormWord } from "../utils";
 
@@ -55,7 +54,6 @@ export default function GameLost() {
     setRoomCode,
     setRoomId,
     setPlayerId,
-    roomId,
     setRandomWord,
     setPossibleWords,
     setHiddenLetterIndex,
@@ -75,7 +73,6 @@ export default function GameLost() {
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [rankingPopupOpen, setRankingPopupOpen] = useState(false);
-  const roomChannelRef = useRef<any>(null);
   const { words } = useLanguageWords(gameDifficulty);
   const { forceReconnect, isConnected } = useRealtimeConnection();
   const roomManager = useRoomManager();
@@ -223,61 +220,6 @@ export default function GameLost() {
       audioRef.current.volume = volume;
     }
   }, [volume]);
-
-  // Escuchar cambios en la sala para detectar new_room_code
-  useEffect(() => {
-    if (players === "multi" && role === "player" && roomId) {
-      roomChannelRef.current = subscribeToRoom(roomId, (payload: any) => {
-        const newRoom = payload.new as any;
-        const newRoomCode = newRoom?.new_room_code as string | undefined;
-
-        if (newRoomCode) {
-          showToast("El anfitrión ha creado una nueva sala", "info", 3000);
-
-          resetGameState();
-          setMode("room");
-          setRoomCode(newRoomCode);
-          setRoomId(null);
-          setPlayerId(null);
-
-          setRandomWord("");
-          setPossibleWords([]);
-          setHiddenLetterIndex(0);
-
-          setTimeout(() => {
-            navigate(`/game?id=${newRoomCode}`);
-          }, 1000);
-        }
-      });
-    }
-
-    return () => {
-      if (roomChannelRef.current) {
-        roomChannelRef.current.unsubscribe();
-        roomChannelRef.current = null;
-      }
-    };
-  }, [
-    players,
-    role,
-    roomId,
-    navigate,
-    setMode,
-    setRoomCode,
-    setRoomId,
-    setPlayerId,
-    setTotalPoints,
-    setLevel,
-    setGameMechanics,
-    setGameTime,
-    setNumberOfPerfectRounds,
-    setNumberOfRounds,
-    setLevelsToAdvance,
-    setRandomWord,
-    setPossibleWords,
-    setHiddenLetterIndex,
-    setPreviousRoundsWords,
-  ]);
 
   if (players === "multi" && role === "player") {
     return (

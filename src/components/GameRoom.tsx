@@ -1,26 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { useNavigate } from "react-router-dom";
 import useGameStore from "../store/useGameStore";
-import useLanguageWords from "../hooks/useLanguageWords";
 import useRandomWords from "../hooks/useRandomWords";
-import {
-  getRoomPlayers,
-  subscribeToRoomPlayers,
-  startRoomWithWord,
-  joinRoomAsPlayer,
-  subscribeToRoom,
-  seedRoundWords,
-} from "../services/multiplayer";
+import { startRound, joinRoomAsPlayer } from "../services/multiplayer";
+import { useRoomRealtimeStore } from "../realtime/roomRealtime";
+import { saveRoomSession } from "../realtime/roomSession";
 import { isValidPlayerName } from "../utils";
 import { useTranslation } from "react-i18next";
-import { supabase } from "../lib/supabase";
-import Difficulty from "../types/Difficulty";
 import { showToast } from "../atoms/Toast";
 
 export default function GameRoom() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const {
     roomCode,
     playerName,
@@ -31,145 +21,23 @@ export default function GameRoom() {
     setRoomId,
     setMode,
     randomWord,
-    setRandomWord,
-    setPossibleWords,
-    setHiddenLetterIndex,
     gameDifficulty,
     setPlayers,
     setPlayerId,
-    setGameDifficulty,
-    setRoomCode,
   } = useGameStore();
-  const { words } = useLanguageWords(gameDifficulty);
 
-  // Generate random word for multiplayer (respecting difficulty rules)
+  // Genera la palabra de la primera ronda (solo host; respeta la dificultad)
   useRandomWords(gameDifficulty);
 
-  const [roomPlayers, setRoomPlayers] = useState<
-    { id: number; name: string; score: number; role: "host" | "player" }[]
-  >([]);
-  const playersChannelRef = useRef<ReturnType<
-    typeof subscribeToRoomPlayers
-  > | null>(null);
-  const roomChannelRef = useRef<ReturnType<typeof subscribeToRoom> | null>(
-    null,
-  );
+  // Jugadores y presencia vienen de la capa de tiempo real (useRoomSync)
+  const roomPlayers = useRoomRealtimeStore((s) => s.players);
+  const online = useRoomRealtimeStore((s) => s.online);
+  const presenceReady = useRoomRealtimeStore((s) => s.presenceReady);
   const [nameError, setNameError] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
 
   const isHost = role === "host";
-
-  useEffect(() => {
-    if (roomId) {
-      getRoomPlayers(roomId).then(({ data }) => {
-        if (data) setRoomPlayers(data);
-      });
-
-      supabase
-        .from("rooms")
-        .select("difficulty")
-        .eq("id", roomId)
-        .single()
-        .then(({ data }) => {
-          if (data && data.difficulty) {
-            setGameDifficulty(data.difficulty as Difficulty);
-          }
-        });
-
-      if (!playersChannelRef.current) {
-        playersChannelRef.current = subscribeToRoomPlayers(roomId, () => {
-          getRoomPlayers(roomId).then(({ data }) => {
-            if (data) setRoomPlayers(data);
-          });
-        });
-      }
-
-      if (!roomChannelRef.current) {
-        roomChannelRef.current = subscribeToRoom(roomId, (payload) => {
-          const newRoom = payload.new as any;
-          const newState = newRoom?.state;
-          const newDifficulty = newRoom?.difficulty as Difficulty | undefined;
-          const newRoomCode = newRoom?.new_room_code as string | undefined;
-
-          if (newRoomCode && role === "player") {
-            showToast("El anfitrión ha creado una nueva sala", "info", 3000);
-
-            setMode("room");
-            setRoomCode(newRoomCode);
-            setRoomId(null);
-            setPlayerId(null);
-
-            setTimeout(() => {
-              navigate(`/game?id=${newRoomCode}`);
-            }, 1000);
-            return;
-          }
-
-          if (newState === "room") {
-            return;
-          }
-          if (newDifficulty) {
-            setGameDifficulty(newDifficulty);
-          }
-
-          const currentWord = newRoom?.current_word as string | null;
-          if (currentWord) {
-            setRandomWord(currentWord);
-            const countLetters = (w: string) =>
-              w.split("").reduce((acc: any, l: string) => {
-                acc[l] = (acc[l] || 0) + 1;
-                return acc;
-              }, {});
-            const canFormWord = (wc: any, lc: any) =>
-              Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
-            const lettersCount = countLetters(currentWord);
-            // Filter words by length first (same as useRandomWords)
-            const filteredWords = (words || []).filter(
-              (word) => word.length >= 4 && word.length <= 9,
-            );
-            const possible = filteredWords.filter((w) =>
-              canFormWord(countLetters(w), lettersCount),
-            );
-            possible.sort((a, b) => a.length - b.length || a.localeCompare(b));
-            setPossibleWords(possible);
-            setHiddenLetterIndex(
-              Math.floor(Math.random() * currentWord.length),
-            );
-          }
-
-          if (newState === "loading") {
-            setMode("loading");
-          } else if (newState === "game") {
-            setMode("game");
-          } else if (newState === "lobby") {
-            setMode("lobby");
-          } else if (newState === "lost") {
-            setMode("lost");
-          }
-        });
-      }
-    }
-
-    return () => {
-      if (playersChannelRef.current) playersChannelRef.current.unsubscribe();
-      playersChannelRef.current = null;
-      if (roomChannelRef.current) roomChannelRef.current.unsubscribe();
-      roomChannelRef.current = null;
-    };
-  }, [
-    roomId,
-    role,
-    setGameDifficulty,
-    setRandomWord,
-    setPossibleWords,
-    setHiddenLetterIndex,
-    setMode,
-    setRoomCode,
-    setRoomId,
-    setPlayerId,
-    navigate,
-    words,
-  ]);
 
   const nonHostPlayers = useMemo(
     () => roomPlayers.filter((p) => p.role !== "host"),
@@ -179,71 +47,25 @@ export default function GameRoom() {
   const canStart = nonHostPlayers.length >= 1;
 
   const handleStart = async () => {
-    if (!roomCode || !canStart) return;
-
+    if (!roomCode || !canStart || isStarting || !randomWord) return;
+    setIsStarting(true);
     try {
-      const currentWord = randomWord || "";
-      const { data, error } = await startRoomWithWord(roomCode, currentWord);
+      const { gameTime } = useGameStore.getState();
+      const { data, error } = await startRound(roomCode, randomWord, gameTime);
 
-      if (error) {
-        showToast("Error al iniciar la partida: " + error.message, "error");
-        return;
-      }
-
-      if (!data) {
-        showToast("No se pudo iniciar la partida", "error");
-        return;
-      }
-
-      let seedingSuccess = false;
-      try {
-        if (words && words.length > 0) {
-          // Use the same logic as useRandomWords to ensure possibleWords has proper range
-          const countLetters = (w: string) =>
-            w.split("").reduce((acc: any, l: string) => {
-              acc[l] = (acc[l] || 0) + 1;
-              return acc;
-            }, {});
-          const canFormWord = (wc: any, lc: any) =>
-            Object.keys(wc).every((k) => (lc[k] || 0) >= wc[k]);
-          const wordCount = countLetters(currentWord);
-          // Filter words that can be formed and have proper length
-          const filteredWords = words.filter(
-            (word) => word.length >= 4 && word.length <= 9,
-          );
-          const possibleWordsList = filteredWords.filter((w) =>
-            canFormWord(countLetters(w), wordCount),
-          );
-          possibleWordsList.sort(
-            (a, b) => a.length - b.length || a.localeCompare(b),
-          );
-
-          const seedResult = await seedRoundWords(roomCode, possibleWordsList);
-          seedingSuccess = !seedResult.error;
-
-          if (seedResult.error) {
-            showToast(
-              "Advertencia: algunas palabras podrían no sincronizarse",
-              "warning",
-              3000,
-            );
-          }
-        }
-      } catch (err) {
+      if (error || !data) {
         showToast(
-          "Advertencia: problema al sincronizar palabras",
-          "warning",
-          3000,
+          "Error al iniciar la partida" + (error ? ": " + error.message : ""),
+          "error",
         );
-      }
-
-      if (seedingSuccess) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        return;
       }
 
       setMode("loading");
-    } catch (err) {
+    } catch {
       showToast("Error inesperado al iniciar la partida", "error");
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -262,17 +84,13 @@ export default function GameRoom() {
         setRoomId(data.room.id);
         setPlayerId(data.player.id);
         setPlayers("multi");
-
-        const { data: roomRow } = await supabase
-          .from("rooms")
-          .select("difficulty")
-          .eq("id", data.room.id)
-          .single();
-
-        const diff = (roomRow as any)?.difficulty as Difficulty | undefined;
-        if (diff) {
-          setGameDifficulty(diff);
-        }
+        saveRoomSession({
+          code: roomCode,
+          roomId: data.room.id,
+          playerId: data.player.id,
+          name: playerName,
+        });
+        // La dificultad y el estado de la sala llegan con el snapshot
       } else if (error) {
         setJoinError(error.message || "No se puede acceder a la sala");
       }
@@ -311,7 +129,7 @@ export default function GameRoom() {
                 <div className="v-section gap-sm f-jc-c f-ai-c">
                   <button
                     className={`btn ${canStart ? "btn--win" : "btn--lose"}`}
-                    disabled={!canStart}
+                    disabled={!canStart || isStarting}
                     onClick={handleStart}
                   >
                     EMPEZAR PARTIDA
@@ -339,6 +157,16 @@ export default function GameRoom() {
                           <h4 className="highlight" key={player.id}>
                             {player.name}
                           </h4>
+                          {presenceReady && (
+                            <span
+                              className={`presence-dot ${online[`player:${player.id}`] ? "presence-dot--online" : ""}`}
+                              title={
+                                online[`player:${player.id}`]
+                                  ? "Conectado"
+                                  : "Desconectado"
+                              }
+                            />
+                          )}
                           <h4 className="unguessed ml-auto">{player.score}</h4>
                         </div>
                       ))

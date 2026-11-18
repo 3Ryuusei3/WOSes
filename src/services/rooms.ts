@@ -1,9 +1,5 @@
 import { supabase } from "../lib/supabase";
-import {
-  PostgrestError,
-  RealtimeChannel,
-  RealtimePostgresChangesPayload,
-} from "@supabase/supabase-js";
+import { PostgrestError } from "@supabase/supabase-js";
 
 interface ScoreRecord {
   id: number;
@@ -131,48 +127,4 @@ export async function insertScoreWithNextId(
     console.error("Error in insertScoreWithNextId:", error);
     return { data: null, error: error as PostgrestError };
   }
-}
-
-type ScoreRealtimePayload = RealtimePostgresChangesPayload<{
-  id: number;
-  name: string;
-  score: number;
-  level: number;
-  difficulty: string;
-  language: string;
-  created_at: string;
-  updated_at?: string;
-}>;
-
-// Subscribe to realtime changes on the scores table
-export function subscribeToScores(
-  callback: (payload: ScoreRealtimePayload) => void,
-  difficulty?: string,
-  language?: string,
-): RealtimeChannel {
-  // Build filter string for multiple conditions
-  let filter = "";
-  if (difficulty && language) {
-    filter = `difficulty=eq.${difficulty},language=eq.${language}`;
-  } else if (difficulty) {
-    filter = `difficulty=eq.${difficulty}`;
-  } else if (language) {
-    filter = `language=eq.${language}`;
-  }
-
-  const channel = supabase
-    .channel("rooms-changes")
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "rooms",
-        ...(filter ? { filter } : {}),
-      },
-      callback,
-    )
-    .subscribe();
-
-  return channel;
 }

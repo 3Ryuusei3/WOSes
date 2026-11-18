@@ -66,24 +66,3 @@ export const checkIfAlreadyPlayed = async (
 
   return !error && data && data.length > 0;
 };
-
-export const subscribeToDailyChallengeRanking = (
-  callback: () => void,
-  challengeNumber: number
-) => {
-  const channel = supabase
-    .channel("daily_challenge_ranking")
-    .on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "rooms",
-        filter: `difficulty=eq.daily,challenge_number=eq.${challengeNumber}`,
-      },
-      callback
-    )
-    .subscribe();
-
-  return channel;
-};

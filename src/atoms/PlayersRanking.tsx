@@ -1,11 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import { useMemo, useState } from "react";
 
 import useGameStore from "../store/useGameStore";
-import {
-  getRoomPlayers,
-  subscribeToRoomPlayers,
-} from "../services/multiplayer";
+import { useRoomRealtimeStore } from "../realtime/roomRealtime";
 import arrowLeft from "../assets/arrow-left.svg";
 import arrowRight from "../assets/arrow-right.svg";
 
@@ -28,31 +24,14 @@ export default function PlayersRanking({
   sortBy = "score",
   toggleable = false,
 }: PlayersRankingProps) {
-  const { roomId, playerName } = useGameStore();
-  const [players, setPlayers] = useState<Player[]>([]);
-  const channelRef = useRef<RealtimeChannel | null>(null);
+  const { playerName } = useGameStore();
+  // Lista de jugadores y presencia mantenidas por roomRealtime
+  const players = useRoomRealtimeStore((s) => s.players) as Player[];
+  const online = useRoomRealtimeStore((s) => s.online);
+  const presenceReady = useRoomRealtimeStore((s) => s.presenceReady);
   const [showLastRound, setShowLastRound] = useState(
     sortBy === "last_round_score",
   );
-
-  useEffect(() => {
-    if (roomId) {
-      getRoomPlayers(roomId).then(({ data }) => {
-        if (data) setPlayers(data as unknown as Player[]);
-      });
-      if (!channelRef.current) {
-        channelRef.current = subscribeToRoomPlayers(roomId, () => {
-          getRoomPlayers(roomId).then(({ data }) => {
-            if (data) setPlayers(data as unknown as Player[]);
-          });
-        });
-      }
-    }
-    return () => {
-      if (channelRef.current) channelRef.current.unsubscribe();
-      channelRef.current = null;
-    };
-  }, [roomId]);
 
   const nonHostPlayers = useMemo(
     () => players.filter((p) => p.role !== "host"),
@@ -122,6 +101,12 @@ export default function PlayersRanking({
                   {String(index + 1).padStart(2, "0")}
                 </h5>
                 <h5 className={isMe ? "tip" : "highlight"}>{player.name}</h5>
+                {presenceReady && (
+                  <span
+                    className={`presence-dot ${online[`player:${player.id}`] ? "presence-dot--online" : ""}`}
+                    title={online[`player:${player.id}`] ? "Conectado" : "Desconectado"}
+                  />
+                )}
                 <h5 className={isMe ? "tip ml-auto" : "unguessed ml-auto"}>
                   {value}
                 </h5>

@@ -3,21 +3,18 @@ import { useTranslation } from "react-i18next";
 
 import useCountdown from "../hooks/useCountdown";
 import useRandomWords from "../hooks/useRandomWords";
-import { advanceRoomToGame, subscribeToRoom } from "../services/multiplayer";
+import { advanceRoomToGame, withRetry } from "../services/multiplayer";
+import { roomRealtime } from "../realtime/roomRealtime";
 import useGameStore from "../store/useGameStore";
 
 import countdownMusic from "../assets/countdown.mp3";
 
 export default function GameLoading() {
   const { t } = useTranslation();
-  const { volume, role, players, roomCode, roomId, setMode, gameDifficulty } =
-    useGameStore();
+  const { volume, role, players, roomCode, gameDifficulty } = useGameStore();
   const countdown = useCountdown();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const roomChannelRef = useRef<ReturnType<typeof subscribeToRoom> | null>(
-    null,
-  );
   // En multiplayer, la palabra ya está establecida por GameRoom o GameLobby
   // Solo generar palabra en singleplayer
   useRandomWords(gameDifficulty, players === "multi");
@@ -45,28 +42,25 @@ export default function GameLoading() {
     };
   }, [volume]);
 
+  // Fin de la cuenta atrás en multijugador
+  const countdownDone = countdown <= 0;
   useEffect(() => {
-    if (roomId) {
-      if (!roomChannelRef.current) {
-        roomChannelRef.current = subscribeToRoom(roomId, (payload) => {
-          const newState = (payload.new as any)?.state;
-          if (newState === "game") {
-            setMode("game");
-          }
-        });
-      }
-    }
-    return () => {
-      if (roomChannelRef.current) roomChannelRef.current.unsubscribe();
-      roomChannelRef.current = null;
-    };
-  }, [roomId, setMode]);
+    if (!countdownDone || players !== "multi" || !roomCode) return;
 
-  useEffect(() => {
-    if (countdown <= 0 && role === "host" && roomCode) {
-      advanceRoomToGame(roomCode);
+    if (role === "host") {
+      // El host pasa la sala a 'game' (con reintentos si falla la red)
+      void withRetry(() => advanceRoomToGame(roomCode)).then(() =>
+        roomRealtime.resync(),
+      );
     }
-  }, [countdown, role, roomCode]);
+
+    // Si el evento 'game' no llega, lo preguntamos al servidor.
+    // (useRoomSync cambia de pantalla en cuanto el estado sea 'game')
+    const interval = setInterval(() => {
+      void roomRealtime.resync();
+    }, 1500);
+    return () => clearInterval(interval);
+  }, [countdownDone, players, role, roomCode]);
 
   useEffect(() => {
     if (audioRef.current) {

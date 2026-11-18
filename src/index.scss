@@ -1810,6 +1810,22 @@ main {
   }
 }
 
+// Presence (jugador conectado / desconectado)
+.presence-dot {
+  display: inline-block;
+  flex-shrink: 0;
+  align-self: center;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--clr-lose);
+  box-shadow: 0 0 0 2px var(--clr-dark);
+
+  &--online {
+    background-color: var(--clr-win);
+  }
+}
+
 // Connection Status Component
 .connection-status {
   position: fixed;

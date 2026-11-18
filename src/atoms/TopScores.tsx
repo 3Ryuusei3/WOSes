@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import Tooltip from "./Tooltip";
@@ -9,16 +9,9 @@ import TopScore from "../types/TopScore";
 import Difficulty from "../types/Difficulty";
 import { DailyChallengeRankingEntry } from "../types/DailyChallenge";
 
-import {
-  getAllTimeTopScores,
-  getWeeklyTopScores,
-  subscribeToScores,
-} from "../services/rooms";
-import {
-  getDailyChallengeRanking,
-  subscribeToDailyChallengeRanking,
-} from "../services/dailyChallenge";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import { getAllTimeTopScores, getWeeklyTopScores } from "../services/rooms";
+import { getDailyChallengeRanking } from "../services/dailyChallenge";
+import { onScoreAdded } from "../realtime/scoresRealtime";
 
 import { getThisWeekDateRange } from "../utils";
 
@@ -46,7 +39,6 @@ export default function TopScores({
     [],
   );
   const [showAllTime, setShowAllTime] = useState(true);
-  const channelRef = useRef<RealtimeChannel | null>(null);
 
   const isDaily = difficulty === "daily";
   const today = new Date().toLocaleDateString();
@@ -104,26 +96,23 @@ export default function TopScores({
   useEffect(() => {
     fetchScores();
 
-    if (isDaily && challengeNumber) {
-      channelRef.current = subscribeToDailyChallengeRanking(
-        fetchScores,
-        challengeNumber,
-      );
-    } else {
-      channelRef.current = subscribeToScores(
-        () => {
-          fetchScores();
-        },
-        difficulty,
-        i18n.language,
-      );
-    }
+    // Solo recargamos si la nueva puntuación afecta a este ranking
+    let debounce: ReturnType<typeof setTimeout> | null = null;
+    const unsubscribe = onScoreAdded((p) => {
+      const relevant =
+        isDaily && challengeNumber
+          ? p.challenge_number === challengeNumber
+          : p.difficulty === difficulty && p.language === i18n.language;
+      if (!relevant) return;
+      if (debounce) clearTimeout(debounce);
+      debounce = setTimeout(fetchScores, 500);
+    });
 
     return () => {
-      if (channelRef.current) {
-        channelRef.current.unsubscribe();
-      }
+      if (debounce) clearTimeout(debounce);
+      unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highestScore, difficulty, i18n.language, isDaily, challengeNumber]);
 
   const toggleRanking = () => {

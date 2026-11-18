@@ -1,8 +1,4 @@
-import {
-  PostgrestError,
-  RealtimeChannel,
-  RealtimePostgresChangesPayload,
-} from "@supabase/supabase-js";
+import { PostgrestError } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 
 export type DbResponse<T> = {
@@ -132,29 +128,6 @@ export async function getRoomPlayers(
     .order("id", { ascending: true });
 }
 
-type RoomPlayersRealtimePayload = RealtimePostgresChangesPayload<RoomPlayerRow>;
-
-export function subscribeToRoomPlayers(
-  roomId: number,
-  callback: (payload: RoomPlayersRealtimePayload) => void,
-): RealtimeChannel {
-  const channel = supabase
-    .channel(`room-${roomId}-players`)
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "room_players",
-        filter: `room_id=eq.${roomId}`,
-      },
-      callback,
-    )
-    .subscribe();
-
-  return channel;
-}
-
 export async function startRoom(code: string): Promise<DbResponse<RoomRow>> {
   const { data, error } = await supabase.rpc("start_room", { p_code: code });
   if (error) return { data: null, error };
@@ -175,29 +148,6 @@ export async function startRoom(code: string): Promise<DbResponse<RoomRow>> {
     },
     error: null,
   };
-}
-
-type RoomRealtimePayload = RealtimePostgresChangesPayload<RoomRow>;
-
-export function subscribeToRoom(
-  roomId: number,
-  callback: (payload: RoomRealtimePayload) => void,
-): RealtimeChannel {
-  const channel = supabase
-    .channel(`room-${roomId}-state`)
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "rooms",
-        filter: `id=eq.${roomId}`,
-      },
-      callback,
-    )
-    .subscribe();
-
-  return channel;
 }
 
 export async function advanceRoomToGame(
@@ -312,28 +262,6 @@ export async function getRoundWords(
     .order("word", { ascending: true });
   if (error) return { data: null, error };
   return { data: data as any, error: null };
-}
-
-type RoomWordsRealtimePayload = RealtimePostgresChangesPayload<RoomWordRow>;
-
-export function subscribeToCorrectWords(
-  roomId: number,
-  callback: (payload: RoomWordsRealtimePayload) => void,
-): RealtimeChannel {
-  const channel = supabase
-    .channel(`room-${roomId}-words`)
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "room_words",
-        filter: `room_id=eq.${roomId}`,
-      },
-      callback,
-    )
-    .subscribe();
-  return channel;
 }
 
 export async function getPlayerNameById(
@@ -476,4 +404,62 @@ export async function setNewRoomCode(
   });
   if (error) return { data: null, error };
   return { data: data as any, error: null };
+}
+
+// Inicia una ronda guardando su duración en el servidor (reloj compartido).
+// Sustituye a startRoomWithWord + seedRoundWords.
+export async function startRound(
+  code: string,
+  currentWord: string,
+  durationSeconds: number,
+): Promise<DbResponse<RoomRow & { round_id?: number }>> {
+  const { data, error } = await supabase.rpc("start_round", {
+    p_code: code,
+    p_current_word: currentWord,
+    p_duration_seconds: Math.round(durationSeconds),
+  });
+  if (error) return { data: null, error };
+  const payload = data as {
+    room_id: number;
+    code: string;
+    state: string;
+    players: string;
+    current_word?: string | null;
+    round_id?: number;
+  };
+  return {
+    data: {
+      id: payload.room_id,
+      code: payload.code,
+      state: payload.state,
+      players: payload.players,
+      current_word: payload.current_word,
+      round_id: payload.round_id,
+    },
+    error: null,
+  };
+}
+
+/**
+ * Reintenta una RPC de transición de sala ante fallos de red.
+ * No reintenta errores de lógica ("Room not in game"...): significan que la
+ * transición ya se hizo o no procede.
+ */
+export async function withRetry<T>(
+  fn: () => Promise<DbResponse<T>>,
+  attempts = 4,
+): Promise<DbResponse<T>> {
+  let last: DbResponse<T> = { data: null, error: null };
+  for (let i = 0; i < attempts; i++) {
+    try {
+      last = await fn();
+    } catch (err) {
+      last = { data: null, error: err as PostgrestError };
+    }
+    if (!last.error) return last;
+    const msg = (last.error as { message?: string })?.message ?? "";
+    if (/not in|not found|already|need at least|invalid/i.test(msg)) return last;
+    await new Promise((r) => setTimeout(r, 400 * 2 ** i));
+  }
+  return last;
 }

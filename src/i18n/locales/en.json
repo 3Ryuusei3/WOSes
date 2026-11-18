@@ -276,7 +276,8 @@
     "disconnected": "Connection lost",
     "reconnecting": "Reconnecting...",
     "error": "Connection error. Reload the page",
-    "connected": "Connected"
+    "connected": "Connected",
+    "hostOffline": "The host disconnected. Waiting for them to come back..."
   },
   "dailyChallenge": {
     "title": "DAILY CHALLENGE",
