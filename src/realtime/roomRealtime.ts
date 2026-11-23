@@ -13,6 +13,8 @@
 import { create } from "zustand";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import type ShuffledWordObjectType from "../types/ShuffledWordObject";
+import type Mechanics from "../types/Mechanics";
 
 export type RoomConnection = "idle" | "connecting" | "connected" | "reconnecting";
 
@@ -39,6 +41,22 @@ export interface RtPlayer {
   score: number;
   last_round_score: number;
   role: "host" | "player";
+}
+
+/**
+ * Letters exactly as the host shows them (order, fake/hidden/dark... flags)
+ * plus what the player needs to draw them the same way. Sent by the HOST
+ * (client broadcast, not the DB): it is only screen state, nothing to store.
+ * The host resends it periodically, so a phone that (re)connects catches up.
+ */
+export interface RtBoard {
+  round_id: number;
+  letters: ShuffledWordObjectType[];
+  mechanics: Mechanics;
+  show_letters_percentage: number;
+  level: number;
+  difficulty: string;
+  daily_original_difficulty: string | null;
 }
 
 export interface RtCorrectWord {
@@ -75,6 +93,8 @@ interface RoomRealtimeState {
   round: RtRound | null;
   players: RtPlayer[];
   wordsByRound: Record<number, RtCorrectWord[]>;
+  /** Letras del host para la ronda actual (null hasta recibirlas) */
+  board: RtBoard | null;
   /** Claves de presence conectadas: `host:<id>` / `player:<id>` */
   online: Record<string, true>;
   presenceReady: boolean;
@@ -97,6 +117,7 @@ const initialState = (): RoomRealtimeState => ({
   round: null,
   players: [],
   wordsByRound: {},
+  board: null,
   online: {},
   presenceReady: false,
   clockOffsetMs: 0,
@@ -258,6 +279,18 @@ class RoomRealtimeManager {
     return this.resyncPromise;
   }
 
+  /**
+   * Host: envía sus letras a los jugadores. Si no hay conexión no pasa nada:
+   * el host lo reenvía periódicamente.
+   */
+  sendBoard(board: RtBoard) {
+    const ch = this.channel;
+    if (!ch || this.get().connection !== "connected") return;
+    void ch
+      .send({ type: "broadcast", event: "board", payload: board })
+      .catch(() => {});
+  }
+
   /** Fuerza reconexión del socket y del canal + resync. */
   async forceReconnect() {
     if (!this.identity) return;
@@ -295,6 +328,10 @@ class RoomRealtimeManager {
         if (this.channel !== ch) return;
         const w = payload as RtCorrectWord;
         if (w?.round_id && w.word) this.mergeWords(w.round_id, [w]);
+      })
+      .on("broadcast", { event: "board" }, ({ payload }) => {
+        if (this.channel !== ch) return;
+        this.applyBoard(payload as RtBoard);
       })
       .on("broadcast", { event: "players" }, ({ payload }) => {
         if (this.channel !== ch) return;
@@ -475,7 +512,18 @@ class RoomRealtimeManager {
         if (Number(k) >= p.round.id) wordsByRound[Number(k)] = v;
       }
     }
-    this.set({ room: p.room, round: p.round, wordsByRound });
+    // Las letras de una ronda anterior ya no sirven
+    const board =
+      s.board && p.round && s.board.round_id < p.round.id ? null : s.board;
+    this.set({ room: p.room, round: p.round, wordsByRound, board });
+  }
+
+  private applyBoard(b: RtBoard) {
+    if (!b || !Array.isArray(b.letters) || !b.round_id) return;
+    const round = this.get().round;
+    // Letras de una ronda vieja que llegan tarde
+    if (round && b.round_id < round.id) return;
+    this.set({ board: b });
   }
 
   private applyPlayers(players: RtPlayer[] | undefined, serverIso: string) {

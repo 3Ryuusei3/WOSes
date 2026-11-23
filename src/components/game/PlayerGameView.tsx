@@ -3,6 +3,27 @@ import { useTranslation } from "react-i18next";
 import reloadIcon from "../../assets/reload.svg";
 import { submitWord } from "../../services/multiplayer";
 import Word from "../../types/Word";
+import Difficulty from "../../types/Difficulty";
+import ScoreContainer from "../../atoms/ScoreContainer";
+import WarningMessage from "../../atoms/WarningMessage";
+import SelectedWord from "../../atoms/SelectedWord";
+import ProgressBar from "../../atoms/ProgressBar";
+import MobileGameKeyboard from "../../atoms/MobileGameKeyboard";
+import useMobileUserAgent from "../../hooks/useMobileUserAgent";
+import useGameStore from "../../store/useGameStore";
+import { useRoomRealtimeStore } from "../../realtime/roomRealtime";
+import { RUNNING_OUT_OF_TIME_PERCENTAGE } from "../../constant";
+
+import Mechanics from "../../types/Mechanics";
+
+const NO_MECHANICS: Mechanics = {
+  fake: false,
+  hidden: false,
+  first: false,
+  dark: false,
+  still: false,
+  mirrored: false,
+};
 
 interface PlayerAttempt {
   word: string;
@@ -24,6 +45,9 @@ interface PlayerGameViewProps {
   roomCode: string;
   markWordGuessed: (word: string) => void;
   percentage: number;
+  timeLeft: number;
+  correctWordsPoints: () => number;
+  goalPoints: number;
 }
 
 export default function PlayerGameView({
@@ -41,8 +65,16 @@ export default function PlayerGameView({
   roomCode,
   markWordGuessed,
   percentage,
+  timeLeft,
+  correctWordsPoints,
+  goalPoints,
 }: PlayerGameViewProps) {
   const { t } = useTranslation();
+  const isMobile = useMobileUserAgent();
+  // Letras exactamente como las ve el host (llegan por Realtime)
+  const board = useRoomRealtimeStore((s) => s.board);
+  const storeLevel = useGameStore((s) => s.level);
+  const storeDifficulty = useGameStore((s) => s.gameDifficulty);
   const [playerAttempts, setPlayerAttempts] = useState<PlayerAttempt[]>([]);
   const inputWordRef = useRef(inputWord);
 
@@ -116,36 +148,72 @@ export default function PlayerGameView({
   };
 
   return (
-    <div className="game__container game__container--player">
-      <div className="h-section gap-xs">
-        <button className="btn btn--deco btn--xs">
-          {t("common.points")} {playerRoundPoints}
-        </button>
-        {showReconnectButton && (
-          <button
-            className={`btn btn--xs ml-auto ${connectionStatus !== "connected" ? "btn--lose" : ""}`}
-            onClick={syncNow}
-            disabled={isSyncing}
-            title={
-              connectionStatus !== "connected"
-                ? t("game.reconnect")
-                : t("common.updateState")
-            }
-          >
-            <span className="sr-only">{t("game.reconnect")}</span>
-            <img src={reloadIcon} alt="reload" className="player-selector" />
+    <>
+      <ScoreContainer
+        words={words}
+        correctWordsPoints={correctWordsPoints}
+        goalPoints={goalPoints}
+        level={board?.level ?? storeLevel}
+        gameDifficulty={(board?.difficulty as Difficulty) ?? storeDifficulty}
+        dailyChallengeOriginalDifficulty={
+          (board?.daily_original_difficulty as Difficulty | null) ?? null
+        }
+      />
+      <div className="game__container game__container--player">
+        <div className="game__header">
+          <div className="v-section">
+            {board ? (
+              <>
+                <WarningMessage gameMechanics={board.mechanics} />
+                <SelectedWord
+                  shuffledWordObject={board.letters}
+                  percentage={percentage}
+                  gameMechanics={board.mechanics}
+                  SHOW_LETTERS_PERCENTAGE={board.show_letters_percentage}
+                />
+              </>
+            ) : (
+              <p className="txt-center">{t("game.waitingForHost")}</p>
+            )}
+          </div>
+          <ProgressBar
+            timeLeft={timeLeft}
+            percentage={percentage}
+            RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
+            SHOW_LETTERS_PERCENTAGE={board?.show_letters_percentage ?? 0}
+          />
+        </div>
+        <div className="h-section gap-xs f-ai-c">
+          <button className="btn btn--deco btn--xs">
+            {t("common.points")} {playerRoundPoints}
           </button>
-        )}
-      </div>
-      <div className="v-section gap-sm w100 f-jc-c">
+          {showReconnectButton && (
+            <button
+              className={`btn btn--xs ml-auto ${connectionStatus !== "connected" ? "btn--lose" : ""}`}
+              onClick={syncNow}
+              disabled={isSyncing}
+              title={
+                connectionStatus !== "connected"
+                  ? t("game.reconnect")
+                  : t("common.updateState")
+              }
+            >
+              <span className="sr-only">{t("game.reconnect")}</span>
+              <img src={reloadIcon} alt="reload" className="player-selector" />
+            </button>
+          )}
+        </div>
         <input
           type="text"
-          className="mx-auto mt-auto"
+          className="mx-auto"
           placeholder={t("game.inputWord")}
           value={inputWord}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           disabled={percentage === 0}
+          // En móvil se escribe con el teclado propio (como en un jugador)
+          inputMode={isMobile ? "none" : undefined}
+          autoFocus={!isMobile}
         />
         <div className="attemptList">
           {playerAttempts.map((it, idx) => (
@@ -158,6 +226,24 @@ export default function PlayerGameView({
           ))}
         </div>
       </div>
-    </div>
+      {isMobile && (
+        <MobileGameKeyboard
+          disabled={percentage === 0}
+          value={inputWord}
+          onValueChange={(next) =>
+            handleChange({
+              target: { value: next },
+            } as React.ChangeEvent<HTMLInputElement>)
+          }
+          onEnter={(value) => void submitCurrentWord(value)}
+          shuffledWordObject={board?.letters ?? []}
+          gameMechanics={
+            board?.mechanics ?? NO_MECHANICS
+          }
+          percentage={percentage}
+          showLettersPercentage={board?.show_letters_percentage ?? 0}
+        />
+      )}
+    </>
   );
 }

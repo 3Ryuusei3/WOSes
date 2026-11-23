@@ -14,7 +14,7 @@ interface Position {
 
 export default function Tooltip({ message, children }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [position, setPosition] = useState<Position>({ top: 'auto', bottom: '40px', left: '-10px', right: 'auto' });
+  const [position, setPosition] = useState<Position>({ top: 'auto', bottom: '2.5rem', left: '-0.625rem', right: 'auto' });
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -28,8 +28,8 @@ export default function Tooltip({ message, children }: TooltipProps) {
 
     const positions: Position = {
       top: 'auto',
-      bottom: '40px',
-      left: '-10px',
+      bottom: '2.5rem',
+      left: '-0.625rem',
       right: 'auto'
     };
 
@@ -43,7 +43,7 @@ export default function Tooltip({ message, children }: TooltipProps) {
     }
 
     if (rect.top - tooltipRect.height < 0) {
-      positions.top = '40px';
+      positions.top = '2.5rem';
       positions.bottom = 'auto';
     }
 

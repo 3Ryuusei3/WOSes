@@ -32,8 +32,12 @@ import {
   useRoomRealtimeStore,
   selectCurrentRoundWords,
   serverIsoToLocalMs,
+  type RtBoard,
 } from "../realtime/roomRealtime";
 import { showToast } from "../atoms/Toast";
+
+/** Host: cada cuánto reenvía sus letras (cubre móviles que (re)conectan) */
+const BOARD_RESEND_MS = 4000;
 
 export default function GameScreen() {
   const { i18n } = useTranslation();
@@ -107,6 +111,44 @@ export default function GameScreen() {
     clearInput,
   } = useInputWords(possibleWords);
   const gameEngine = useGameEngine();
+
+  // Host multijugador: los móviles muestran exactamente sus letras
+  const isMultiHost = players === "multi" && role === "host";
+  const rtRoundId = rtRound?.id ?? null;
+  const board = useMemo<RtBoard | null>(
+    () =>
+      isMultiHost && rtRoundId && shuffledWordObject.length > 0
+        ? {
+            round_id: rtRoundId,
+            letters: shuffledWordObject,
+            mechanics: gameMechanics,
+            show_letters_percentage: showLettersPercentage,
+            level,
+            difficulty: gameDifficulty,
+            daily_original_difficulty: dailyChallengeOriginalDifficulty,
+          }
+        : null,
+    [
+      isMultiHost,
+      rtRoundId,
+      shuffledWordObject,
+      gameMechanics,
+      showLettersPercentage,
+      level,
+      gameDifficulty,
+      dailyChallengeOriginalDifficulty,
+    ],
+  );
+  // Reenviar también en cuanto alguien (re)conecta
+  const onlineKeys = useRoomRealtimeStore((s) =>
+    Object.keys(s.online).sort().join(","),
+  );
+  useEffect(() => {
+    if (!board) return;
+    roomRealtime.sendBoard(board);
+    const id = setInterval(() => roomRealtime.sendBoard(board), BOARD_RESEND_MS);
+    return () => clearInterval(id);
+  }, [board, onlineKeys]);
 
   // Calcular estadísticas del nivel usando GameEngine
   const levelStats = useMemo(() => {
@@ -509,6 +551,9 @@ export default function GameScreen() {
           roomCode={roomCode}
           markWordGuessed={markWordGuessed}
           percentage={percentage}
+          timeLeft={timeLeft}
+          correctWordsPoints={correctWordsPoints}
+          goalPoints={goalPoints}
         />
       ) : (
         <HostGameView

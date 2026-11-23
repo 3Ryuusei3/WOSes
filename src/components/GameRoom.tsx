@@ -117,6 +117,8 @@ export default function GameRoom() {
                       bgColor="#420072"
                       size={170}
                       fgColor="#ddccff"
+                      // rem so it scales with the rest of the layout
+                      style={{ width: "10.625rem", height: "10.625rem" }}
                     />
                     <button
                       onClick={copyUrl}

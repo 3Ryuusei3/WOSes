@@ -76,6 +76,7 @@ export default function SelectedWord({
     <div
       key={shuffledWordObject.map((letter) => letter.letter).join("")}
       className="selectedWord"
+      style={{ "--count": shuffledWordObject.length } as React.CSSProperties}
     >
       {shuffledWordObject.map((letter, index) => (
         <span

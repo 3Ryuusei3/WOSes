@@ -9,10 +9,7 @@ import {
 
 import HomePage from "./components/HomePage";
 import GamePage from "./components/GamePage";
-import useZoom, {
-  ZoomProvider,
-  computeEffectiveGameZoom,
-} from "./hooks/useZoom";
+import { shouldUseFluidScale } from "./hooks/fluidScale";
 import useGameStore from "./store/useGameStore";
 import { isMobileUserAgent } from "./utils/mobileUserAgent";
 
@@ -20,41 +17,37 @@ function BodyLayoutClassSync() {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const role = useGameStore((s) => s.role);
-  const zoom = useZoom();
-  const roomId = searchParams.get("id");
-  const hasRoomIdInUrl = !!roomId;
-  const effectiveZoom = computeEffectiveGameZoom(zoom, role, hasRoomIdInUrl);
-  const isZoomed = effectiveZoom !== 1;
+  const hasRoomIdInUrl = !!searchParams.get("id");
+  const isScaled = shouldUseFluidScale(role, hasRoomIdInUrl);
 
   useEffect(() => {
-    document.body.classList.remove("mobile", "is-zoomed");
+    // On <html> so the classes can set the root font-size (rem scaling).
+    const html = document.documentElement;
 
     if (isMobileUserAgent()) {
-      document.body.classList.add("mobile");
-    } else if (pathname === "/game") {
-      document.body.classList.add(isZoomed ? "is-zoomed" : "mob");
+      html.classList.add("mobile");
+    } else if (pathname === "/game" && isScaled) {
+      html.classList.add("fluid-scale");
     }
 
     return () => {
-      document.body.classList.remove("mobile", "is-zoomed");
+      html.classList.remove("mobile", "fluid-scale");
     };
-  }, [pathname, isZoomed]);
+  }, [pathname, isScaled]);
 
   return null;
 }
 
 function App() {
   return (
-    <ZoomProvider>
-      <Router>
-        <BodyLayoutClassSync />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/game" element={<GamePage />} />
-          <Route path="*" element={<HomePage />} />
-        </Routes>
-      </Router>
-    </ZoomProvider>
+    <Router>
+      <BodyLayoutClassSync />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/game" element={<GamePage />} />
+        <Route path="*" element={<HomePage />} />
+      </Routes>
+    </Router>
   );
 }
 

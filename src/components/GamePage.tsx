@@ -12,7 +12,7 @@ import { useEffect } from "react";
 
 import GameLogo from "../atoms/GameLogo";
 
-import useZoom, { computeEffectiveGameZoom } from "../hooks/useZoom";
+import { shouldUseFluidScale } from "../hooks/fluidScale";
 
 import useGameStore from "../store/useGameStore";
 import useRoomSync from "../hooks/useRoomSync";
@@ -21,7 +21,6 @@ import { loadRoomSession } from "../realtime/roomSession";
 
 const GamePage = () => {
   const { mode, setRoomCode, setMode, role, players } = useGameStore();
-  const zoom = useZoom();
   const [searchParams] = useSearchParams();
   // Única suscripción en tiempo real de la sala (multijugador)
   useRoomSync();
@@ -48,18 +47,13 @@ const GamePage = () => {
     }
   }, [roomId, mode, setRoomCode, setMode]);
 
-  const hasRoomIdInUrl = !!roomId;
-  const effectiveZoom = computeEffectiveGameZoom(zoom, role, hasRoomIdInUrl);
-
-  const isZoomed = effectiveZoom !== 1;
+  const isScaled = shouldUseFluidScale(role, !!roomId);
 
   return (
-    <main
-      style={isZoomed ? { zoom: effectiveZoom } : undefined}
-    >
+    <main>
       {players === "multi" && <ConnectionStatus />}
       <ToastContainer />
-      <GameLogo isZoomed={isZoomed} />
+      <GameLogo large={isScaled} />
       <div className="container pos-rel">
         {mode === "start" ? (
           <GameStart />
