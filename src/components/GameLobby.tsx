@@ -24,6 +24,8 @@ import { LEVELS_TO_ADVANCE } from "../constant";
 import PlayersPanel from "../atoms/PlayersPanel";
 import { startRound } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
+import { primeMobileKeyboard } from "../utils/mobileKeyboard";
+import useMobileUserAgent from "../hooks/useMobileUserAgent";
 
 export default function GameLobby() {
   const {
@@ -48,6 +50,7 @@ export default function GameLobby() {
   } = useGameStore();
 
   const isPlayer = players === "multi" && role === "player";
+  const isMobile = useMobileUserAgent();
 
   const { t } = useTranslation();
 
@@ -132,6 +135,8 @@ export default function GameLobby() {
         setIsAdvancing(false);
       }
     } else {
+      // Same tap opens the keyboard on iOS (see primeMobileKeyboard)
+      primeMobileKeyboard();
       setMode("loading");
     }
   }, [canAdvance, isAdvancing, players, role, roomCode, randomWord, setMode]);
@@ -151,102 +156,112 @@ export default function GameLobby() {
     );
   }
 
-  return (
-    <div
-      ref={containerRef}
-      className="game__container f-jc-c"
-      onKeyDown={(e) => e.key === "Enter" && handleAdvance()}
-      tabIndex={0}
-      role="button"
-      aria-label="Avanzar al siguiente nivel"
-    >
-      <div className="difficulty-tag">
-        <DifficultyTag
-          gameDifficulty={gameDifficulty}
-          dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
+  const actions = (
+    <div className="h-section gap-xs f-jc-c mb-sm screen-actions">
+      <button
+        onClick={handleAdvance}
+        disabled={!canAdvance || isAdvancing}
+        className={!canAdvance || isAdvancing ? "btn button-disabled" : "btn"}
+      >
+        {t("lobby.playLevel", { level })}
+      </button>
+      {showReconnectButton && (
+        <ReconnectButton
+          onClick={syncNow}
+          disabled={isSyncing}
+          connectionStatus={connectionStatus}
         />
-      </div>
-      {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
-        <h1 className="won">{t("lobby.perfect")}</h1>
-      ) : (
-        <h1 className="highlight">{t("lobby.congratulations")}</h1>
       )}
-      <h3>
-        {t("lobby.youAdvanced")}
-        {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
-          <span className="won"> {levelsToAdvance} </span>
-        ) : (
-          <span className="highlight"> {levelsToAdvance} </span>
-        )}
-        {levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
-      </h3>
-      <div className="game__summary">
-        <LobbyStatsContainer
-          level={level}
-          levelsToAdvance={levelsToAdvance}
-          lastRoundPoints={lastRoundPoints}
-          totalPoints={totalPoints}
-          gameTime={gameTime}
-          numberOfRounds={numberOfRounds}
-          numberOfPerfectRounds={numberOfPerfectRounds}
-          secondsToRemove={secondsToRemove}
-        />
-        <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
-        {gameMechanics && (
-          <>
-            <NextChallengesSection
-              gameMechanics={gameMechanics}
-              canAdvance={canAdvance}
-              onMechanicClick={handleMechanicClick}
-            />
-            <MechanicsModal
-              isOpen={isModalOpen}
-              setModalOpen={setIsModalOpen}
-              mechanicType={selectedMechanic}
-            />
-          </>
-        )}
-      </div>
-      {secondsToRemove > 0 && (
-        <h3
-          dangerouslySetInnerHTML={{
-            __html: t("lobby.lessTime", { seconds: secondsToRemove }),
-          }}
-        ></h3>
-      )}
-      {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR && (
-        <h3 dangerouslySetInnerHTML={{ __html: t("lobby.perfectBonus") }}></h3>
-      )}
-      {levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR && (
-        <h3
-          dangerouslySetInnerHTML={{ __html: t("lobby.threeStarBonus") }}
-        ></h3>
-      )}
-      <div className="h-section gap-xs f-jc-c mb-sm">
-        <button
-          onClick={handleAdvance}
-          disabled={!canAdvance || isAdvancing}
-          className={!canAdvance || isAdvancing ? "btn button-disabled" : "btn"}
-        >
-          {t("lobby.playLevel", { level })}
-        </button>
-        {showReconnectButton && (
-          <ReconnectButton
-            onClick={syncNow}
-            disabled={isSyncing}
-            connectionStatus={connectionStatus}
-          />
-        )}
-      </div>
-      <GameSound />
-      <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
-      <WordFeedbackModal
-        isOpen={isFeedbackModalOpen}
-        setModalOpen={setIsFeedbackModalOpen}
-        lastLevelWords={lastLevelWords}
-        difficulty={gameDifficulty}
-        roomName={playerName}
-      />
     </div>
+  );
+
+  return (
+    <>
+      <div
+        ref={containerRef}
+        className="game__container f-jc-c"
+        onKeyDown={(e) => e.key === "Enter" && handleAdvance()}
+        tabIndex={0}
+        role="button"
+        aria-label="Avanzar al siguiente nivel"
+      >
+        <div className="difficulty-tag">
+          <DifficultyTag
+            gameDifficulty={gameDifficulty}
+            dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
+          />
+        </div>
+        {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
+          <h1 className="won">{t("lobby.perfect")}</h1>
+        ) : (
+          <h1 className="highlight">{t("lobby.congratulations")}</h1>
+        )}
+        <h3>
+          {t("lobby.youAdvanced")}
+          {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
+            <span className="won"> {levelsToAdvance} </span>
+          ) : (
+            <span className="highlight"> {levelsToAdvance} </span>
+          )}
+          {levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
+        </h3>
+        <div className="game__summary">
+          <LobbyStatsContainer
+            level={level}
+            levelsToAdvance={levelsToAdvance}
+            lastRoundPoints={lastRoundPoints}
+            totalPoints={totalPoints}
+            gameTime={gameTime}
+            numberOfRounds={numberOfRounds}
+            numberOfPerfectRounds={numberOfPerfectRounds}
+            secondsToRemove={secondsToRemove}
+          />
+          <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
+          {gameMechanics && (
+            <>
+              <NextChallengesSection
+                gameMechanics={gameMechanics}
+                canAdvance={canAdvance}
+                onMechanicClick={handleMechanicClick}
+              />
+              <MechanicsModal
+                isOpen={isModalOpen}
+                setModalOpen={setIsModalOpen}
+                mechanicType={selectedMechanic}
+              />
+            </>
+          )}
+        </div>
+        {secondsToRemove > 0 && (
+          <h3
+            dangerouslySetInnerHTML={{
+              __html: t("lobby.lessTime", { seconds: secondsToRemove }),
+            }}
+          ></h3>
+        )}
+        {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR && (
+          <h3
+            dangerouslySetInnerHTML={{ __html: t("lobby.perfectBonus") }}
+          ></h3>
+        )}
+        {levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR && (
+          <h3
+            dangerouslySetInnerHTML={{ __html: t("lobby.threeStarBonus") }}
+          ></h3>
+        )}
+        {!isMobile && actions}
+        <GameSound />
+        <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
+        <WordFeedbackModal
+          isOpen={isFeedbackModalOpen}
+          setModalOpen={setIsFeedbackModalOpen}
+          lastLevelWords={lastLevelWords}
+          difficulty={gameDifficulty}
+          roomName={playerName}
+        />
+      </div>
+      {/* Mobile: outside the panel, stuck to the bottom of the screen */}
+      {isMobile && actions}
+    </>
   );
 }

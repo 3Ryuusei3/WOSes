@@ -48,6 +48,7 @@ export default function WordList({
     prevGuessedCountRef.current = guessedCount;
   }, [words, players, role, volume]);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const isMobile = isMobileUserAgent();
   const { columns: defaultColumns } = useWindowSize();
   const listRef = useRef<HTMLUListElement>(null);
   const bestColumns = useBestMobileColumns(listRef, words);
@@ -61,17 +62,29 @@ export default function WordList({
         {
           "--wordlist-rows": Math.ceil(words.length / columns),
           "--wordlist-columns": columns,
+          // Same tile size for every word: based on the longest one
+          "--letters": Math.max(1, ...words.map((w) => w.word.length)),
         } as React.CSSProperties
       }
     >
       {words.map((wordObj, index) => (
         <li
           key={`${index}-${wordObj.word}`}
-          className={`word ${wordObj.guessed ? "active" : ""}`}
-          style={{ "--letters": wordObj.word.length } as React.CSSProperties}
+          className={`word ${wordObj.guessed ? "active" : ""} ${
+            // Mobile multiplayer: no names (no room), rows guessed by someone
+            // else get a different highlight instead
+            isMobile &&
+            players === "multi" &&
+            wordObj.guessed &&
+            wordObj.guessedByName &&
+            wordObj.guessedByName !== playerName
+              ? "word--other"
+              : ""
+          }`}
           ref={(el) => (wordRefs.current[index] = el)}
         >
-          {wordObj.guessed && !isMobileUserAgent() && (
+          {/* Who guessed it: desktop only (the host's screen) */}
+          {wordObj.guessed && !isMobile && (
             <span className="playerName">
               {wordObj.guessedByName || playerName}
             </span>
@@ -123,20 +136,30 @@ function useBestMobileColumns(
       }
       const { width, height } = el.getBoundingClientRect();
       if (!width || !height) return;
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const rem = parseFloat(
+        getComputedStyle(document.documentElement).fontSize,
+      );
       // Mirrors the .mobile .wordlist / .letter sizes in index.scss
       const colGap = 0.5 * rem;
       const gap = 0.125 * rem;
-      const maxTile = 1.375 * rem;
+      const maxTile = 1.75 * rem;
+      // Below this the list scrolls instead of shrinking (see index.scss)
+      const minTileByHeight = 0.6875 * rem;
+      const rowGap = 1; // px, .wordlist row-gap on the mobile game screen
 
       let bestCols = 2;
       let bestTile = 0;
       for (const cols of [2, 3, 4]) {
         const colWidth = (width - (cols - 1) * colGap) / cols;
-        const byWidth = (colWidth - (maxLetters - 1) * gap - 0.25 * rem) / maxLetters;
+        const byWidth =
+          (colWidth - (maxLetters - 1) * gap - 0.25 * rem) / maxLetters;
         const rows = Math.ceil(count / cols);
-        const byHeight = (height - (rows - 1) * gap) / rows - 0.25 * rem;
-        const tile = Math.min(byWidth, byHeight, maxTile);
+        const byHeight = (height - (rows - 1) * rowGap) / rows;
+        const tile = Math.min(
+          byWidth,
+          Math.max(byHeight, minTileByHeight),
+          maxTile,
+        );
         // Only add columns when it clearly helps
         if (tile > bestTile + 1) {
           bestTile = tile;

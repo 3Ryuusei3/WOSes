@@ -54,7 +54,9 @@
     "spanish": "Español",
     "english": "Inglés",
     "dictionary": "Diccionario",
-    "definition": "Definición"
+    "definition": "Definición",
+    "summary": "RESUMEN",
+    "understood": "ENTENDIDO"
   },
   "home": {
     "title": "DISFRUTA DE WORDS ON STREAM",
@@ -86,7 +88,9 @@
   "gameStart": {
     "nameAndDifficulty": "¡DEMUESTRA TU VOCABULARIO!",
     "nameError": "EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES",
-    "learnToPlay": "APRENDE A JUGAR AQUÍ"
+    "learnToPlay": "APRENDE A JUGAR AQUÍ",
+    "startDaily": "EMPEZAR RETO DIARIO",
+    "howToPlayButton": "CÓMO JUGAR"
   },
   "game": {
     "lost": "HAS PERDIDO...",
@@ -130,7 +134,9 @@
     "exit": "Salir",
     "backHome": "Volver al inicio",
     "skipLevel": "Saltar nivel",
-    "hint": "Pista"
+    "hint": "Pista",
+    "showBoard": "VER TABLERO",
+    "hideBoard": "OCULTAR TABLERO"
   },
   "howToPlay": {
     "title": "¿CÓMO JUGAR?",

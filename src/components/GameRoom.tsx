@@ -8,6 +8,7 @@ import { saveRoomSession } from "../realtime/roomSession";
 import { isValidPlayerName } from "../utils";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../atoms/Toast";
+import useMobileUserAgent from "../hooks/useMobileUserAgent";
 
 export default function GameRoom() {
   const { t } = useTranslation();
@@ -38,6 +39,7 @@ export default function GameRoom() {
   const [isStarting, setIsStarting] = useState(false);
 
   const isHost = role === "host";
+  const isMobile = useMobileUserAgent();
 
   const nonHostPlayers = useMemo(
     () => roomPlayers.filter((p) => p.role !== "host"),
@@ -103,137 +105,151 @@ export default function GameRoom() {
     navigator.clipboard.writeText(window.location.href);
   };
 
+  const showJoinForm = !isHost && (role !== "player" || !roomId);
+
+  const joinAction = (
+    <div className="screen-actions">
+      <button
+        className="btn btn--sm mx-auto"
+        onClick={handleJoin}
+        disabled={!isValidPlayerName(playerName)}
+      >
+        {t("game.joinRoom")}
+      </button>
+    </div>
+  );
+
   return (
-    <div className="game__container game__container--join">
-      <div className="game__room">
-        {isHost ? (
-          <>
-            <div className="v-section gap-md f-jc-c">
-              <div className="v-section gap-md">
-                <div className="score__container--box dark">
-                  <div className="v-section gap-sm f-jc-c f-ai-c">
-                    <QRCodeSVG
-                      value={window.location.href}
-                      bgColor="#420072"
-                      size={170}
-                      fgColor="#ddccff"
-                      // rem so it scales with the rest of the layout
-                      style={{ width: "10.625rem", height: "10.625rem" }}
-                    />
-                    <button
-                      onClick={copyUrl}
-                      className="btn btn--xs btn--win mx-auto"
-                    >
-                      {roomCode}
-                    </button>
+    <>
+      <div className="game__container game__container--join">
+        <div className="game__room">
+          {isHost ? (
+            <>
+              <div className="v-section gap-md f-jc-c">
+                <div className="v-section gap-md">
+                  <div className="score__container--box dark">
+                    <div className="v-section gap-sm f-jc-c f-ai-c">
+                      <QRCodeSVG
+                        value={window.location.href}
+                        bgColor="#420072"
+                        size={170}
+                        fgColor="#ddccff"
+                        // rem so it scales with the rest of the layout
+                        style={{ width: "10.625rem", height: "10.625rem" }}
+                      />
+                      <button
+                        onClick={copyUrl}
+                        className="btn btn--xs btn--win mx-auto"
+                      >
+                        {roomCode}
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="v-section gap-sm f-jc-c f-ai-c">
-                  <button
-                    className={`btn ${canStart ? "btn--win" : "btn--lose"}`}
-                    disabled={!canStart || isStarting}
-                    onClick={handleStart}
-                  >
-                    EMPEZAR PARTIDA
-                  </button>
-                  {!canStart && (
-                    <small className="txt-center">
-                      SE NECESITA AL MENOS
-                      <br />1 JUGADOR PARA EMPEZAR
-                    </small>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="v-section gap-md f-jc-c">
-              <div className="v-section score__container--box dark player-list">
-                <div className="v-section gap-lg f-jc-c">
-                  <h2 className="highlight">LISTADO DE JUGADORES</h2>
-                  <div className="v-section gap-2xs">
-                    {nonHostPlayers.length > 0 ? (
-                      nonHostPlayers.map((player, index) => (
-                        <div className="h-section gap-sm" key={player.id}>
-                          <h4 className="won">
-                            {String(index + 1).padStart(2, "0")}
-                          </h4>
-                          <h4 className="highlight" key={player.id}>
-                            {player.name}
-                          </h4>
-                          {presenceReady && (
-                            <span
-                              className={`presence-dot ${online[`player:${player.id}`] ? "presence-dot--online" : ""}`}
-                              title={
-                                online[`player:${player.id}`]
-                                  ? "Conectado"
-                                  : "Desconectado"
-                              }
-                            />
-                          )}
-                          <h4 className="unguessed ml-auto">{player.score}</h4>
-                        </div>
-                      ))
-                    ) : (
-                      <h4 className="lost">
-                        TODAVÍA NO HAY
-                        <br />
-                        JUGADORES EN LA SALA
-                      </h4>
+                  <div className="v-section gap-sm f-jc-c f-ai-c">
+                    <button
+                      className={`btn ${canStart ? "btn--win" : "btn--lose"}`}
+                      disabled={!canStart || isStarting}
+                      onClick={handleStart}
+                    >
+                      EMPEZAR PARTIDA
+                    </button>
+                    {!canStart && (
+                      <small className="txt-center">
+                        SE NECESITA AL MENOS
+                        <br />1 JUGADOR PARA EMPEZAR
+                      </small>
                     )}
                   </div>
                 </div>
               </div>
-            </div>
-          </>
-        ) : (
-          <>
-            {role !== "player" || !roomId ? (
               <div className="v-section gap-md f-jc-c">
-                <h4 className="highlight">
-                  INTRODUCE TU NOMBRE
-                  <br />
-                  PARA UNIRTE A LA SALA
-                </h4>
-                <div className="v-section gap-md">
-                  <input
-                    className="mx-auto"
-                    type="text"
-                    placeholder={t("common.typePlayerName")}
-                    value={playerName}
-                    onChange={(e) => {
-                      setNameError(false);
-                      setJoinError(null);
-                      setPlayerName(e.target.value.toUpperCase());
-                    }}
-                  />
-                  <small className={`txt-center ${nameError ? "" : "op-0"}`}>
-                    {t("gameStart.nameError")}
-                  </small>
-                  <small
-                    className={`txt-center lost ${joinError ? "" : "op-0"}`}
-                  >
-                    {joinError || ""}
-                  </small>
-                  <button
-                    className="btn btn--sm mx-auto"
-                    onClick={handleJoin}
-                    disabled={!isValidPlayerName(playerName)}
-                  >
-                    {t("game.joinRoom")}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="v-section gap-md f-jc-c">
-                <div className="score__container--box dark">
-                  <div className="v-section gap-md">
-                    <p className="txt-center">{t("game.waitingForHost")}</p>
+                <div className="v-section score__container--box dark player-list">
+                  <div className="v-section gap-lg f-jc-c">
+                    <h2 className="highlight">LISTADO DE JUGADORES</h2>
+                    <div className="v-section gap-2xs">
+                      {nonHostPlayers.length > 0 ? (
+                        nonHostPlayers.map((player, index) => (
+                          <div className="h-section gap-sm" key={player.id}>
+                            <h4 className="won">
+                              {String(index + 1).padStart(2, "0")}
+                            </h4>
+                            <h4 className="highlight" key={player.id}>
+                              {player.name}
+                            </h4>
+                            {presenceReady && (
+                              <span
+                                className={`presence-dot ${online[`player:${player.id}`] ? "presence-dot--online" : ""}`}
+                                title={
+                                  online[`player:${player.id}`]
+                                    ? "Conectado"
+                                    : "Desconectado"
+                                }
+                              />
+                            )}
+                            <h4 className="unguessed ml-auto">
+                              {player.score}
+                            </h4>
+                          </div>
+                        ))
+                      ) : (
+                        <h4 className="lost">
+                          TODAVÍA NO HAY
+                          <br />
+                          JUGADORES EN LA SALA
+                        </h4>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
-          </>
-        )}
+            </>
+          ) : (
+            <>
+              {role !== "player" || !roomId ? (
+                <div className="v-section gap-md f-jc-c">
+                  <h4 className="highlight">
+                    INTRODUCE TU NOMBRE
+                    <br />
+                    PARA UNIRTE A LA SALA
+                  </h4>
+                  <div className="v-section gap-md">
+                    <input
+                      className="mx-auto"
+                      type="text"
+                      placeholder={t("common.typePlayerName")}
+                      value={playerName}
+                      onChange={(e) => {
+                        setNameError(false);
+                        setJoinError(null);
+                        setPlayerName(e.target.value.toUpperCase());
+                      }}
+                    />
+                    <small className={`txt-center ${nameError ? "" : "op-0"}`}>
+                      {t("gameStart.nameError")}
+                    </small>
+                    <small
+                      className={`txt-center lost ${joinError ? "" : "op-0"}`}
+                    >
+                      {joinError || ""}
+                    </small>
+                  </div>
+                </div>
+              ) : (
+                <div className="v-section gap-md f-jc-c">
+                  <div className="score__container--box dark">
+                    <div className="v-section gap-md">
+                      <p className="txt-center">{t("game.waitingForHost")}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        {showJoinForm && !isMobile && joinAction}
       </div>
-    </div>
+      {/* Mobile: outside the panel, stuck to the bottom of the screen */}
+      {showJoinForm && isMobile && joinAction}
+    </>
   );
 }

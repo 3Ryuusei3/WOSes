@@ -54,7 +54,9 @@
     "spanish": "Spanish",
     "english": "English",
     "dictionary": "Dictionary",
-    "definition": "Definition"
+    "definition": "Definition",
+    "summary": "SUMMARY",
+    "understood": "GOT IT"
   },
   "home": {
     "title": "ENJOY WORDS ON STREAM",
@@ -79,10 +81,16 @@
     "daily": "DAILY CHALLENGE",
     "tooltip": "Words organized by levels according to the frequency of use perceived by users. The \"EXPERT\" difficulty contains all the words that exist in the dictionary."
   },
+  "players": {
+    "single": "SOLO",
+    "multi": "MULTIPLAYER"
+  },
   "gameStart": {
     "nameAndDifficulty": "ENTER YOUR NAME AND CHOOSE DIFFICULTY",
     "nameError": "NAME MUST BE BETWEEN 3 AND 10 CHARACTERS",
-    "learnToPlay": "LEARN HOW TO PLAY HERE"
+    "learnToPlay": "LEARN HOW TO PLAY HERE",
+    "startDaily": "START DAILY CHALLENGE",
+    "howToPlayButton": "HOW TO PLAY"
   },
   "game": {
     "lost": "YOU LOST...",
@@ -126,7 +134,9 @@
     "exit": "Exit",
     "backHome": "Back to home",
     "skipLevel": "Skip level",
-    "hint": "Hint"
+    "hint": "Hint",
+    "showBoard": "SHOW BOARD",
+    "hideBoard": "HIDE BOARD"
   },
   "howToPlay": {
     "title": "HOW TO PLAY?",

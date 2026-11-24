@@ -1,19 +1,12 @@
-import {
-  useRef,
-  useEffect,
-  useCallback,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
-import { flushSync } from "react-dom";
+import { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
 
 import useInputResponse from "../hooks/useInputResponse";
 import useMobileUserAgent from "../hooks/useMobileUserAgent";
 
 export type WordInputHandle = {
-  applyValue: (next: string) => void;
-  submitEnter: () => void;
+  /** Focus the input (on mobile this opens the device keyboard) */
+  focus: () => void;
 };
 
 interface WordInputProps {
@@ -51,41 +44,24 @@ const WordInput = forwardRef<WordInputHandle, WordInputProps>(
         volume,
       );
 
-    const applyValue = useCallback(
-      (next: string) => {
-        flushSync(() => {
-          handleChange({
-            target: { value: next },
-          } as React.ChangeEvent<HTMLInputElement>);
-        });
-      },
-      [handleChange],
-    );
-
-    const enterEvent = {
-      key: "Enter",
-      preventDefault: () => {},
-      stopPropagation: () => {},
-    } as React.KeyboardEvent<HTMLInputElement>;
-
-    const submitEnter = useCallback(() => {
-      handleKeyDownWithShake(enterEvent);
-    }, [handleKeyDownWithShake]);
-
     useImperativeHandle(
       ref,
-      () => ({
-        applyValue,
-        submitEnter,
-      }),
-      [applyValue, submitEnter],
+      () => ({ focus: () => inputRef.current?.focus({ preventScroll: true }) }),
+      [],
     );
 
+    // Desktop: keep the input focused while the round runs
     useEffect(() => {
       if (percentage > 0 && !isMobile) {
         inputRef.current?.focus();
       }
     }, [percentage, isMobile]);
+
+    // Mobile: take the focus at the start. The keyboard is already open if
+    // the round was started with a tap (see primeMobileKeyboard).
+    useEffect(() => {
+      if (isMobile) inputRef.current?.focus({ preventScroll: true });
+    }, [isMobile]);
 
     return (
       <input
@@ -96,9 +72,14 @@ const WordInput = forwardRef<WordInputHandle, WordInputProps>(
         onChange={handleChange}
         onKeyDown={handleKeyDownWithShake}
         disabled={percentage === 0}
-        inputMode={isMobile ? "none" : undefined}
         ref={inputRef}
         autoFocus={!isMobile}
+        // Device keyboard: "send" key, no corrections or capitals
+        enterKeyHint="send"
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="none"
+        spellCheck={false}
       />
     );
   },

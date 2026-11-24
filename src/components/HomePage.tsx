@@ -14,7 +14,7 @@ const HomePage = () => {
           <h2 className='title'>{t('home.title')}</h2>
           <h1 className='highlight'>{t('home.subtitle')}</h1>
           <h4 className='highlight'>{t('home.multiplayer')}</h4>
-          <div className="h-section gap-xs f-jc-c mb-sm">
+          <div className="h-section gap-xs f-jc-c mb-sm screen-actions">
             <Link to="/game" className='btn'>
               {t('common.play')}
             </Link>

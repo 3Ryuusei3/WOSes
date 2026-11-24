@@ -14,6 +14,11 @@ interface HowToPlayModalProps {
   setHowToPlayModal: Dispatch<SetStateAction<boolean>>;
 }
 
+/**
+ * Step-by-step instructions. All slides are rendered in the same grid cell
+ * (only the current one visible), so the modal always has the height of the
+ * tallest slide and nothing jumps when moving between them.
+ */
 export default function HowToPlayModal({
   isOpen,
   setHowToPlayModal,
@@ -23,18 +28,20 @@ export default function HowToPlayModal({
   const instructions = Instructions();
   const { columns } = useWindowSize();
 
+  const isFirst = currentStep === 0;
+  const isLast = currentStep === instructions.length - 1;
+
   const handleClose = () => {
     setHowToPlayModal(false);
+    setCurrentStep(0);
   };
 
   const handleNext = () => {
-    setCurrentStep((prev) =>
-      prev < instructions.length - 1 ? prev + 1 : prev,
-    );
+    setCurrentStep((prev) => Math.min(prev + 1, instructions.length - 1));
   };
 
   const handlePrev = () => {
-    setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
   if (!isOpen) {
@@ -42,10 +49,14 @@ export default function HowToPlayModal({
   }
 
   return createPortal(
-    <div className="modal open">
+    <div className="modal open" onClick={handleClose} role="presentation">
       <div
-        className="modal__content"
+        className="modal__content modal__content--steps"
         style={{ "--wordlist-columns": columns } as CSSProperties}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("howToPlay.title")}
       >
         <button
           type="button"
@@ -55,36 +66,56 @@ export default function HowToPlayModal({
         >
           <img src={closeIcon} alt="close" width={16} height={16} />
         </button>
-        <div className="instruction-slide__arrows">
-          <img
-            src={arrowLeft}
-            alt="arrow-left"
-            onClick={handlePrev}
-            style={{ opacity: currentStep === 0 ? 0.5 : 1 }}
-          />
-          <img
-            src={arrowRight}
-            alt="arrow-right"
-            onClick={handleNext}
-            style={{
-              opacity: currentStep === instructions.length - 1 ? 0.5 : 1,
-            }}
-          />
+        <h2 className="won">
+          {isLast ? t("howToPlay.ready") : t("howToPlay.title")}
+        </h2>
+        <div className="modal__steps">
+          {instructions.map((instruction, index) => (
+            <div
+              key={index}
+              className={`instruction-slide ${index === currentStep ? "is-active" : ""}`}
+              aria-hidden={index !== currentStep}
+            >
+              {instruction.content}
+            </div>
+          ))}
         </div>
-        <div className="v-section gap-md pos-rel">
-          <h2 className="won">
-            {currentStep === instructions.length - 1
-              ? t("howToPlay.ready")
-              : t("howToPlay.title")}
-          </h2>
-          <div className="instruction-slide">
-            {instructions[currentStep].content}
-            {currentStep === instructions.length - 1 && (
-              <button onClick={handleClose} className="btn btn--win mx-auto">
-                {t("howToPlay.startNow")}
-              </button>
-            )}
+        <div className="modal__footer">
+          <button
+            type="button"
+            className="btn btn--sm modal__nav"
+            onClick={handlePrev}
+            disabled={isFirst}
+            aria-label={t("common.previous")}
+          >
+            <img src={arrowLeft} alt="" />
+          </button>
+          <div className="modal__dots" aria-hidden="true">
+            {instructions.map((_, index) => (
+              <span
+                key={index}
+                className={`modal__dot ${index === currentStep ? "is-active" : ""}`}
+              />
+            ))}
           </div>
+          {isLast ? (
+            <button
+              type="button"
+              className="btn btn--sm btn--win"
+              onClick={handleClose}
+            >
+              {t("howToPlay.startNow")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn--sm modal__nav"
+              onClick={handleNext}
+              aria-label={t("common.next")}
+            >
+              <img src={arrowRight} alt="" />
+            </button>
+          )}
         </div>
       </div>
     </div>,

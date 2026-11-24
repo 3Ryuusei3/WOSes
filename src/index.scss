@@ -838,20 +838,114 @@ main {
   justify-content: center;
   gap: 1.5rem;
   padding-block: 1rem;
+
+  input {
+    max-width: none;
+  }
 }
 
+// Desktop start screen: form column and ranking side by side, centered
+.fluid-scale .game__container > .h-section:has(.home__container) {
+  justify-content: center;
+  align-items: stretch;
+}
+.fluid-scale .home__container {
+  width: 24rem;
+  flex: 0 0 auto;
+}
+// Ranking box as tall as the form column
+.fluid-scale .top-scores > .score__container--box {
+  flex: 1 1 auto;
+  gap: 0.75rem;
+}
+// ...and the list fills it: rows spread evenly instead of leaving a gap
+.fluid-scale .top-scores > .score__container--box > .v-section {
+  flex: 1 1 auto;
+
+  .ranking {
+    flex: 1 1 auto;
+  }
+  .ranking__grid {
+    flex: 1 1 auto;
+    align-content: space-between;
+  }
+}
+.start-actions {
+  .btn {
+    width: 100%;
+    padding-block: 1rem;
+  }
+}
+
+// Start screen (desktop and mobile): difficulty as a 2x2 grid of big equal
+// buttons; the unselected ones are dimmed so the choice is obvious
 .difficulty-selector {
   position: relative;
-  display: flex;
-  justify-content: center;
-  width: fit-content;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
   gap: 0.5rem;
-  margin-inline: auto;
 
   .btn {
-    margin-bottom: 0.25rem;
+    width: 100%;
+    margin: 0;
+    padding: 0.875rem 0.5rem;
+    font-size: 1rem;
+
+    &:not(.selected) {
+      opacity: 0.55;
+    }
+    &:hover:not(.selected) {
+      opacity: 0.85;
+    }
+    // Odd number of buttons (no daily challenge): last one full width
+    &:last-of-type:nth-of-type(odd) {
+      grid-column: span 2;
+    }
   }
+}
+
+// Solo / multiplayer: segmented control with icon and text
+.players-selector {
+  width: 100%;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background-color: var(--clr-bg-primary-dim);
+  border-radius: 0.25rem;
+
+  .btn {
+    flex: 1 1 0;
+    gap: 0.375rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--clr-text-secondary) !important;
+
+    &:hover {
+      background: transparent;
+      box-shadow: none;
+    }
+    &.selected,
+    &.selected:hover {
+      color: var(--clr-text-primary) !important;
+      background-color: var(--clr-accent-primary);
+    }
+    img {
+      width: 1rem;
+      padding: 0;
+    }
+  }
+  // Icons are white-on-dark when not selected
+  .btn:not(.selected) img {
+    filter: invert(1);
+    opacity: 0.8;
+  }
+}
+
+.players-selector__label {
+  display: inline;
 }
 
 .game__summary {
@@ -1393,23 +1487,6 @@ main {
     border: 0.125rem solid var(--clr-accent-primary);
     box-shadow: 0 0 0 0.25rem var(--clr-progress-bg);
     border-radius: 0.25rem;
-
-    &--ranking {
-      max-width: min(41.875rem, 96vw);
-      max-height: 88vh;
-      padding: 1.375rem 1.125rem;
-      align-items: stretch;
-      gap: 0.75rem;
-
-      .score__container--box {
-        border: none;
-        box-shadow: none;
-        background: transparent;
-        padding: 0;
-        gap: 0.65rem;
-        text-align: inherit;
-      }
-    }
   }
 }
 
@@ -1417,18 +1494,6 @@ main {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-
-  img {
-    display: block;
-    width: 1.375rem;
-    height: 1.375rem;
-  }
-}
-
-.ranking-btn {
-  position: absolute;
-  bottom: -2rem;
-  right: 0rem;
 
   img {
     display: block;
@@ -1446,22 +1511,6 @@ main {
   text-align: center;
   min-height: 8.125rem;
   animation: fadeIn 0.5s ease;
-
-  &__arrows {
-    position: absolute;
-    top: 50%;
-    left: 1.5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 97%;
-    z-index: 1000;
-
-    img {
-      width: 2.5rem;
-      filter: drop-shadow(0px 0.125rem 0px var(--clr-accent-secondary));
-    }
-  }
 }
 
 @keyframes fadeIn {
@@ -1580,14 +1629,16 @@ main {
 
 .mobile {
   --border-width: 1px;
-
-  body {
-    height: 100%;
-  }
   --box-shadow-width: 0.125rem;
 
+  // App-like shell: every screen fills the viewport, content at the top and
+  // the main actions in a bar at the bottom (.screen-actions)
+  body {
+    min-height: 100dvh;
+  }
   main {
-    padding: 0.375rem;
+    min-height: 100dvh;
+    padding: 1rem 0.75rem 0.375rem;
   }
   p {
     font-size: 0.625rem;
@@ -1636,13 +1687,51 @@ main {
     }
   }
   .container {
-    height: 100%;
+    flex: 1 1 auto;
   }
+  // Same panel as on desktop (background, border, corners), only as tall as
+  // its content; the actions bar goes below it, at the bottom of the screen
   .game__container {
-    gap: 0.5rem;
+    flex: 0 0 auto;
+    gap: 0.75rem;
+    max-height: none;
     padding: 0.75rem;
-    border: 0.125rem solid var(--clr-text-secondary);
-    border-radius: 0.25rem;
+    border: 0.25rem solid var(--clr-text-secondary);
+    border-radius: 0.5rem;
+
+    // It gets focused (Enter to continue); no focus ring on touch screens
+    &:focus {
+      outline: none;
+    }
+  }
+  // Game board: no actions bar, so it needs its bottom padding
+  .game__container:has(.game__header) {
+    padding: 0.75rem 0.5rem;
+  }
+  .home {
+    min-height: 100dvh;
+    padding: 0 0.75rem;
+
+    .container,
+    .container > .v-section {
+      flex: 1 1 auto;
+    }
+    // Welcome screen: centered hero text, play button in the bottom bar
+    .container > .v-section > :first-child {
+      margin-top: auto;
+    }
+    .logo {
+      width: 9rem !important;
+    }
+    h1 {
+      font-size: 2.25rem;
+    }
+    h2 {
+      font-size: 1.25rem;
+    }
+    h4 {
+      font-size: 0.9375rem;
+    }
   }
   .game__header {
     gap: 0.5rem;
@@ -1653,6 +1742,14 @@ main {
   }
   .home__container {
     gap: 1rem;
+  }
+  // Start screen selectors: same design as desktop, a bit smaller
+  .difficulty-selector .btn {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+  .players-selector .btn {
+    font-size: 0.75rem;
   }
   .game__summary {
     flex-direction: column;
@@ -1672,8 +1769,16 @@ main {
   }
   .score__container {
     &--wordlist {
-      a {
-        font-size: 0.8125rem;
+      // Long words in 3 columns must fit: font shrinks with the list width
+      container-type: inline-size;
+      width: 100%;
+      grid-template-columns: repeat(var(--wordlist-columns), minmax(0, 1fr));
+      column-gap: 0.5rem;
+
+      a,
+      h6 {
+        font-size: min(0.8125rem, 4.6cqw);
+        overflow-wrap: anywhere;
       }
     }
     &--stats {
@@ -1699,10 +1804,12 @@ main {
     font-size: calc(var(--box) * 0.72);
     border-radius: 0.25rem;
   }
+  // Points of each top letter: follow the box size, never tiny
   .letterPoints {
-    font-size: 0.375rem;
-    bottom: -0.125rem;
-    right: 0px;
+    font-size: max(0.5625rem, calc(var(--box, 2.25rem) * 0.28));
+    line-height: 1;
+    bottom: 0.0625rem;
+    right: 0.125rem;
   }
   .score__info {
     gap: 0.5rem;
@@ -1731,15 +1838,38 @@ main {
   }
   .wordLetters {
     gap: 0.125rem;
+    flex-shrink: 0;
+  }
+  // Multiplayer: word guessed by another player (yours keep the normal one)
+  .word.active.word--other {
+    background-color: var(--clr-accent-primary-dim);
+  }
+  // Default "¡Encuentra anagramas!" text: not needed on a phone
+  .warning-message--default {
+    display: none;
+  }
+  // Game header: values only (no "NIVEL", "DIFICULTAD"... labels)
+  .score__container--abs p {
+    display: none;
+  }
+  // Smaller logo on the game screens (the welcome page has its own)
+  main .logo {
+    width: 3.75rem !important;
   }
   .letter {
-    // Biggest tile that fits: max 22px, limited by the column width divided
-    // by the word length (--letters, set in WordList) and by the list height
-    // divided by its rows (cqh = .wordlist, see "game screen" below)
+    // Biggest tile that fits, same for the whole list: max 28px, limited by
+    // the column width divided by the longest word (--letters, set in
+    // WordList) and by the list height divided by its rows (cqh = .wordlist,
+    // see "game screen" below). The height limit stops at 11px: with that
+    // many words the list scrolls instead of becoming unreadable.
     --tile: min(
-      1.375rem,
+      1.75rem,
       (100cqw - (var(--letters, 7) - 1) * 0.125rem - 0.25rem) / var(--letters, 7),
-      (100cqh - (var(--wordlist-rows, 8) - 1) * 0.125rem) / var(--wordlist-rows, 8) - 0.25rem
+      max(
+        0.6875rem,
+        (100cqh - (var(--wordlist-rows, 8) - 1) * 1px) /
+          var(--wordlist-rows, 8)
+      )
     );
     width: var(--tile);
     height: var(--tile);
@@ -1752,14 +1882,6 @@ main {
   .modal {
     &__close {
       padding: 0.25rem;
-    }
-    h2 {
-      margin-top: 0.625rem;
-    }
-    .instruction-slide {
-      &__arrows {
-        top: 12%;
-      }
     }
   }
   .tooltip-container {
@@ -1776,32 +1898,66 @@ main {
     bottom: unset;
   }
 
-  // Game screen with on-screen keyboard: fit exactly one screen. The word
-  // list takes the leftover height and the tiles size themselves from it.
-  body:has(.mobile-game-keyboard) {
+  // Game screen: fit exactly one screen, with a fixed space at the bottom
+  // for the device keyboard (.keyboard-reserve) so nothing moves when it
+  // opens. The word list takes the leftover height and sizes its tiles.
+  body:has(.keyboard-reserve) {
     height: 100dvh;
     min-height: 0;
+    // The page never scrolls while playing (iOS must not shift it when the
+    // input gets focus)
+    overflow: hidden;
 
+    main {
+      min-height: 0;
+      height: 100dvh;
+      padding-bottom: 0;
+    }
+
+    .logo-container {
+      margin-bottom: 0.5rem;
+    }
     .container {
       flex: 1 1 auto;
       min-height: 0;
     }
+    // Every pixel goes to the word list
     .game__container {
       flex: 1 1 auto;
       min-height: 0;
       max-height: none;
+      gap: 0.5rem;
+      padding: 0.5rem;
+    }
+    .game__header {
+      gap: 0.375rem;
+    }
+    .wordlist {
+      row-gap: 1px;
+    }
+    .word,
+    .word.active {
+      padding: 0;
+      border: none;
     }
     .wordlist {
       flex: 1 1 0;
       min-height: 0;
       container-type: size;
+      // Rows as tall as their tiles (no stretching), block centered
+      grid-template-rows: repeat(var(--wordlist-rows), auto);
       align-content: center;
+      overflow-y: auto;
     }
     // Player view: the attempts take the leftover space and scroll
     .attemptList {
       flex: 1 1 0;
       min-height: 0;
       max-height: none;
+    }
+    // ...except when the board is shown: then only the last attempt
+    .attemptList--last {
+      flex: 0 0 auto;
     }
   }
 }
@@ -2104,107 +2260,301 @@ main {
   }
 }
 
-.mobile-game-keyboard {
-  width: 100%;
-  margin-top: auto;
+
+// Mobile: segmented control that replaces modals (e.g. play / ranking)
+.segmented-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 0.4375rem;
-  padding: 0.5rem 0.3125rem calc(0.625rem + env(safe-area-inset-bottom, 0px));
-  background-color: var(--clr-bg-secondary);
-  border-top: 0.25rem solid var(--clr-text-secondary);
-  box-sizing: border-box;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 0.25rem;
+  background-color: var(--clr-bg-primary-dim);
+  border-radius: 0.25rem;
 
-  &__row {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: stretch;
-    gap: 0.3125rem;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  &__row--offset {
-    padding-left: 4.5%;
-    padding-right: 0;
-    box-sizing: border-box;
-  }
-
-  &__row--bottom-letters {
-    justify-content: flex-start;
-    padding-right: 0;
-  }
-
-  &__gap-left {
-    flex: 0.55 0 0;
-    min-width: 0.625rem;
-    max-width: 1.375rem;
-    align-self: stretch;
-    pointer-events: none;
-  }
-
-  &__row--send {
-    margin-top: 0.125rem;
-    padding: 0 1px;
-  }
-
-  &__key {
+  &__tab {
     flex: 1 1 0;
-    min-width: 0;
-    // Shorter keys on short screens so the whole game fits
-    min-height: min(2.75rem, 6.2dvh);
-    padding: 0 0.125rem;
-    font-size: 1.08rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--clr-text-primary);
-    background-color: var(--clr-text-secondary);
-    border: 1px solid var(--clr-border-secondary);
-    border-radius: 0.4375rem;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
-    cursor: pointer;
-    touch-action: manipulation;
-    appearance: none;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-
-    &:disabled {
-      opacity: 0.38;
-      cursor: not-allowed;
-    }
-
-    &:hover {
-      background-color: var(--clr-text-secondary);
-      box-shadow: none;
-    }
-  }
-
-  &__key--backspace {
-    flex: 1.45 1 0;
-    min-width: 2.75rem;
-    font-size: 1.2rem;
-    font-weight: 500;
-  }
-
-  &__key--send {
-    flex: 1 1 auto;
-    width: 100%;
-    min-height: min(3rem, 6.8dvh);
-    font-size: 0.95rem;
-    font-weight: 900;
-    text-transform: none;
-    letter-spacing: 0.04em;
-    color: var(--clr-bg-secondary);
-    background-color: var(--clr-accent-primary);
-    border: 1px solid var(--clr-accent-secondary);
-    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--clr-text-secondary) !important;
+    background: transparent;
+    border: none;
+    border-radius: 0.25rem;
     box-shadow: none;
 
     &:hover {
-      background-color: var(--clr-accent-primary-highlight);
+      background: transparent;
+      box-shadow: none;
+    }
+
+    &.is-active,
+    &.is-active:hover {
+      color: var(--clr-text-primary) !important;
+      background-color: var(--clr-accent-primary);
     }
   }
+}
+
+.mobile {
+  .game__container--join {
+    padding-block: 0.75rem !important;
+  }
+
+  // Countdown: just the animation, no panel. It shares the screen with the
+  // keyboard space, so the animation scales to the height it gets.
+  .game__container--loading {
+    background: none;
+    border: none;
+    filter: none;
+    justify-content: center;
+    gap: 0.5rem;
+
+    .loading__container {
+      flex: 1 1 auto;
+      min-height: 0;
+      align-self: stretch;
+      container-type: size;
+    }
+    .loading__container--box {
+      width: min(6.875rem, 36cqmin);
+      height: min(6.875rem, 36cqmin);
+    }
+    .loading__container--box-md {
+      width: min(8.75rem, 46cqmin);
+      height: min(8.75rem, 46cqmin);
+    }
+    .loading__container--box-lg {
+      width: min(10.625rem, 56cqmin);
+      height: min(10.625rem, 56cqmin);
+    }
+    .loading__container--box-xl {
+      width: min(12.5rem, 66cqmin);
+      height: min(12.5rem, 66cqmin);
+    }
+  }
+
+  .player-list {
+    min-height: 0;
+  }
+
+  .mobile-ranking {
+    gap: 0.65rem;
+    padding: 1rem 0.75rem;
+    text-align: inherit;
+
+    // Desktop end screen forces a 25rem ranking; on a phone it must fit
+    .ranking {
+      min-width: 0;
+    }
+  }
+
+  // Main actions of each screen, stuck to the bottom like an app
+  .screen-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    gap: 0.5rem;
+    width: auto;
+    align-self: stretch;
+    margin: auto -0.75rem 0;
+    padding: 0.75rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    // Fades the content that scrolls under it
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--clr-bg-primary) 0.75rem
+    );
+
+    .btn {
+      flex: 1 1 0;
+      max-width: none;
+      margin: 0;
+      padding-block: 0.875rem;
+      font-size: 0.9375rem;
+    }
+  }
+
+  // Welcome page: the button floats over the background image
+  .home .screen-actions {
+    margin-inline: 0;
+    padding-inline: 0;
+    background: none;
+  }
+}
+
+// Mobile game screen: space where the device keyboard appears. Height is the
+// measured keyboard height (KeyboardReserve) or an estimate until then.
+.keyboard-reserve {
+  flex: 0 0 var(--kb-height, 44dvh);
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  margin: 0 -0.75rem;
+  padding: 0;
+  background: var(--clr-bg-primary-dim);
+  border: none;
+  border-top: var(--border-width) solid var(--clr-border-primary);
+  border-radius: 0;
+  box-shadow: none;
+
+  &:hover {
+    background: var(--clr-bg-primary-dim);
+    box-shadow: none;
+  }
+}
+
+// Multiplayer player: points / board toggle / reconnect, all the same height
+// (the reconnect icon used to make its button taller)
+.player-actions {
+  align-items: stretch;
+
+  .btn img {
+    width: auto;
+    height: 0.875rem;
+    padding: 0;
+  }
+}
+
+// Ranking difficulty tabs: each one in its difficulty's color (same as the
+// difficulty buttons: easy = win, medium = accent, hard = lose, daily = still)
+@each $difficulty, $color in (
+  easy: var(--clr-win),
+  medium: var(--clr-accent-primary),
+  hard: var(--clr-lose),
+  daily: var(--clr-still)
+) {
+  .segmented-tabs__tab--#{$difficulty} {
+    color: $color !important;
+
+    &.is-active,
+    &.is-active:hover {
+      color: var(--clr-text-primary) !important;
+      background-color: $color;
+    }
+  }
+}
+
+.segmented-tabs--sm {
+  gap: 0.125rem;
+  padding: 0.125rem;
+
+  .segmented-tabs__tab {
+    padding: 0.375rem 0.125rem;
+    font-size: 0.5625rem;
+    white-space: nowrap;
+  }
+}
+
+// Modals with steps / explanations ("Cómo jugar", letter types): title,
+// content and a bottom bar with the actions (no floating arrows)
+.modal__content--steps {
+  max-width: 34rem;
+  gap: 1.25rem;
+  align-items: stretch;
+  padding: 1.5rem 1.25rem 1.25rem;
+
+  h2 {
+    text-align: center;
+  }
+}
+
+// All slides in the same cell: the modal takes the tallest one's height
+.modal__steps {
+  display: grid;
+
+  > .instruction-slide {
+    grid-area: 1 / 1;
+    visibility: hidden;
+    animation: none;
+
+    &.is-active {
+      visibility: visible;
+      animation: fadeIn 0.4s ease;
+    }
+  }
+}
+
+.modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  // Same height for every footer button (no jump on the last slide)
+  .btn {
+    height: 2.5rem;
+    padding-block: 0;
+  }
+}
+
+// Prev / next: outline buttons with the arrow
+.modal__nav {
+  padding: 0.375rem 0.875rem;
+  background: transparent;
+  border: var(--border-width) solid var(--clr-accent-primary);
+  box-shadow: none;
+
+  img {
+    display: block;
+    width: 1.25rem;
+  }
+  &:hover {
+    background: var(--clr-accent-primary-dim);
+    box-shadow: none;
+  }
+  &:disabled {
+    opacity: 0.35;
+    background: transparent;
+    border-color: var(--clr-accent-primary);
+    box-shadow: none;
+  }
+}
+
+// Step indicator
+.modal__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.modal__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background-color: var(--clr-bg-terciary);
+  opacity: 0.5;
+  transition:
+    width 0.2s ease,
+    opacity 0.2s ease;
+
+  &.is-active {
+    width: 1.25rem;
+    background-color: var(--clr-accent-primary);
+    opacity: 1;
+  }
+}
+
+.modal__primary {
+  flex: 1 1 auto;
+}
+
+// Secondary action (e.g. "Cómo jugar"): outline only
+.btn--ghost {
+  color: var(--clr-accent-primary) !important;
+  background: transparent;
+  border: var(--border-width) solid var(--clr-accent-primary);
+  box-shadow: none;
+
+  &:hover {
+    background: var(--clr-accent-primary-dim);
+    box-shadow: none;
+  }
+}
+
+// "Cómo jugar" slide 2: the three difficulties, just as an illustration
+.instruction-difficulties {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
 }

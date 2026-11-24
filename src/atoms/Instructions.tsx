@@ -40,21 +40,24 @@ const Instructions = () => {
       content: (
         <>
           <h4 className="highlight">{t("instructions.wordsOrganized")}</h4>
-          <div className="difficulty-selector">
-            <button className="btn--sm btn--win">
+          {/* Just an illustration (not the start screen's selector) */}
+          <div className="instruction-difficulties">
+            <span className="btn btn--sm btn--deco btn--win">
               {t("difficulties.easy")}
-            </button>
-            <button className="btn--sm">{t("difficulties.medium")}</button>
-            <button className="btn--sm btn--lose">
+            </span>
+            <span className="btn btn--sm btn--deco">
+              {t("difficulties.medium")}
+            </span>
+            <span className="btn btn--sm btn--deco btn--lose">
               {t("difficulties.hard")}
-            </button>
+            </span>
           </div>
         </>
       ),
     },
     {
       content: (
-        <div className="instruction-slide v-section gap-md">
+        <>
           <h4 className="highlight">{t("instructions.example")}</h4>
           <div className="selectedWord">
             <span className="selectedLetter">
@@ -198,7 +201,7 @@ const Instructions = () => {
               </>
             )}
           </ul>
-        </div>
+        </>
       ),
     },
     {

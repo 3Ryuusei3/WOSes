@@ -4,16 +4,6 @@ import reloadIcon from "../../assets/reload.svg";
 import { submitWord } from "../../services/multiplayer";
 import Word from "../../types/Word";
 import Difficulty from "../../types/Difficulty";
-import ScoreContainer from "../../atoms/ScoreContainer";
-import WarningMessage from "../../atoms/WarningMessage";
-import SelectedWord from "../../atoms/SelectedWord";
-import ProgressBar from "../../atoms/ProgressBar";
-import MobileGameKeyboard from "../../atoms/MobileGameKeyboard";
-import useMobileUserAgent from "../../hooks/useMobileUserAgent";
-import useGameStore from "../../store/useGameStore";
-import { useRoomRealtimeStore } from "../../realtime/roomRealtime";
-import { RUNNING_OUT_OF_TIME_PERCENTAGE } from "../../constant";
-
 import Mechanics from "../../types/Mechanics";
 
 const NO_MECHANICS: Mechanics = {
@@ -24,6 +14,18 @@ const NO_MECHANICS: Mechanics = {
   still: false,
   mirrored: false,
 };
+import ScoreContainer from "../../atoms/ScoreContainer";
+import WarningMessage from "../../atoms/WarningMessage";
+import SelectedWord from "../../atoms/SelectedWord";
+import ProgressBar from "../../atoms/ProgressBar";
+import KeyboardReserve from "../../atoms/KeyboardReserve";
+import WordList from "../../atoms/WordList";
+import useMobileUserAgent from "../../hooks/useMobileUserAgent";
+import useGameStore from "../../store/useGameStore";
+import { useRoomRealtimeStore } from "../../realtime/roomRealtime";
+import { RUNNING_OUT_OF_TIME_PERCENTAGE } from "../../constant";
+
+const SHOW_BOARD_KEY = "wos:player-show-board";
 
 interface PlayerAttempt {
   word: string;
@@ -74,9 +76,28 @@ export default function PlayerGameView({
   // Letras exactamente como las ve el host (llegan por Realtime)
   const board = useRoomRealtimeStore((s) => s.board);
   const storeLevel = useGameStore((s) => s.level);
+  const myName = useGameStore((s) => s.playerName);
+  // Word list (with who guessed each word), can be hidden; the letters and
+  // the timer are always shown. Remembered on this device for next games.
+  const [showBoard, setShowBoard] = useState(
+    () => localStorage.getItem(SHOW_BOARD_KEY) !== "0",
+  );
+  const toggleBoard = () => {
+    setShowBoard((prev) => {
+      localStorage.setItem(SHOW_BOARD_KEY, prev ? "0" : "1");
+      return !prev;
+    });
+  };
   const storeDifficulty = useGameStore((s) => s.gameDifficulty);
   const [playerAttempts, setPlayerAttempts] = useState<PlayerAttempt[]>([]);
   const inputWordRef = useRef(inputWord);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Mobile: take the focus at the start (Android opens the keyboard; on iOS
+  // the round isn't started by this player's tap, so they tap the input)
+  useEffect(() => {
+    if (isMobile) inputRef.current?.focus({ preventScroll: true });
+  }, [isMobile]);
 
   useEffect(() => {
     inputWordRef.current = inputWord;
@@ -159,7 +180,17 @@ export default function PlayerGameView({
           (board?.daily_original_difficulty as Difficulty | null) ?? null
         }
       />
-      <div className="game__container game__container--player">
+      <div
+        className="game__container game__container--player"
+        // Mobile: tapping the board must not close the device keyboard
+        onMouseDown={
+          isMobile
+            ? (e) => {
+                if (!(e.target instanceof HTMLInputElement)) e.preventDefault();
+              }
+            : undefined
+        }
+      >
         <div className="game__header">
           <div className="v-section">
             {board ? (
@@ -183,9 +214,26 @@ export default function PlayerGameView({
             SHOW_LETTERS_PERCENTAGE={board?.show_letters_percentage ?? 0}
           />
         </div>
-        <div className="h-section gap-xs f-ai-c">
+        {showBoard && (
+          <WordList
+            words={words}
+            playerName={myName}
+            percentage={percentage}
+            gameMechanics={board?.mechanics ?? NO_MECHANICS}
+            SHOW_LETTERS_PERCENTAGE={board?.show_letters_percentage ?? 0}
+          />
+        )}
+        <div className="h-section gap-xs player-actions">
           <button className="btn btn--deco btn--xs">
             {t("common.points")} {playerRoundPoints}
+          </button>
+          <button
+            type="button"
+            className="btn btn--xs"
+            onClick={toggleBoard}
+            aria-pressed={showBoard}
+          >
+            {showBoard ? t("game.hideBoard") : t("game.showBoard")}
           </button>
           {showReconnectButton && (
             <button
@@ -203,7 +251,22 @@ export default function PlayerGameView({
             </button>
           )}
         </div>
+        {/* With the board visible, only the last attempt as feedback */}
+        <div className={`attemptList ${showBoard ? "attemptList--last" : ""}`}>
+          {(showBoard ? playerAttempts.slice(0, 1) : playerAttempts).map(
+            (it, idx) => (
+              <h4
+                key={`${idx}-${it.word}`}
+                className={`${it.status === "correct" ? "highlight" : it.status === "tip" ? "tip" : "dark"} txt-center`}
+              >
+                {it.word.toUpperCase()}
+              </h4>
+            ),
+          )}
+        </div>
+        {/* Right above the device keyboard */}
         <input
+          ref={inputRef}
           type="text"
           className="mx-auto"
           placeholder={t("game.inputWord")}
@@ -211,37 +274,17 @@ export default function PlayerGameView({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           disabled={percentage === 0}
-          // En móvil se escribe con el teclado propio (como en un jugador)
-          inputMode={isMobile ? "none" : undefined}
           autoFocus={!isMobile}
+          enterKeyHint="send"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
         />
-        <div className="attemptList">
-          {playerAttempts.map((it, idx) => (
-            <h4
-              key={`${idx}-${it.word}`}
-              className={`${it.status === "correct" ? "highlight" : it.status === "tip" ? "tip" : "dark"} txt-center`}
-            >
-              {it.word.toUpperCase()}
-            </h4>
-          ))}
-        </div>
       </div>
       {isMobile && (
-        <MobileGameKeyboard
-          disabled={percentage === 0}
-          value={inputWord}
-          onValueChange={(next) =>
-            handleChange({
-              target: { value: next },
-            } as React.ChangeEvent<HTMLInputElement>)
-          }
-          onEnter={(value) => void submitCurrentWord(value)}
-          shuffledWordObject={board?.letters ?? []}
-          gameMechanics={
-            board?.mechanics ?? NO_MECHANICS
-          }
-          percentage={percentage}
-          showLettersPercentage={board?.show_letters_percentage ?? 0}
+        <KeyboardReserve
+          onActivate={() => inputRef.current?.focus({ preventScroll: true })}
         />
       )}
     </>

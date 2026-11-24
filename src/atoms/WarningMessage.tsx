@@ -113,7 +113,13 @@ export default function WarningMessage({ gameMechanics }: WarningMessageProps) {
 
   return (
     <>
-      <h4>
+      {/* The default "find anagrams" text is hidden on mobile (see index.scss);
+          mechanic warnings are always shown */}
+      <h4
+        className={
+          conditions.length === 0 ? "warning-message--default" : undefined
+        }
+      >
         {conditions.length > 0 && t("warningMessage.warning")}
         {formatWithStyles(getFormattedText())}
       </h4>

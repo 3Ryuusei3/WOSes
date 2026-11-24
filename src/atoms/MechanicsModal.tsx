@@ -3,12 +3,14 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getMechanicInfo } from "../constant/mechanics";
 import closeIcon from "../assets/close.svg";
+
 interface MechanicsModalProps {
   isOpen: boolean;
   setModalOpen: Dispatch<SetStateAction<boolean>>;
   mechanicType: string;
 }
 
+/** Explains one letter type (fake, hidden, dark...) with an example. */
 export default function MechanicsModal({
   isOpen,
   setModalOpen,
@@ -19,41 +21,21 @@ export default function MechanicsModal({
     setModalOpen(false);
   };
 
-  const getMechanicInstructions = () => {
-    const mechanicInfo = getMechanicInfo(mechanicType);
-
-    if (!mechanicInfo) {
-      return (
-        <>
-          <h2>MECÁNICA DESCONOCIDA</h2>
-          <div className="instruction-slide">
-            <h4 className="highlight">
-              No hay información disponible para esta mecánica
-            </h4>
-          </div>
-        </>
-      );
-    }
-
-    return (
-      <>
-        <h2 className="won">{mechanicInfo.label}</h2>
-        <div className="instruction-slide">
-          <h3 className="highlight">{mechanicInfo.description}</h3>
-          {mechanicInfo.example}
-          <h6 className="highlight">{mechanicInfo.show}</h6>
-        </div>
-      </>
-    );
-  };
-
   if (!isOpen) {
     return null;
   }
 
+  const mechanicInfo = getMechanicInfo(mechanicType);
+
   return createPortal(
-    <div className="modal open">
-      <div className="modal__content">
+    <div className="modal open" onClick={handleClose} role="presentation">
+      <div
+        className="modal__content modal__content--steps"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={mechanicInfo?.label}
+      >
         <button
           type="button"
           className="modal__close btn btn--lost btn--xs"
@@ -62,10 +44,32 @@ export default function MechanicsModal({
         >
           <img src={closeIcon} alt="close" width={16} height={16} />
         </button>
-        <div className="v-section gap-md pos-rel">
-          {getMechanicInstructions()}
-          <button onClick={handleClose} className="btn mx-auto">
-            ENTENDIDO
+        {mechanicInfo ? (
+          <>
+            <h2 className="won">{mechanicInfo.label}</h2>
+            <div className="instruction-slide is-active">
+              <h4 className="highlight">{mechanicInfo.description}</h4>
+              {mechanicInfo.example}
+              <h6 className="highlight">{mechanicInfo.show}</h6>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2>MECÁNICA DESCONOCIDA</h2>
+            <div className="instruction-slide is-active">
+              <h4 className="highlight">
+                No hay información disponible para esta mecánica
+              </h4>
+            </div>
+          </>
+        )}
+        <div className="modal__footer">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="btn modal__primary"
+          >
+            {t("common.understood")}
           </button>
         </div>
       </div>

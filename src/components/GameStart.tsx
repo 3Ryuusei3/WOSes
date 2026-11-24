@@ -14,10 +14,8 @@ import useRoomManager from "../hooks/useRoomManager";
 import useMobileUserAgent from "../hooks/useMobileUserAgent";
 
 import useGameStore from "../store/useGameStore";
-import {
-  MobileRankingOpenButton,
-  RankingPopupModal,
-} from "../atoms/RankingPopup";
+import SegmentedTabs from "../atoms/SegmentedTabs";
+import { primeMobileKeyboard } from "../utils/mobileKeyboard";
 import GameSound from "../atoms/GameSound";
 import PlayersSelector from "../atoms/PlayersSelector";
 
@@ -52,7 +50,12 @@ export default function GameStart() {
   } = useGameStore();
   const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
-  const [rankingPopupOpen, setRankingPopupOpen] = useState(false);
+  // Mobile: ranking is a tab of the screen instead of a modal
+  const [mobileTab, setMobileTab] = useState<"play" | "ranking">("play");
+  // Mobile ranking tab: its own difficulty (doesn't change the game's).
+  // null = follow the difficulty selected to play.
+  const [rankingTabDifficulty, setRankingTabDifficulty] =
+    useState<Difficulty | null>(null);
   const [isDailyChallengeSelected, setIsDailyChallengeSelected] =
     useState(false);
   const isMobileUa = useMobileUserAgent();
@@ -109,11 +112,14 @@ export default function GameStart() {
     }
 
     if (isDailyChallengeSelected && dailyChallenge) {
+      primeMobileKeyboard();
       startDailyChallenge();
       return;
     }
 
     if (players === "single") {
+      // Same tap opens the keyboard on iOS (see primeMobileKeyboard)
+      primeMobileKeyboard();
       setMode("loading");
       setDailyChallengeOriginalDifficulty(null);
     } else {
@@ -153,7 +159,7 @@ export default function GameStart() {
 
   const getButtonText = () => {
     if (isDailyChallengeSelected) {
-      return t("common.start", { difficulty: t("difficulties.daily") });
+      return t("gameStart.startDaily");
     }
     const difficultyLabel = t(`difficulties.${gameDifficulty}`);
     if (players === "multi") {
@@ -184,93 +190,136 @@ export default function GameStart() {
     isDailyChallengeSelected || gameDifficulty === "daily"
       ? "daily"
       : gameDifficulty;
-  const rankingChallengeNumber =
-    isDailyChallengeSelected || gameDifficulty === "daily"
-      ? dailyChallenge?.challenge_number
-      : undefined;
+
+  // Ranking shown: on mobile the one picked in its tabs (doesn't change the
+  // game's difficulty); otherwise / until then, the difficulty selected to play
+  const shownRankingDifficulty =
+    (isMobileUa && rankingTabDifficulty) || rankingDifficulty;
+
+  const handleRankingDifficulty = (difficulty: Difficulty) => {
+    setRankingTabDifficulty(difficulty);
+    // The daily ranking needs today's challenge number
+    if (difficulty === "daily" && !dailyChallenge && !loadingChallenge) {
+      void loadDailyChallenge();
+    }
+  };
 
   const rankingPanel = (
     <>
-      {alreadyPlayed &&
-        (isDailyChallengeSelected || gameDifficulty === "daily") && (
-          <p className="daily-retry-note">{t("dailyChallenge.retryNote")}</p>
-        )}
-      <TopScores
-        difficulty={rankingDifficulty}
-        challengeNumber={rankingChallengeNumber}
-      />
+      {/* Mobile only: on desktop the ranking follows the selected difficulty */}
+      {isMobileUa && (
+        <SegmentedTabs
+          tabs={(["easy", "medium", "hard", "daily"] as Difficulty[]).map(
+            (d) => ({
+              key: d,
+              label: t(`difficulties.${d}`),
+              // Same colors as the difficulty buttons
+              className: `segmented-tabs__tab--${d}`,
+            }),
+          )}
+          active={shownRankingDifficulty}
+          onChange={handleRankingDifficulty}
+          size="sm"
+        />
+      )}
+      {alreadyPlayed && shownRankingDifficulty === "daily" && (
+        <p className="daily-retry-note">{t("dailyChallenge.retryNote")}</p>
+      )}
+      {shownRankingDifficulty === "daily" && !dailyChallenge ? (
+        <p className="txt-center">{t("common.loading")}</p>
+      ) : (
+        <TopScores
+          difficulty={shownRankingDifficulty}
+          challengeNumber={
+            shownRankingDifficulty === "daily"
+              ? dailyChallenge?.challenge_number
+              : undefined
+          }
+        />
+      )}
     </>
   );
+
+  const startButton = (
+    <button
+      className={`btn ${
+        isDailyChallengeSelected
+          ? "btn--daily"
+          : gameDifficulty === "easy"
+            ? "btn--win"
+            : gameDifficulty === "hard"
+              ? "btn--lose"
+              : ""
+      }`}
+      onClick={handleSubmit}
+    >
+      {getButtonText()}
+    </button>
+  );
+
+  const showForm = !isMobileUa || mobileTab === "play";
 
   return (
     <>
       <div className="game__container f-jc-c pos-rel">
+        {isMobileUa && (
+          <SegmentedTabs
+            tabs={[
+              { key: "play", label: t("common.play") },
+              { key: "ranking", label: t("common.ranking") },
+            ]}
+            active={mobileTab}
+            onChange={setMobileTab}
+          />
+        )}
         <div className="h-section gap-lg">
-          <div className="home__container">
-            <h2 className="highlight">{t("gameStart.nameAndDifficulty")}</h2>
-            <DifficultySelector
-              gameDifficulty={gameDifficulty}
-              onDifficultyChange={handleDifficultyChange}
-              showDailyChallenge={players === "single"}
-              onDailyChallengeClick={handleDailyChallenge}
-              loadingDaily={loadingChallenge}
-              isDailyChallengeSelected={isDailyChallengeSelected}
-            />
-            <PlayersSelector
-              players={players}
-              setPlayers={setPlayers}
-              onDifficultyChange={handleDifficultyChange}
-            />
-            <div className="v-section gap-xs">
-              <input
-                className="mx-auto"
-                type="text"
-                placeholder={t("common.enterName")}
-                value={playerName}
-                onChange={handleChange}
-                onKeyDown={handleKeyDown}
+          {showForm && (
+            <div className="home__container">
+              <h2 className="highlight">{t("gameStart.nameAndDifficulty")}</h2>
+              <DifficultySelector
+                gameDifficulty={gameDifficulty}
+                onDifficultyChange={handleDifficultyChange}
+                showDailyChallenge={players === "single"}
+                onDailyChallengeClick={handleDailyChallenge}
+                loadingDaily={loadingChallenge}
+                isDailyChallengeSelected={isDailyChallengeSelected}
               />
-              <small className={`txt-center ${error ? "" : "op-0"}`}>
-                {t("gameStart.nameError")}
-              </small>
-            </div>
-            <h6
-              className="highlight cursor"
-              onClick={() => setHowToPlayModal(true)}
-            >
-              <u>{t("gameStart.learnToPlay")}</u>
-            </h6>
-            <div className="h-section gap-xs f-jc-c">
+              <PlayersSelector
+                players={players}
+                setPlayers={setPlayers}
+                onDifficultyChange={handleDifficultyChange}
+              />
+              <div className="v-section gap-xs">
+                <input
+                  className="mx-auto"
+                  type="text"
+                  placeholder={t("common.enterName")}
+                  value={playerName}
+                  onChange={handleChange}
+                  onKeyDown={handleKeyDown}
+                />
+                <small className={`txt-center ${error ? "" : "op-0"}`}>
+                  {t("gameStart.nameError")}
+                </small>
+              </div>
               <button
-                className={`btn ${
-                  isDailyChallengeSelected
-                    ? "btn--daily"
-                    : gameDifficulty === "easy"
-                      ? "btn--win"
-                      : gameDifficulty === "hard"
-                        ? "btn--lose"
-                        : ""
-                }`}
-                onClick={handleSubmit}
+                type="button"
+                className="btn btn--sm btn--ghost mx-auto"
+                onClick={() => setHowToPlayModal(true)}
               >
-                {getButtonText()}
+                {t("gameStart.howToPlayButton")}
               </button>
+              {!isMobileUa && (
+                <div className="start-actions">{startButton}</div>
+              )}
             </div>
-          </div>
+          )}
           {isMobileUa ? (
-            <>
-              <MobileRankingOpenButton
-                onClick={() => setRankingPopupOpen(true)}
-              />
-              <RankingPopupModal
-                isOpen={rankingPopupOpen}
-                onClose={() => setRankingPopupOpen(false)}
-              >
-                <div className="score__container--box dark w100">
-                  {rankingPanel}
-                </div>
-              </RankingPopupModal>
-            </>
+            mobileTab === "ranking" && (
+              <div className="score__container--box dark w100 mobile-ranking">
+                {rankingPanel}
+              </div>
+            )
           ) : (
             <div className="ranking ranking--lg v-section gap-md top-scores">
               <div className="score__container--box dark">{rankingPanel}</div>
@@ -279,6 +328,8 @@ export default function GameStart() {
         </div>
         <GameSound />
       </div>
+      {/* Mobile: outside the panel, stuck to the bottom of the screen */}
+      {isMobileUa && <div className="screen-actions">{startButton}</div>}
       <HowToPlayModal
         isOpen={howToPlayModal}
         setHowToPlayModal={setHowToPlayModal}

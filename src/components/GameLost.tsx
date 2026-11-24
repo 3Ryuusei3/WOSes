@@ -3,10 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import TopScores from "../atoms/TopScores";
-import {
-  MobileRankingOpenButton,
-  RankingPopupModal,
-} from "../atoms/RankingPopup";
+import SegmentedTabs from "../atoms/SegmentedTabs";
 import PlayersPanel from "../atoms/PlayersPanel";
 import GameSound from "../atoms/GameSound";
 import DifficultyTag from "../atoms/DifficultyTag";
@@ -72,7 +69,8 @@ export default function GameLost() {
   const isMobileUa = useMobileUserAgent();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
-  const [rankingPopupOpen, setRankingPopupOpen] = useState(false);
+  // Mobile: ranking is a tab of the screen instead of a modal
+  const [mobileTab, setMobileTab] = useState<"summary" | "ranking">("summary");
   const { words } = useLanguageWords(gameDifficulty);
   const { forceReconnect, isConnected } = useRealtimeConnection();
   const roomManager = useRoomManager();
@@ -222,181 +220,175 @@ export default function GameLost() {
   }, [volume]);
 
   if (players === "multi" && role === "player") {
-    return (
-      <div className="game__container f-jc-c">
-        <PlayersPanel lastLevelWords={lastLevelWords} />
-        <div className="v-section gap-md f-jc-c mt-sm">
-          <div className="score__container--box dark">
-            <p className="txt-center">{t("game.waitingForHost")}</p>
-          </div>
-          <div className="h-section gap-xs f-jc-c">
-            <button className="btn btn--sm btn--lose" onClick={handleExit}>
-              {t("game.exit")}
-            </button>
-            {!isConnected && (
-              <button onClick={forceReconnect} className="btn btn--sm">
-                {t("game.reconnect")}
-              </button>
-            )}
-          </div>
-        </div>
+    const waitingActions = (
+      <div className="h-section gap-xs f-jc-c screen-actions">
+        <button className="btn btn--sm btn--lose" onClick={handleExit}>
+          {t("game.exit")}
+        </button>
+        {!isConnected && (
+          <button onClick={forceReconnect} className="btn btn--sm">
+            {t("game.reconnect")}
+          </button>
+        )}
       </div>
+    );
+
+    return (
+      <>
+        <div className="game__container f-jc-c">
+          <PlayersPanel lastLevelWords={lastLevelWords} />
+          <div className="v-section gap-md f-jc-c mt-sm">
+            <div className="score__container--box dark">
+              <p className="txt-center">{t("game.waitingForHost")}</p>
+            </div>
+          </div>
+          {!isMobileUa && waitingActions}
+        </div>
+        {/* Mobile: outside the panel, stuck to the bottom of the screen */}
+        {isMobileUa && waitingActions}
+      </>
     );
   }
 
+  const ranking = isDailyChallenge ? (
+    <TopScores
+      hasTooltip
+      difficulty="daily"
+      challengeNumber={currentChallengeNumber!}
+    />
+  ) : (
+    <TopScores hasTooltip difficulty={gameDifficulty} />
+  );
+
+  const showSummary = !isMobileUa || mobileTab === "summary";
+
+  const actions = (
+    <div className="h-section gap-xs f-jc-c mb-sm screen-actions">
+      {!isDailyChallenge && players === "multi" && (
+        <button className="btn btn--sm btn--lose" onClick={handleExit}>
+          {t("game.exit")}
+        </button>
+      )}
+      <button
+        className="btn"
+        onClick={handlePlayAgain}
+        disabled={!isDailyChallenge && isCreatingRoom}
+      >
+        {isDailyChallenge
+          ? t("common.startNewGame")
+          : isCreatingRoom
+            ? t("game.creatingNewRoom")
+            : t("common.playAgain")}
+      </button>
+    </div>
+  );
+
   return (
-    <div className="game__container game__container--lost f-jc-c">
-      <div className="difficulty-tag">
-        <DifficultyTag
-          gameDifficulty={gameDifficulty}
-          dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
-        />
-      </div>
-      {isDailyChallenge ? (
-        <>
+    <>
+      <div className="game__container game__container--lost f-jc-c">
+        <div className="difficulty-tag">
+          <DifficultyTag
+            gameDifficulty={gameDifficulty}
+            dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
+          />
+        </div>
+        {isDailyChallenge ? (
           <h1 className={isDailyChallengeCompleted ? "won" : "lost"}>
             {isDailyChallengeCompleted
               ? t("dailyChallenge.completed")
               : t("dailyChallenge.lost")}
           </h1>
-          <div className="game__review">
-            <div className="v-section">
-              <StatBox
-                label={t("common.totalPoints")}
-                value={totalPoints}
-                size="sm"
-              />
-            </div>
-            <div className="v-section">
-              <StatBox
-                label={t("common.remainingTime")}
-                value={`${gameTime}s`}
-                size="sm"
-              />
-            </div>
-          </div>
-          <div className="game__summary">
-            <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
-            {!isMobileUa && (
-              <div className="score__container--box pos-rel">
-                <TopScores
-                  hasTooltip
-                  difficulty="daily"
-                  challengeNumber={currentChallengeNumber!}
+        ) : (
+          <h1 className="lost">{t("game.lost")}</h1>
+        )}
+        {isMobileUa && (
+          <SegmentedTabs
+            tabs={[
+              { key: "summary", label: t("common.summary") },
+              { key: "ranking", label: t("common.ranking") },
+            ]}
+            active={mobileTab}
+            onChange={setMobileTab}
+          />
+        )}
+        {showSummary &&
+          (isDailyChallenge ? (
+            <div className="game__review">
+              <div className="v-section">
+                <StatBox
+                  label={t("common.totalPoints")}
+                  value={totalPoints}
+                  size="sm"
                 />
               </div>
-            )}
-          </div>
-          {isMobileUa && (
-            <>
-              <MobileRankingOpenButton
-                onClick={() => setRankingPopupOpen(true)}
-              />
-              <RankingPopupModal
-                isOpen={rankingPopupOpen}
-                onClose={() => setRankingPopupOpen(false)}
-              >
-                <div className="score__container--box pos-rel w100">
-                  <TopScores
-                    hasTooltip
-                    difficulty="daily"
-                    challengeNumber={currentChallengeNumber!}
-                  />
-                </div>
-              </RankingPopupModal>
-            </>
-          )}
-          <div className="h-section gap-xs f-jc-c mb-sm">
-            <button className="btn" onClick={handlePlayAgain}>
-              {t("common.startNewGame")}
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <h1 className="lost">{t("game.lost")}</h1>
-          <div className="game__review">
-            <div className="v-section">
-              <StatBox
-                label={t("common.reachedLevel")}
-                value={level}
-                size="sm"
-              />
+              <div className="v-section">
+                <StatBox
+                  label={t("common.remainingTime")}
+                  value={`${gameTime}s`}
+                  size="sm"
+                />
+              </div>
             </div>
-            <div className="v-section">
-              <StatBox
-                label={t("common.totalPoints")}
-                value={totalPoints}
-                size="sm"
-              />
+          ) : (
+            <div className="game__review">
+              <div className="v-section">
+                <StatBox
+                  label={t("common.reachedLevel")}
+                  value={level}
+                  size="sm"
+                />
+              </div>
+              <div className="v-section">
+                <StatBox
+                  label={t("common.totalPoints")}
+                  value={totalPoints}
+                  size="sm"
+                />
+              </div>
+              <div className="v-section">
+                <StatBox
+                  label={t("common.numberOfRounds")}
+                  value={numberOfRounds}
+                  size="sm"
+                />
+              </div>
+              <div className="v-section">
+                <StatBox
+                  label={t("common.perfectRounds")}
+                  value={numberOfPerfectRounds}
+                  size="sm"
+                />
+              </div>
             </div>
-            <div className="v-section">
-              <StatBox
-                label={t("common.numberOfRounds")}
-                value={numberOfRounds}
-                size="sm"
-              />
-            </div>
-            <div className="v-section">
-              <StatBox
-                label={t("common.perfectRounds")}
-                value={numberOfPerfectRounds}
-                size="sm"
-              />
-            </div>
-          </div>
+          ))}
+        {showSummary && (
           <div className="game__summary">
             <div className="v-section gap-md">
               <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
             </div>
             {!isMobileUa && (
-              <div className="score__container--box pos-rel">
-                <TopScores hasTooltip difficulty={gameDifficulty} />
-              </div>
+              <div className="score__container--box pos-rel">{ranking}</div>
             )}
           </div>
-          {isMobileUa && (
-            <>
-              <MobileRankingOpenButton
-                onClick={() => setRankingPopupOpen(true)}
-              />
-              <RankingPopupModal
-                isOpen={rankingPopupOpen}
-                onClose={() => setRankingPopupOpen(false)}
-              >
-                <div className="score__container--box pos-rel w100">
-                  <TopScores hasTooltip difficulty={gameDifficulty} />
-                </div>
-              </RankingPopupModal>
-            </>
-          )}
-          <div className="h-section gap-xs f-jc-c mb-sm">
-            {players === "multi" && (
-              <button className="btn btn--sm btn--lose" onClick={handleExit}>
-                {t("game.exit")}
-              </button>
-            )}
-            <button
-              className="btn"
-              onClick={handlePlayAgain}
-              disabled={isCreatingRoom}
-            >
-              {isCreatingRoom
-                ? t("game.creatingNewRoom")
-                : t("common.playAgain")}
-            </button>
+        )}
+        {isMobileUa && mobileTab === "ranking" && (
+          <div className="score__container--box dark w100 mobile-ranking">
+            {ranking}
           </div>
-        </>
-      )}
-      <GameSound />
-      <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
-      <WordFeedbackModal
-        isOpen={isFeedbackModalOpen}
-        setModalOpen={setIsFeedbackModalOpen}
-        lastLevelWords={lastLevelWords}
-        difficulty={gameDifficulty}
-        roomName={playerName}
-      />
-    </div>
+        )}
+        {!isMobileUa && actions}
+        <GameSound />
+        <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
+        <WordFeedbackModal
+          isOpen={isFeedbackModalOpen}
+          setModalOpen={setIsFeedbackModalOpen}
+          lastLevelWords={lastLevelWords}
+          difficulty={gameDifficulty}
+          roomName={playerName}
+        />
+      </div>
+      {/* Mobile: outside the panel, stuck to the bottom of the screen */}
+      {isMobileUa && actions}
+    </>
   );
 }

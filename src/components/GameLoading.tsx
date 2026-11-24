@@ -6,6 +6,8 @@ import useRandomWords from "../hooks/useRandomWords";
 import { advanceRoomToGame, withRetry } from "../services/multiplayer";
 import { roomRealtime } from "../realtime/roomRealtime";
 import useGameStore from "../store/useGameStore";
+import KeyboardReserve from "../atoms/KeyboardReserve";
+import useMobileUserAgent from "../hooks/useMobileUserAgent";
 
 import countdownMusic from "../assets/countdown.mp3";
 
@@ -13,6 +15,7 @@ export default function GameLoading() {
   const { t } = useTranslation();
   const { volume, role, players, roomCode, gameDifficulty } = useGameStore();
   const countdown = useCountdown();
+  const isMobile = useMobileUserAgent();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // En multiplayer, la palabra ya está establecida por GameRoom o GameLobby
@@ -71,17 +74,21 @@ export default function GameLoading() {
   }, [volume, players, role]);
 
   return (
-    <div className="game__container">
-      <h2 className="highlight">{t("game.gameStartsIn")}</h2>
-      <div className="loading__container">
-        <h2 className="highlight">
-          {countdown <= 0 ? t("game.start") : Math.ceil(countdown)}
-        </h2>
-        <div className="loading__container--box loading__container--box-xl"></div>
-        <div className="loading__container--box loading__container--box-lg"></div>
-        <div className="loading__container--box loading__container--box-md"></div>
-        <div className="loading__container--box"></div>
+    <>
+      <div className="game__container game__container--loading">
+        <h2 className="highlight">{t("game.gameStartsIn")}</h2>
+        <div className="loading__container">
+          <h2 className="highlight">
+            {countdown <= 0 ? t("game.start") : Math.ceil(countdown)}
+          </h2>
+          <div className="loading__container--box loading__container--box-xl"></div>
+          <div className="loading__container--box loading__container--box-lg"></div>
+          <div className="loading__container--box loading__container--box-md"></div>
+          <div className="loading__container--box"></div>
+        </div>
       </div>
-    </div>
+      {/* Mobile: the keyboard may already be open (started with a tap) */}
+      {isMobile && <KeyboardReserve />}
+    </>
   );
 }

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import userIcon from "./../assets/user.svg";
 import usersIcon from "./../assets/users.svg";
 
@@ -16,6 +18,7 @@ export default function PlayersSelector({
   enableMulti = true,
   onDifficultyChange,
 }: PlayersSelectorProps) {
+  const { t } = useTranslation();
   const handlePlayers = (players: string) => {
     setPlayers(players);
     if (players !== "single") {
@@ -24,12 +27,14 @@ export default function PlayersSelector({
   };
 
   return (
-    <div className="h-section gap-xs f-jc-c pos-rel w-fit mx-auto">
+    <div className="h-section gap-xs f-jc-c pos-rel w-fit mx-auto players-selector">
       <button
         className={`btn ${players === "single" ? "selected" : ""} btn--xs`}
         onClick={() => handlePlayers("single")}
       >
         <img src={userIcon} alt="user" className="player-selector" />
+        {/* Text only shown on mobile (segmented control) */}
+        <span className="players-selector__label">{t("players.single")}</span>
       </button>
       {enableMulti && (
         <button
@@ -37,6 +42,7 @@ export default function PlayersSelector({
           onClick={() => handlePlayers("multi")}
         >
           <img src={usersIcon} alt="users" className="player-selector" />
+          <span className="players-selector__label">{t("players.multi")}</span>
         </button>
       )}
     </div>

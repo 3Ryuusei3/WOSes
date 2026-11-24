@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 import ScoreContainer from "../../atoms/ScoreContainer";
 import WordInput, { type WordInputHandle } from "../../atoms/WordInput";
-import MobileGameKeyboard from "../../atoms/MobileGameKeyboard";
+import KeyboardReserve from "../../atoms/KeyboardReserve";
 import useMobileUserAgent from "../../hooks/useMobileUserAgent";
 import WarningMessage from "../../atoms/WarningMessage";
 import WordList from "../../atoms/WordList";
@@ -76,7 +76,17 @@ export default function HostGameView({
         gameDifficulty={gameDifficulty}
         dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
       />
-      <div className="game__container">
+      <div
+        className="game__container"
+        // Mobile: tapping the board must not close the device keyboard
+        onMouseDown={
+          isMobile
+            ? (e) => {
+                if (!(e.target instanceof HTMLInputElement)) e.preventDefault();
+              }
+            : undefined
+        }
+      >
         <div className="game__header">
           <div className="v-section">
             <WarningMessage gameMechanics={gameMechanics} />
@@ -116,16 +126,7 @@ export default function HostGameView({
         <GameSound />
       </div>
       {isMobile && players === "single" && (
-        <MobileGameKeyboard
-          disabled={percentage === 0}
-          value={inputWord}
-          onValueChange={(next) => wordInputRef.current?.applyValue(next)}
-          onEnter={() => wordInputRef.current?.submitEnter()}
-          shuffledWordObject={shuffledWordObject}
-          gameMechanics={gameMechanics}
-          percentage={percentage}
-          showLettersPercentage={showLettersPercentage}
-        />
+        <KeyboardReserve onActivate={() => wordInputRef.current?.focus()} />
       )}
     </>
   );
