@@ -20,6 +20,7 @@ export default function GameRoom() {
     setPlayerName,
     role,
     roomId,
+    playerId,
     setMode,
     randomWord,
     gameDifficulty,
@@ -92,6 +93,52 @@ export default function GameRoom() {
 
   const showJoinForm = !isHost && (role !== "player" || !roomId);
 
+  // Players in the room (host and players see the same list)
+  const playersPanel = (
+    <div className="v-section gap-md f-jc-c">
+      <div className="v-section score__container--box dark player-list">
+        <div className="v-section gap-lg f-jc-c">
+          <h2 className="highlight">LISTADO DE JUGADORES</h2>
+          <div className="v-section gap-2xs">
+            {listedPlayers.length > 0 ? (
+              listedPlayers.map((player, index) => (
+                <div className="h-section gap-sm" key={player.id}>
+                  <h4 className="won">
+                    {String(index + 1).padStart(2, "0")}
+                  </h4>
+                  <h4
+                    className={player.id === playerId ? "won" : "highlight"}
+                  >
+                    {player.name}
+                  </h4>
+                  {presenceReady && (
+                    <span
+                      className={`presence-dot ${online[`player:${player.id}`] ? "presence-dot--online" : ""}`}
+                      title={
+                        online[`player:${player.id}`]
+                          ? "Conectado"
+                          : "Desconectado"
+                      }
+                    />
+                  )}
+                  <h4 className="unguessed ml-auto">
+                    {player.score}
+                  </h4>
+                </div>
+              ))
+            ) : (
+              <h4 className="lost">
+                TODAVÍA NO HAY
+                <br />
+                JUGADORES EN LA SALA
+              </h4>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const joinAction = (
     <div className="screen-actions">
       <button
@@ -148,46 +195,7 @@ export default function GameRoom() {
                   </div>
                 </div>
               </div>
-              <div className="v-section gap-md f-jc-c">
-                <div className="v-section score__container--box dark player-list">
-                  <div className="v-section gap-lg f-jc-c">
-                    <h2 className="highlight">LISTADO DE JUGADORES</h2>
-                    <div className="v-section gap-2xs">
-                      {listedPlayers.length > 0 ? (
-                        listedPlayers.map((player, index) => (
-                          <div className="h-section gap-sm" key={player.id}>
-                            <h4 className="won">
-                              {String(index + 1).padStart(2, "0")}
-                            </h4>
-                            <h4 className="highlight" key={player.id}>
-                              {player.name}
-                            </h4>
-                            {presenceReady && (
-                              <span
-                                className={`presence-dot ${online[`player:${player.id}`] ? "presence-dot--online" : ""}`}
-                                title={
-                                  online[`player:${player.id}`]
-                                    ? "Conectado"
-                                    : "Desconectado"
-                                }
-                              />
-                            )}
-                            <h4 className="unguessed ml-auto">
-                              {player.score}
-                            </h4>
-                          </div>
-                        ))
-                      ) : (
-                        <h4 className="lost">
-                          TODAVÍA NO HAY
-                          <br />
-                          JUGADORES EN LA SALA
-                        </h4>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {playersPanel}
             </>
           ) : (
             <>
@@ -221,12 +229,16 @@ export default function GameRoom() {
                   </div>
                 </div>
               ) : (
-                <div className="v-section gap-md f-jc-c">
+                <div className="v-section gap-md room-waiting">
                   <div className="score__container--box dark">
-                    <div className="v-section gap-md">
+                    <div className="v-section gap-xs">
                       <p className="txt-center">{t("game.waitingForHost")}</p>
+                      <small className="txt-center unguessed">
+                        {t("gameStart.roomCode")} {roomCode}
+                      </small>
                     </div>
                   </div>
+                  {playersPanel}
                 </div>
               )}
             </>
