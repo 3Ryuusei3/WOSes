@@ -377,8 +377,11 @@ export default function GameLost() {
           </div>
         )}
         {!isMobileUa && actions}
-        <GameSound />
-        <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
+        {/* Top-right corner: "¿Falta algo?" next to the sound button */}
+        <div className="panel-actions">
+          <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
+          <GameSound />
+        </div>
         <WordFeedbackModal
           isOpen={isFeedbackModalOpen}
           setModalOpen={setIsFeedbackModalOpen}

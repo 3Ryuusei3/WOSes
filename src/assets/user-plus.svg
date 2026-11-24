@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Join a room: solid person (same shape as user.svg) + plus sign -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+<g fill="#360170">
+	<path transform="translate(-48 40) scale(0.88)" d="M320,312c66.3,0,120-53.7,120-120S386.3,72,320,72s-120,53.7-120,120S253.7,312,320,312z M290.3,368
+	C191.8,368,112,447.8,112,546.3c0,16.4,13.3,29.7,29.7,29.7h356.6c16.4,0,29.7-13.3,29.7-29.7c0-98.5-79.8-178.3-178.3-178.3H290.3z"/>
+	<rect x="468" y="236" width="152" height="56" rx="28"/>
+	<rect x="516" y="188" width="56" height="152" rx="28"/>
+</g>
+</svg>

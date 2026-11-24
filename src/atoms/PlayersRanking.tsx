@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import useGameStore from "../store/useGameStore";
 import { useRoomRealtimeStore } from "../realtime/roomRealtime";
+import useHostPlays from "../hooks/useHostPlays";
 import arrowLeft from "../assets/arrow-left.svg";
 import arrowRight from "../assets/arrow-right.svg";
 
@@ -33,9 +34,11 @@ export default function PlayersRanking({
     sortBy === "last_round_score",
   );
 
+  const hostPlays = useHostPlays();
   const nonHostPlayers = useMemo(
-    () => players.filter((p) => p.role !== "host"),
-    [players],
+    // The host only competes in rooms without a main screen
+    () => players.filter((p) => hostPlays || p.role !== "host"),
+    [players, hostPlays],
   );
   const effectiveKey = toggleable
     ? showLastRound

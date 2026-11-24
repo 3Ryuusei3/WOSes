@@ -57,6 +57,8 @@ export interface RtBoard {
   level: number;
   difficulty: string;
   daily_original_difficulty: string | null;
+  /** Room without main screen: the host plays too, board always visible */
+  host_plays?: boolean;
 }
 
 export interface RtCorrectWord {

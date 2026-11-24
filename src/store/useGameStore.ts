@@ -61,6 +61,12 @@ interface GameState {
     words: string[] | ((prev: string[]) => string[]),
   ) => void;
   volume: number;
+  /** Player name modal (header user button / first visit); not persisted */
+  nameModalOpen: boolean;
+  setNameModalOpen: (open: boolean) => void;
+  /** Creating a room: the host also plays (no main/shared screen) */
+  hostPlays: boolean;
+  setHostPlays: (hostPlays: boolean) => void;
   setVolume: (volume: number) => void;
   currentChallengeNumber: number | null;
   setCurrentChallengeNumber: (num: number | null) => void;
@@ -150,6 +156,10 @@ const useGameStore = create<GameState>()(
         })),
       volume: 0.2,
       setVolume: (volume) => set({ volume }),
+      nameModalOpen: false,
+      setNameModalOpen: (nameModalOpen) => set({ nameModalOpen }),
+      hostPlays: false,
+      setHostPlays: (hostPlays) => set({ hostPlays }),
       previousRoundsWords: [],
       setPreviousRoundsWords: (words) =>
         set((state) => ({
@@ -176,6 +186,8 @@ const useGameStore = create<GameState>()(
         playerName: state.playerName,
         volume: state.volume,
         gameDifficulty: state.gameDifficulty,
+        // Remembered choice; also survives a reload of the host mid-game
+        hostPlays: state.hostPlays,
       }),
     },
   ),

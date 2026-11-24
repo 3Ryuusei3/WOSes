@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -15,9 +15,16 @@ import useMobileLayout from "../hooks/useMobileLayout";
 
 import useGameStore from "../store/useGameStore";
 import SegmentedTabs from "../atoms/SegmentedTabs";
+import { showToast } from "../atoms/Toast";
 import { primeMobileKeyboard } from "../utils/mobileKeyboard";
 import GameSound from "../atoms/GameSound";
-import PlayersSelector from "../atoms/PlayersSelector";
+import PlayersSelector, { type StartMode } from "../atoms/PlayersSelector";
+import QrScannerModal from "../atoms/QrScannerModal";
+import UserBadge from "../atoms/UserBadge";
+import HelpButton from "../atoms/HelpButton";
+import WordFeedbackModal from "../atoms/WordFeedbackModal";
+import useJoinRoom from "../hooks/useJoinRoom";
+import { isInstalledPwa } from "../utils/pwa";
 
 import Difficulty from "../types/Difficulty";
 import { START_TIME } from "../constant";
@@ -25,7 +32,9 @@ import { START_TIME } from "../constant";
 export default function GameStart() {
   const {
     playerName,
-    setPlayerName,
+    setNameModalOpen,
+    hostPlays,
+    setHostPlays,
     setMode,
     gameMechanics,
     level,
@@ -48,9 +57,24 @@ export default function GameStart() {
     setPreviousRoundsWords,
     setDailyChallengeOriginalDifficulty,
   } = useGameStore();
-  const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
   // Mobile: ranking is a tab of the screen instead of a modal
+  // "Unirse": join an existing room with its code (or its QR, in the app)
+  const [joinMode, setJoinMode] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
+  const [codeError, setCodeError] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const { join, joining, joinError, setJoinError } = useJoinRoom();
+  // Installed app: the phone's camera app would open the QR link in the
+  // browser, outside the app, so we offer an in-app scanner instead
+  const [canScanQr] = useState(isInstalledPwa);
+  const startMode: StartMode = joinMode
+    ? "join"
+    : players === "multi"
+      ? "multi"
+      : "single";
+
   // Mobile: the ranking is its own view (opened with a button, "Volver" to
   // come back) instead of a modal
   const [mobileView, setMobileView] = useState<"play" | "ranking">("play");
@@ -106,10 +130,15 @@ export default function GameStart() {
 
   useBackgroundAudio(volume);
 
+  // The name is asked once (header user button to change it)
+  const hasValidName = roomManager.validatePlayerName(playerName).valid;
+  useEffect(() => {
+    if (!hasValidName) setNameModalOpen(true);
+  }, [hasValidName, setNameModalOpen]);
+
   const handleSubmit = async () => {
-    const nameValidation = roomManager.validatePlayerName(playerName);
-    if (!nameValidation.valid) {
-      setError(true);
+    if (!hasValidName) {
+      setNameModalOpen(true);
       return;
     }
 
@@ -142,21 +171,48 @@ export default function GameStart() {
         setPlayerId(result.data.playerId);
         navigate(`/game?id=${roomCode}`);
       } else {
-        setError(true);
+        showToast(t("gameStart.createError"), "error");
       }
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    setError(false);
-    if (e.key === "Enter") {
-      handleSubmit();
-    }
+  const handleModeChange = (mode: StartMode) => {
+    setJoinMode(mode === "join");
+    setPlayers(mode === "multi" ? "multi" : "single");
+    setCodeError(false);
+    setJoinError(null);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toUpperCase();
-    setPlayerName(value);
+  const joinWithCode = async (rawCode: string) => {
+    const code = rawCode.trim().toUpperCase();
+    const codeValid = roomManager.validateRoomCode(code);
+    setCodeError(!codeValid);
+    if (!codeValid) return;
+    if (!hasValidName) {
+      setNameModalOpen(true);
+      return;
+    }
+
+    const joined = await join(code, playerName);
+    // The room screen takes it from here (identity is saved by useJoinRoom)
+    if (joined) navigate(`/game?id=${code}`);
+  };
+
+  const handleScannedCode = useCallback(
+    (code: string) => {
+      setScannerOpen(false);
+      setJoinCode(code);
+      void joinWithCode(code);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [playerName],
+  );
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      if (joinMode) void joinWithCode(joinCode);
+      else handleSubmit();
+    }
   };
 
   const getButtonText = () => {
@@ -172,10 +228,8 @@ export default function GameStart() {
   };
 
   const handleDailyChallenge = async () => {
-    // Validar nombre usando RoomManager
-    const nameValidation = roomManager.validatePlayerName(playerName);
-    if (!nameValidation.valid) {
-      setError(true);
+    if (!hasValidName) {
+      setNameModalOpen(true);
       return;
     }
 
@@ -242,7 +296,15 @@ export default function GameStart() {
     </>
   );
 
-  const startButton = (
+  const startButton = joinMode ? (
+    <button
+      className="btn"
+      onClick={() => void joinWithCode(joinCode)}
+      disabled={joining}
+    >
+      {t("game.joinRoom")}
+    </button>
+  ) : (
     <button
       className={`btn ${
         isDailyChallengeSelected
@@ -268,31 +330,119 @@ export default function GameStart() {
           {showForm && (
             <div className="home__container">
               <h2 className="highlight">{t("gameStart.nameAndDifficulty")}</h2>
-              <DifficultySelector
-                gameDifficulty={gameDifficulty}
-                onDifficultyChange={handleDifficultyChange}
-                showDailyChallenge={players === "single"}
-                onDailyChallengeClick={handleDailyChallenge}
-                loadingDaily={loadingChallenge}
-                isDailyChallengeSelected={isDailyChallengeSelected}
-              />
               <PlayersSelector
-                players={players}
-                setPlayers={setPlayers}
+                mode={startMode}
+                onModeChange={handleModeChange}
                 onDifficultyChange={handleDifficultyChange}
               />
-              <div className="v-section gap-xs">
-                <input
-                  className="mx-auto"
-                  type="text"
-                  placeholder={t("common.enterName")}
-                  value={playerName}
-                  onChange={handleChange}
-                  onKeyDown={handleKeyDown}
-                />
-                <small className={`txt-center ${error ? "" : "op-0"}`}>
-                  {t("gameStart.nameError")}
-                </small>
+              {/* Each mode's options, stacked in the same space: the box keeps
+                  the tallest one's height, so it doesn't jump when switching */}
+              <div className="mode-panels">
+                <div
+                  className={`mode-panel ${startMode === "single" ? "is-active" : ""}`}
+                  aria-hidden={startMode !== "single"}
+                >
+                  <DifficultySelector
+                    gameDifficulty={gameDifficulty}
+                    onDifficultyChange={handleDifficultyChange}
+                    showDailyChallenge
+                    onDailyChallengeClick={handleDailyChallenge}
+                    loadingDaily={loadingChallenge}
+                    isDailyChallengeSelected={isDailyChallengeSelected}
+                  />
+                </div>
+                <div
+                  className={`mode-panel ${startMode === "multi" ? "is-active" : ""}`}
+                  aria-hidden={startMode !== "multi"}
+                >
+                  <DifficultySelector
+                    gameDifficulty={gameDifficulty}
+                    onDifficultyChange={handleDifficultyChange}
+                  />
+                  {/* Shared main screen, or everyone (host included) plays
+                      on their own phone */}
+                  <label className="switch-row">
+                    <input
+                      type="checkbox"
+                      checked={hostPlays}
+                      onChange={(e) => setHostPlays(e.target.checked)}
+                    />
+                    <span className="switch-row__switch" aria-hidden="true" />
+                    <span className="switch-row__text">
+                      {/* Both texts stacked (only one visible): the row keeps
+                          the same height when toggling */}
+                      <span
+                        className={`switch-row__variant ${hostPlays ? "" : "is-active"}`}
+                        aria-hidden={hostPlays}
+                      >
+                        <span>{t("gameStart.mainScreen")}</span>
+                        <small>{t("gameStart.mainScreenHint")}</small>
+                      </span>
+                      <span
+                        className={`switch-row__variant ${hostPlays ? "is-active" : ""}`}
+                        aria-hidden={!hostPlays}
+                      >
+                        <span>{t("gameStart.noMainScreen")}</span>
+                        <small>{t("gameStart.noMainScreenHint")}</small>
+                      </span>
+                    </span>
+                  </label>
+                </div>
+                {/* Joining: the room already has its difficulty */}
+                <div
+                  className={`mode-panel ${startMode === "join" ? "is-active" : ""}`}
+                  aria-hidden={startMode !== "join"}
+                >
+                  <div className="v-section gap-xs">
+                    <div className="room-code-field">
+                      <input
+                        type="text"
+                        placeholder={t("gameStart.roomCode")}
+                        value={joinCode}
+                        maxLength={6}
+                        autoCapitalize="characters"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        enterKeyHint="go"
+                        onChange={(e) => {
+                          setCodeError(false);
+                          setJoinError(null);
+                          setJoinCode(
+                            e.target.value
+                              .toUpperCase()
+                              .replace(/[^A-Z0-9]/g, ""),
+                          );
+                        }}
+                        onKeyDown={handleKeyDown}
+                      />
+                      {canScanQr && (
+                        <button
+                          type="button"
+                          className="btn btn--sm room-code-field__scan"
+                          onClick={() => setScannerOpen(true)}
+                          aria-label={t("gameStart.scanQr")}
+                          title={t("gameStart.scanQr")}
+                        >
+                          {/* camera icon */}
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                              fill="currentColor"
+                              d="M9 3 7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    <small
+                      className={`txt-center lost ${codeError || joinError ? "" : "op-0"}`}
+                    >
+                      {codeError
+                        ? t("gameStart.invalidCode")
+                        : joinError || "\u00a0"}
+                    </small>
+                  </div>
+                </div>
               </div>
               <div className="h-section gap-xs f-jc-c secondary-actions">
                 <button
@@ -338,10 +488,27 @@ export default function GameStart() {
             </div>
           )}
         </div>
-        <GameSound />
+        <UserBadge />
+        {/* Top-right corner: "¿Falta algo?" next to the sound button */}
+        <div className="panel-actions">
+          <HelpButton onClick={() => setFeedbackOpen(true)} />
+          <GameSound />
+        </div>
       </div>
       {/* Mobile: outside the panel, stuck to the bottom of the screen */}
       {isMobileUa && <div className="screen-actions">{startButton}</div>}
+      <WordFeedbackModal
+        isOpen={feedbackOpen}
+        setModalOpen={setFeedbackOpen}
+        lastLevelWords={[]}
+        difficulty={gameDifficulty}
+        roomName={playerName}
+      />
+      <QrScannerModal
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onCode={handleScannedCode}
+      />
       <HowToPlayModal
         isOpen={howToPlayModal}
         setHowToPlayModal={setHowToPlayModal}

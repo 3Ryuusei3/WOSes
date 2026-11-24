@@ -56,23 +56,8 @@
     "dictionary": "Diccionario",
     "definition": "Definición",
     "summary": "RESUMEN",
-    "understood": "ENTENDIDO"
-  },
-  "home": {
-    "title": "DISFRUTA DE WORDS ON STREAM",
-    "subtitle": "EN ESPAÑOL",
-    "multiplayer": "PRÓXIMAMENTE EN MULTIJUGADOR",
-    "playButton": "Jugar",
-    "howToPlay": "Cómo jugar",
-    "topScores": "Mejores puntuaciones",
-    "gameDescription": "Basado en 'Words on Stream' - Encuentra todas las palabras posibles usando las letras dadas antes de que se acabe el tiempo",
-    "features": {
-      "title": "Características",
-      "multipleDifficulties": "Múltiples dificultades",
-      "timeChallenge": "Desafío contra el tiempo",
-      "letterMechanics": "Mecánicas especiales de letras",
-      "progressiveSystem": "Sistema de progresión por niveles"
-    }
+    "understood": "ENTENDIDO",
+    "save": "GUARDAR"
   },
   "difficulties": {
     "easy": "ESTÁNDAR",
@@ -83,14 +68,28 @@
   },
   "players": {
     "single": "SOLO",
-    "multi": "MULTIJUGADOR"
+    "multi": "MULTIJUGADOR",
+    "createRoom": "CREAR SALA",
+    "join": "UNIRSE"
   },
   "gameStart": {
     "nameAndDifficulty": "¡DEMUESTRA TU VOCABULARIO!",
     "nameError": "EL NOMBRE DEBE TENER ENTRE 3 Y 10 CARACTERES",
     "learnToPlay": "APRENDE A JUGAR AQUÍ",
     "startDaily": "EMPEZAR RETO DIARIO",
-    "howToPlayButton": "CÓMO JUGAR"
+    "howToPlayButton": "CÓMO JUGAR",
+    "roomCode": "CÓDIGO DE SALA",
+    "invalidCode": "EL CÓDIGO SON 6 LETRAS O NÚMEROS",
+    "scanQr": "ESCANEAR QR",
+    "nameTitle": "¿CÓMO TE LLAMAS?",
+    "editName": "Cambiar nombre",
+    "yourName": "TU NOMBRE",
+    "mainScreen": "CON PANTALLA PRINCIPAL",
+    "noMainScreen": "TODOS EN SU DISPOSITIVO",
+    "mainScreenHint": "ESTE DISPOSITIVO SERÁ LA PANTALLA QUE VEN TODOS",
+    "noMainScreenHint": "TÚ TAMBIÉN JUEGAS DESDE ESTE DISPOSITIVO",
+    "createError": "NO SE PUDO CREAR LA SALA",
+    "nameHint": "ASÍ TE VERÁN LOS DEMÁS JUGADORES"
   },
   "game": {
     "lost": "HAS PERDIDO...",
@@ -302,6 +301,20 @@
     "submitting": "ENVIANDO...",
     "errorEmpty": "Por favor, introduce una palabra",
     "errorSubmit": "Error al enviar la solicitud",
-    "success": "¡Solicitud enviada! Gracias por tu ayuda"
+    "success": "¡Solicitud enviada! Gracias por tu ayuda",
+    "title": "AYÚDANOS A MEJORAR",
+    "tabWord": "PALABRA",
+    "tabFeedback": "SUGERENCIA",
+    "feedbackDescription": "CUÉNTANOS QUÉ MEJORARÍAS O SI HAS ENCONTRADO ALGÚN ERROR. LO LEEMOS TODO.",
+    "feedbackPlaceholder": "Escribe tu sugerencia...",
+    "errorEmptyFeedback": "Por favor, escribe tu sugerencia",
+    "successFeedback": "¡Gracias! Hemos recibido tu sugerencia"
+  },
+  "scanner": {
+    "title": "ESCANEA EL QR",
+    "hint": "APUNTA AL QR DE LA PANTALLA DEL ANFITRIÓN",
+    "denied": "PERMITE EL ACCESO A LA CÁMARA PARA ESCANEAR",
+    "unavailable": "NO SE PUEDE USAR LA CÁMARA. ESCRIBE EL CÓDIGO",
+    "invalid": "ESE QR NO ES DE UNA SALA"
   }
 }

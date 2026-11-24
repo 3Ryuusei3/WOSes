@@ -22,7 +22,10 @@ import KeyboardReserve from "../../atoms/KeyboardReserve";
 import WordList from "../../atoms/WordList";
 import useMobileUserAgent from "../../hooks/useMobileUserAgent";
 import useGameStore from "../../store/useGameStore";
-import { useRoomRealtimeStore } from "../../realtime/roomRealtime";
+import {
+  useRoomRealtimeStore,
+  type RtBoard,
+} from "../../realtime/roomRealtime";
 import { RUNNING_OUT_OF_TIME_PERCENTAGE } from "../../constant";
 
 const SHOW_BOARD_KEY = "wos:player-show-board";
@@ -50,6 +53,8 @@ interface PlayerGameViewProps {
   timeLeft: number;
   correctWordsPoints: () => number;
   goalPoints: number;
+  /** Host playing too: its own letters (it doesn't receive its broadcast) */
+  localBoard?: RtBoard | null;
 }
 
 export default function PlayerGameView({
@@ -70,11 +75,13 @@ export default function PlayerGameView({
   timeLeft,
   correctWordsPoints,
   goalPoints,
+  localBoard,
 }: PlayerGameViewProps) {
   const { t } = useTranslation();
   const isMobile = useMobileUserAgent();
   // Letras exactamente como las ve el host (llegan por Realtime)
-  const board = useRoomRealtimeStore((s) => s.board);
+  const rtBoard = useRoomRealtimeStore((s) => s.board);
+  const board = localBoard !== undefined ? localBoard : rtBoard;
   const storeLevel = useGameStore((s) => s.level);
   const myName = useGameStore((s) => s.playerName);
   // Word list (with who guessed each word), can be hidden; the letters and
@@ -82,6 +89,9 @@ export default function PlayerGameView({
   const [showBoard, setShowBoard] = useState(
     () => localStorage.getItem(SHOW_BOARD_KEY) !== "0",
   );
+  // Room without main screen: everyone always sees the board (no toggle)
+  const boardLocked = localBoard !== undefined || board?.host_plays === true;
+  const boardVisible = boardLocked || showBoard;
   const toggleBoard = () => {
     setShowBoard((prev) => {
       localStorage.setItem(SHOW_BOARD_KEY, prev ? "0" : "1");
@@ -214,7 +224,7 @@ export default function PlayerGameView({
             SHOW_LETTERS_PERCENTAGE={board?.show_letters_percentage ?? 0}
           />
         </div>
-        {showBoard && (
+        {boardVisible && (
           <WordList
             words={words}
             playerName={myName}
@@ -227,14 +237,16 @@ export default function PlayerGameView({
           <button className="btn btn--deco btn--xs">
             {t("common.points")} {playerRoundPoints}
           </button>
-          <button
-            type="button"
-            className="btn btn--xs"
-            onClick={toggleBoard}
-            aria-pressed={showBoard}
-          >
-            {showBoard ? t("game.hideBoard") : t("game.showBoard")}
-          </button>
+          {!boardLocked && (
+            <button
+              type="button"
+              className="btn btn--xs"
+              onClick={toggleBoard}
+              aria-pressed={showBoard}
+            >
+              {showBoard ? t("game.hideBoard") : t("game.showBoard")}
+            </button>
+          )}
           {showReconnectButton && (
             <button
               className={`btn btn--xs ml-auto ${connectionStatus !== "connected" ? "btn--lose" : ""}`}
@@ -252,8 +264,10 @@ export default function PlayerGameView({
           )}
         </div>
         {/* With the board visible, only the last attempt as feedback */}
-        <div className={`attemptList ${showBoard ? "attemptList--last" : ""}`}>
-          {(showBoard ? playerAttempts.slice(0, 1) : playerAttempts).map(
+        <div
+          className={`attemptList ${boardVisible ? "attemptList--last" : ""}`}
+        >
+          {(boardVisible ? playerAttempts.slice(0, 1) : playerAttempts).map(
             (it, idx) => (
               <h4
                 key={`${idx}-${it.word}`}

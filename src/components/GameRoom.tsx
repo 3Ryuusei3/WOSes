@@ -2,9 +2,10 @@ import { useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import useGameStore from "../store/useGameStore";
 import useRandomWords from "../hooks/useRandomWords";
-import { startRound, joinRoomAsPlayer } from "../services/multiplayer";
+import { startRound } from "../services/multiplayer";
+import useJoinRoom from "../hooks/useJoinRoom";
+import useHostPlays from "../hooks/useHostPlays";
 import { useRoomRealtimeStore } from "../realtime/roomRealtime";
-import { saveRoomSession } from "../realtime/roomSession";
 import { isValidPlayerName } from "../utils";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../atoms/Toast";
@@ -17,14 +18,10 @@ export default function GameRoom() {
     playerName,
     setPlayerName,
     role,
-    setRole,
     roomId,
-    setRoomId,
     setMode,
     randomWord,
     gameDifficulty,
-    setPlayers,
-    setPlayerId,
   } = useGameStore();
 
   // Genera la palabra de la primera ronda (solo host; respeta la dificultad)
@@ -35,7 +32,7 @@ export default function GameRoom() {
   const online = useRoomRealtimeStore((s) => s.online);
   const presenceReady = useRoomRealtimeStore((s) => s.presenceReady);
   const [nameError, setNameError] = useState(false);
-  const [joinError, setJoinError] = useState<string | null>(null);
+  const { join, joinError, setJoinError } = useJoinRoom();
   const [isStarting, setIsStarting] = useState(false);
 
   const isHost = role === "host";
@@ -44,6 +41,12 @@ export default function GameRoom() {
   const nonHostPlayers = useMemo(
     () => roomPlayers.filter((p) => p.role !== "host"),
     [roomPlayers],
+  );
+  // Without a main screen the host is one more player in the list
+  const hostPlays = useHostPlays();
+  const listedPlayers = useMemo(
+    () => (hostPlays ? roomPlayers : nonHostPlayers),
+    [hostPlays, roomPlayers, nonHostPlayers],
   );
 
   const canStart = nonHostPlayers.length >= 1;
@@ -79,26 +82,7 @@ export default function GameRoom() {
       return;
     }
 
-    try {
-      const { data, error } = await joinRoomAsPlayer(roomCode, playerName);
-      if (!error && data) {
-        setRole("player");
-        setRoomId(data.room.id);
-        setPlayerId(data.player.id);
-        setPlayers("multi");
-        saveRoomSession({
-          code: roomCode,
-          roomId: data.room.id,
-          playerId: data.player.id,
-          name: playerName,
-        });
-        // La dificultad y el estado de la sala llegan con el snapshot
-      } else if (error) {
-        setJoinError(error.message || "No se puede acceder a la sala");
-      }
-    } catch (err) {
-      setJoinError("Error al intentar unirse a la sala");
-    }
+    await join(roomCode, playerName);
   };
 
   const copyUrl = () => {
@@ -167,8 +151,8 @@ export default function GameRoom() {
                   <div className="v-section gap-lg f-jc-c">
                     <h2 className="highlight">LISTADO DE JUGADORES</h2>
                     <div className="v-section gap-2xs">
-                      {nonHostPlayers.length > 0 ? (
-                        nonHostPlayers.map((player, index) => (
+                      {listedPlayers.length > 0 ? (
+                        listedPlayers.map((player, index) => (
                           <div className="h-section gap-sm" key={player.id}>
                             <h4 className="won">
                               {String(index + 1).padStart(2, "0")}

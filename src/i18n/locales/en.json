@@ -56,23 +56,8 @@
     "dictionary": "Dictionary",
     "definition": "Definition",
     "summary": "SUMMARY",
-    "understood": "GOT IT"
-  },
-  "home": {
-    "title": "ENJOY WORDS ON STREAM",
-    "subtitle": "IN ENGLISH",
-    "multiplayer": "MULTIPLAYER COMING SOON",
-    "playButton": "Play",
-    "howToPlay": "How to play",
-    "topScores": "Top scores",
-    "gameDescription": "Based on 'Words on Stream' - Find all possible words using the given letters before time runs out",
-    "features": {
-      "title": "Features",
-      "multipleDifficulties": "Multiple difficulties",
-      "timeChallenge": "Time challenge",
-      "letterMechanics": "Special letter mechanics",
-      "progressiveSystem": "Progressive level system"
-    }
+    "understood": "GOT IT",
+    "save": "SAVE"
   },
   "difficulties": {
     "easy": "STANDARD",
@@ -83,14 +68,28 @@
   },
   "players": {
     "single": "SOLO",
-    "multi": "MULTIPLAYER"
+    "multi": "MULTIPLAYER",
+    "createRoom": "CREATE ROOM",
+    "join": "JOIN"
   },
   "gameStart": {
     "nameAndDifficulty": "ENTER YOUR NAME AND CHOOSE DIFFICULTY",
     "nameError": "NAME MUST BE BETWEEN 3 AND 10 CHARACTERS",
     "learnToPlay": "LEARN HOW TO PLAY HERE",
     "startDaily": "START DAILY CHALLENGE",
-    "howToPlayButton": "HOW TO PLAY"
+    "howToPlayButton": "HOW TO PLAY",
+    "roomCode": "ROOM CODE",
+    "invalidCode": "THE CODE IS 6 LETTERS OR NUMBERS",
+    "scanQr": "SCAN QR",
+    "nameTitle": "WHAT'S YOUR NAME?",
+    "editName": "Change name",
+    "yourName": "YOUR NAME",
+    "mainScreen": "WITH MAIN SCREEN",
+    "noMainScreen": "EVERYONE ON THEIR DEVICE",
+    "mainScreenHint": "THIS DEVICE WILL BE THE SCREEN EVERYONE WATCHES",
+    "noMainScreenHint": "YOU ALSO PLAY FROM THIS DEVICE",
+    "createError": "COULDN'T CREATE THE ROOM",
+    "nameHint": "THIS IS HOW OTHER PLAYERS WILL SEE YOU"
   },
   "game": {
     "lost": "YOU LOST...",
@@ -317,6 +316,20 @@
     "submitting": "SUBMITTING...",
     "errorEmpty": "Please enter a word",
     "errorSubmit": "Error submitting request",
-    "success": "Request submitted! Thank you for your help"
+    "success": "Request submitted! Thank you for your help",
+    "title": "HELP US IMPROVE",
+    "tabWord": "WORD",
+    "tabFeedback": "FEEDBACK",
+    "feedbackDescription": "TELL US WHAT YOU'D IMPROVE OR ANY BUG YOU FOUND. WE READ EVERYTHING.",
+    "feedbackPlaceholder": "Write your feedback...",
+    "errorEmptyFeedback": "Please write your feedback",
+    "successFeedback": "Thanks! We got your feedback"
+  },
+  "scanner": {
+    "title": "SCAN THE QR",
+    "hint": "POINT AT THE QR ON THE HOST'S SCREEN",
+    "denied": "ALLOW CAMERA ACCESS TO SCAN",
+    "unavailable": "CAMERA NOT AVAILABLE. TYPE THE CODE",
+    "invalid": "THAT QR IS NOT A ROOM"
   }
 }

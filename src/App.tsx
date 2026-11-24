@@ -3,18 +3,15 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useLocation,
   useSearchParams,
 } from "react-router-dom";
 
-import HomePage from "./components/HomePage";
 import GamePage from "./components/GamePage";
 import { shouldUseFluidScale } from "./hooks/fluidScale";
 import useGameStore from "./store/useGameStore";
 import useMobileLayout from "./hooks/useMobileLayout";
 
 function BodyLayoutClassSync() {
-  const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const role = useGameStore((s) => s.role);
   const hasRoomIdInUrl = !!searchParams.get("id");
@@ -28,14 +25,14 @@ function BodyLayoutClassSync() {
 
     if (isMobile) {
       html.classList.add("mobile");
-    } else if (pathname === "/game" && isScaled) {
+    } else if (isScaled) {
       html.classList.add("fluid-scale");
     }
 
     return () => {
       html.classList.remove("mobile", "fluid-scale");
     };
-  }, [pathname, isScaled, isMobile]);
+  }, [isScaled, isMobile]);
 
   return null;
 }
@@ -45,9 +42,9 @@ function App() {
     <Router>
       <BodyLayoutClassSync />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/game" element={<GamePage />} />
-        <Route path="*" element={<HomePage />} />
+        {/* One route for the whole game ("/" = start screen, "/game" while
+            playing): changing the address doesn't remount the game */}
+        <Route path="*" element={<GamePage />} />
       </Routes>
     </Router>
   );

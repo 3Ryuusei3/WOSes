@@ -606,20 +606,6 @@ main {
   position: relative;
 }
 
-.home {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0 1.25rem;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-image: url("./assets/home-bg.jpg");
-  background-color: #250186;
-}
 
 .logo-container {
   display: flex;
@@ -850,8 +836,13 @@ main {
   align-items: stretch;
 }
 .fluid-scale .home__container {
-  width: 24rem;
+  width: 28rem;
   flex: 0 0 auto;
+}
+// More room around the start box so its content never touches the corner
+// buttons (user on the left, "¿Falta algo?" + sound on the right)
+.fluid-scale .game__container:has(.home__container) {
+  padding: 3.5rem 3rem 2.5rem;
 }
 // Ranking box lined up with the form's visible content (title top to start
 // button bottom), not with the column's padding
@@ -861,6 +852,8 @@ main {
 // Ranking box as tall as the form column
 .fluid-scale .top-scores > .score__container--box {
   flex: 1 1 auto;
+  // Fill the column: no empty strip on its right (looked off-center)
+  width: 100%;
   gap: 0.75rem;
 }
 // ...and the list fills it: rows spread evenly instead of leaving a gap
@@ -928,7 +921,8 @@ main {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
-    color: var(--clr-text-secondary) !important;
+    // Not selected: our usual yellow (label and icon)
+    color: var(--clr-accent-primary) !important;
 
     &:hover {
       background: transparent;
@@ -939,15 +933,6 @@ main {
       color: var(--clr-text-primary) !important;
       background-color: var(--clr-accent-primary);
     }
-    img {
-      width: 1rem;
-      padding: 0;
-    }
-  }
-  // Icons are white-on-dark when not selected
-  .btn:not(.selected) img {
-    filter: invert(1);
-    opacity: 0.8;
   }
 }
 
@@ -1337,12 +1322,6 @@ main {
   }
 }
 
-@media (min-width: 576px) {
-  .top-scores {
-    margin-right: 3rem;
-  }
-}
-
 .ranking {
   width: 100%;
   display: flex;
@@ -1714,31 +1693,6 @@ main {
   // Game board: no actions bar, so it needs its bottom padding
   .game__container:has(.game__header) {
     padding: 0.75rem 0.5rem;
-  }
-  .home {
-    min-height: 100dvh;
-    padding: 0 0.75rem;
-
-    .container,
-    .container > .v-section {
-      flex: 1 1 auto;
-    }
-    // Welcome screen: centered hero text, play button in the bottom bar
-    .container > .v-section > :first-child {
-      margin-top: auto;
-    }
-    .logo {
-      width: 9rem !important;
-    }
-    h1 {
-      font-size: 2.25rem;
-    }
-    h2 {
-      font-size: 1.25rem;
-    }
-    h4 {
-      font-size: 0.9375rem;
-    }
   }
   .game__header {
     gap: 0.5rem;
@@ -2397,12 +2351,6 @@ main {
     }
   }
 
-  // Welcome page: the button floats over the background image
-  .home .screen-actions {
-    margin-inline: 0;
-    padding-inline: 0;
-    background: none;
-  }
 }
 
 // Mobile game screen: space where the device keyboard appears. Height is the
@@ -2612,4 +2560,375 @@ main {
 // Start screen secondary actions ("Cómo jugar", and "Ranking" on mobile)
 .secondary-actions {
   flex-wrap: wrap;
+}
+
+// "Unirse": room code (6 characters) + in-app QR scan button (PWA only)
+.room-code-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  width: 100%;
+
+  input {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+  }
+
+  // Same height and ring as the input next to it (no 3D shadow)
+  &__scan {
+    flex: 0 0 auto;
+    height: auto;
+    align-self: stretch;
+    padding: 0 0.875rem;
+    border: 0.1875rem solid var(--clr-accent-secondary);
+    box-shadow: 0 0 0 0.125rem var(--clr-bg-quaternary);
+
+    &:hover {
+      box-shadow: 0 0 0 0.125rem var(--clr-bg-quaternary);
+    }
+
+    svg {
+      display: block;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+}
+
+// Three options (solo / create / join): labels on one line and the same
+// height for every option (the inline SVG icon used to make one taller)
+.players-selector .btn {
+  height: 2.25rem;
+  padding-block: 0;
+  padding-inline: 0.375rem;
+  white-space: nowrap;
+
+  .players-selector__icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+.mobile .players-selector .btn {
+  height: 2rem;
+  font-size: 0.6875rem;
+}
+
+// Selector icons: the SVG as a mask, painted with the text color
+.players-selector__icon {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  background-color: currentColor;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
+}
+
+// In-app QR scanner
+.qr-scanner__view {
+  position: relative;
+  width: 100%;
+  max-width: 22rem;
+  margin-inline: auto;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #000;
+  border-radius: 0.5rem;
+
+  video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+// Aiming square, darkening the rest
+.qr-scanner__frame {
+  position: absolute;
+  inset: 15%;
+  border: 0.1875rem solid var(--clr-accent-primary);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+// Player button (icon + name): top-left corner, opposite the sound button
+.user-control {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  max-width: 40%;
+  gap: 0.375rem;
+
+  img {
+    display: block;
+    flex: 0 0 auto;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+.user-control__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Corner buttons (user · "¿Falta algo?" · sound): all the same height
+.user-control,
+.panel-actions .btn {
+  height: 1.875rem;
+  padding-block: 0;
+}
+
+// Top-right corner of the panel: "¿Falta algo?" + sound, side by side
+.panel-actions {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 5;
+  display: flex;
+  align-items: stretch;
+  gap: 0.375rem;
+
+  .volume-control,
+  .help-button {
+    position: static;
+    margin: 0;
+  }
+}
+// Mobile: up to the logo row (right side), like the user button on the left
+.mobile .panel-actions {
+  top: -2.75rem;
+  right: 0;
+}
+// Mobile: corner buttons with the same height on both sides
+.mobile .user-control,
+.mobile .panel-actions .btn {
+  height: 1.25rem;
+  padding-block: 0;
+}
+// Mobile: the panel is tight, so it goes up to the logo row (left side)
+.mobile .user-control {
+  top: -2.75rem;
+  left: 0;
+
+  img {
+    width: 0.8125rem;
+    height: 0.8125rem;
+  }
+}
+
+// Start screen: each mode's options stacked in the same cell, so the box
+// keeps the tallest one's height when switching solo / create / join
+.mode-panels {
+  display: grid;
+  width: 100%;
+}
+.mode-panel {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &:not(.is-active),
+  &:not(.is-active) * {
+    visibility: hidden !important;
+    transition: none !important;
+  }
+}
+
+// Name modal: small centered card
+.player-name-modal {
+  max-width: 24rem;
+  gap: 1rem;
+  padding: 1.75rem 1.5rem 1.5rem;
+  text-align: center;
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  &__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    background-color: var(--clr-accent-primary);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0.25rem var(--clr-bg-primary-dim);
+
+    img {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+
+  &__hint {
+    font-size: 0.75rem;
+    color: var(--clr-text-terciary);
+  }
+
+  input {
+    max-width: none;
+    text-align: center;
+  }
+}
+
+// On/off switch with a title and a hint (e.g. room with/without main screen)
+.switch-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  // No gray tap box on phones
+  -webkit-tap-highlight-color: transparent;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--clr-bg-primary-dim);
+  border-radius: 0.25rem;
+  cursor: pointer;
+
+  // Real checkbox (accessibility), invisible and 1px: it must not inherit
+  // the inputs' 100% width (it made the page overflow sideways)
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    max-width: none;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &__switch {
+    position: relative;
+    flex: 0 0 auto;
+    width: 2.5rem;
+    height: 1.375rem;
+    background-color: var(--clr-bg-terciary);
+    border-radius: 999px;
+    transition: background-color 0.2s ease;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0.1875rem;
+      left: 0.1875rem;
+      width: 1rem;
+      height: 1rem;
+      background-color: var(--clr-text-secondary);
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+  }
+  input:checked + &__switch {
+    background-color: var(--clr-accent-primary);
+
+    &::after {
+      transform: translateX(1.125rem);
+      background-color: var(--clr-text-primary);
+    }
+  }
+  input:focus-visible + &__switch {
+    outline: 0.125rem solid var(--clr-accent-primary);
+    outline-offset: 0.125rem;
+  }
+
+  &__text {
+    display: grid;
+    flex: 1 1 auto;
+    font-size: 0.875rem;
+    color: var(--clr-accent-primary);
+    text-align: left;
+
+    small {
+      font-size: 0.625rem;
+      color: var(--clr-text-secondary);
+    }
+  }
+  // On / off texts in the same cell: constant height whichever is shown
+  &__variant {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.125rem;
+
+    &:not(.is-active) {
+      visibility: hidden;
+    }
+  }
+}
+
+// Feedback modal ("¿Falta algo?"): word report or free-text suggestion.
+// Both bodies share one grid cell (constant modal height).
+.feedback-modal__panels {
+  display: grid;
+}
+.feedback-modal__body {
+  grid-area: 1 / 1;
+  text-align: center;
+
+  &:not(.is-active),
+  &:not(.is-active) * {
+    visibility: hidden !important;
+    transition: none !important;
+  }
+
+  input {
+    max-width: none;
+  }
+}
+.feedback-modal__textarea {
+  width: 100%;
+  min-height: 7.5rem;
+  padding: 0.5rem 0.625rem;
+  font-size: max(16px, 0.9375rem);
+  font-weight: 600;
+  text-transform: none;
+  color: var(--clr-text-primary);
+  background-color: var(--clr-text-secondary);
+  border: 0.1875rem solid var(--clr-border-primary);
+  box-shadow: 0 0 0 0.125rem var(--clr-bg-quaternary);
+  border-radius: 0.25rem;
+  resize: vertical;
+
+  &::placeholder {
+    color: var(--clr-text-terciary);
+  }
+}
+.feedback-modal__counter {
+  align-self: flex-end;
+  color: var(--clr-text-terciary);
+}
+
+// Mobile: no gray highlight box when tapping buttons / labels
+.mobile {
+  button,
+  label,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+// Mobile: modals open near the top, so their fields stay above the device
+// keyboard and nothing moves when it appears
+.mobile .modal {
+  align-items: flex-start;
+  padding-top: calc(2.5rem + env(safe-area-inset-top, 0px));
+}
+
+// Mobile, "Cómo jugar" modal: the game's top-letter examples keep a fixed
+// size (their in-game sizing reads the row width, which is 0 inside the
+// slide's auto-width rows, so the tiles collapsed to a few pixels)
+.mobile .modal .selectedWord {
+  container-type: normal;
+  width: auto;
+}
+.mobile .modal .selectedLetter {
+  --box: 2rem;
 }

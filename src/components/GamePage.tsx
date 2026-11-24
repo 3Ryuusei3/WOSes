@@ -7,10 +7,11 @@ import GameRoom from "./GameRoom";
 import ConnectionStatus from "../atoms/ConnectionStatus";
 import { ToastContainer } from "../atoms/Toast";
 
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 
 import GameLogo from "../atoms/GameLogo";
+import PlayerNameModal from "../atoms/PlayerNameModal";
 
 import { shouldUseFluidScale } from "../hooks/fluidScale";
 
@@ -22,6 +23,8 @@ import { loadRoomSession } from "../realtime/roomSession";
 const GamePage = () => {
   const { mode, setRoomCode, setMode, role, players } = useGameStore();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { pathname, search } = useLocation();
   // Única suscripción en tiempo real de la sala (multijugador)
   useRoomSync();
   const rtRoundId = useRoomRealtimeStore((s) => s.round?.id ?? 0);
@@ -47,12 +50,24 @@ const GamePage = () => {
     }
   }, [roomId, mode, setRoomCode, setMode]);
 
+  // Address follows the screen: "/" on the start screen, "/game" otherwise.
+  // A room link (/game?id=CODE) stays as is while it opens the room.
+  useEffect(() => {
+    const onStart = mode === "start" && !roomId;
+    if (onStart && pathname !== "/") {
+      navigate("/", { replace: true });
+    } else if (!onStart && pathname !== "/game") {
+      navigate(`/game${search}`, { replace: true });
+    }
+  }, [mode, roomId, pathname, search, navigate]);
+
   const isScaled = shouldUseFluidScale(role, !!roomId);
 
   return (
     <main>
       {players === "multi" && <ConnectionStatus />}
       <ToastContainer />
+      <PlayerNameModal />
       <GameLogo large={isScaled} />
       <div className="container pos-rel">
         {mode === "start" ? (

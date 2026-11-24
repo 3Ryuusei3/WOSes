@@ -29,3 +29,30 @@ export async function submitWordRequest(
 
   return { data, error };
 }
+
+interface FeedbackParams {
+  message: string;
+  difficulty?: string;
+  roomName?: string;
+}
+
+/**
+ * General platform feedback (ideas, bugs…). Same `requests` table with
+ * type = 'feedback' and the text in `message` (see migration
+ * 20261124120000_requests_feedback.sql, which must be applied first).
+ */
+export async function submitFeedback(
+  params: FeedbackParams,
+): Promise<DbResponse<any>> {
+  const { data, error } = await supabase.from("requests").insert([
+    {
+      type: "feedback",
+      message: params.message,
+      difficulty: params.difficulty || null,
+      state: "to_do",
+      room_name: params.roomName || null,
+    },
+  ]);
+
+  return { data, error };
+}

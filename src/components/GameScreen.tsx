@@ -114,6 +114,8 @@ export default function GameScreen() {
 
   // Host multijugador: los móviles muestran exactamente sus letras
   const isMultiHost = players === "multi" && role === "host";
+  // Room without main screen: the host plays from this device like a player
+  const hostPlays = useGameStore((s) => s.hostPlays) && isMultiHost;
   const rtRoundId = rtRound?.id ?? null;
   const board = useMemo<RtBoard | null>(
     () =>
@@ -126,10 +128,12 @@ export default function GameScreen() {
             level,
             difficulty: gameDifficulty,
             daily_original_difficulty: dailyChallengeOriginalDifficulty,
+            host_plays: hostPlays,
           }
         : null,
     [
       isMultiHost,
+      hostPlays,
       rtRoundId,
       shuffledWordObject,
       gameMechanics,
@@ -146,7 +150,10 @@ export default function GameScreen() {
   useEffect(() => {
     if (!board) return;
     roomRealtime.sendBoard(board);
-    const id = setInterval(() => roomRealtime.sendBoard(board), BOARD_RESEND_MS);
+    const id = setInterval(
+      () => roomRealtime.sendBoard(board),
+      BOARD_RESEND_MS,
+    );
     return () => clearInterval(id);
   }, [board, onlineKeys]);
 
@@ -235,7 +242,10 @@ export default function GameScreen() {
         useRoomRealtimeStore.getState(),
       ).map((w) => w.word);
       const merged = Array.from(new Set([...serverCorrect, ...correctWords]));
-      const serverStats = gameEngine.getCurrentLevelStats(possibleWords, merged);
+      const serverStats = gameEngine.getCurrentLevelStats(
+        possibleWords,
+        merged,
+      );
       return serverStats.hasReachedGoal || serverStats.isPerfect;
     }
 
@@ -343,7 +353,10 @@ export default function GameScreen() {
       if (players === "multi" && role === "host" && roomCode) {
         const { error } = await withRetry(() => finishRoundToLobby(roomCode));
         if (error) {
-          showToast("No se pudo avisar a los jugadores del fin de ronda", "error");
+          showToast(
+            "No se pudo avisar a los jugadores del fin de ronda",
+            "error",
+          );
         }
       }
     } else {
@@ -359,7 +372,10 @@ export default function GameScreen() {
           ),
         );
         if (error) {
-          showToast("No se pudo avisar a los jugadores del fin de partida", "error");
+          showToast(
+            "No se pudo avisar a los jugadores del fin de partida",
+            "error",
+          );
         }
       }
     }
@@ -535,8 +551,11 @@ export default function GameScreen() {
 
   return (
     <>
-      {players === "multi" && role === "player" ? (
+      {(players === "multi" && role === "player") || hostPlays ? (
+        // Players, and the host when it plays too (no main screen): it
+        // sees its own letters (it doesn't receive its own broadcast)
         <PlayerGameView
+          localBoard={hostPlays ? board : undefined}
           playerRoundPoints={playerRoundPoints}
           showReconnectButton={showReconnectButton}
           connectionStatus={connectionStatus}
