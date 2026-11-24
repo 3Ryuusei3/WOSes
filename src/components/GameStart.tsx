@@ -24,6 +24,7 @@ import UserBadge from "../atoms/UserBadge";
 import HelpButton from "../atoms/HelpButton";
 import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import useJoinRoom from "../hooks/useJoinRoom";
+import { saveRoomSession, unmarkRoomLeft } from "../realtime/roomSession";
 import { isInstalledPwa } from "../utils/pwa";
 
 import Difficulty from "../types/Difficulty";
@@ -169,6 +170,15 @@ export default function GameStart() {
         setRole("host");
         setRoomId(result.data.roomId);
         setPlayerId(result.data.playerId);
+        // Remembered so a reload brings the host back to its room
+        saveRoomSession({
+          code: roomCode,
+          roomId: result.data.roomId,
+          playerId: result.data.playerId,
+          name: playerName,
+          role: "host",
+        });
+        unmarkRoomLeft(roomCode);
         navigate(`/game?id=${roomCode}`);
       } else {
         showToast(t("gameStart.createError"), "error");

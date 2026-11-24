@@ -139,8 +139,10 @@
     "hideBoard": "OCULTAR TABLERO",
     "exitConfirmTitle": "¿VOLVER AL INICIO?",
     "exitConfirmText": "PERDERÁS EL PROGRESO DE ESTA PARTIDA.",
-    "exitConfirmHost": "SALDRÁS DE LA SALA Y LOS JUGADORES SE QUEDARÁN SIN ANFITRIÓN.",
-    "exitConfirmPlayer": "SALDRÁS DE LA SALA."
+    "leaveRoomTitle": "¿SALIR DE LA SALA?",
+    "leaveRoomPlayer": "SALDRÁS DE LA SALA {{code}} Y DESAPARECERÁS DE LA LISTA DE JUGADORES.",
+    "leaveRoomHost": "SALDRÁS DE LA SALA {{code}} Y LOS JUGADORES SE QUEDARÁN SIN ANFITRIÓN.",
+    "leaveRoomButton": "SALIR"
   },
   "howToPlay": {
     "title": "¿CÓMO JUGAR?",

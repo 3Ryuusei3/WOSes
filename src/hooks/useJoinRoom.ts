@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import useGameStore from "../store/useGameStore";
 import { joinRoomAsPlayer } from "../services/multiplayer";
-import { saveRoomSession } from "../realtime/roomSession";
+import { saveRoomSession, unmarkRoomLeft } from "../realtime/roomSession";
 
 /**
  * Join a room as a player (shared by the room screen and the start screen).
@@ -33,7 +33,9 @@ export default function useJoinRoom() {
         roomId: data.room.id,
         playerId: data.player.id,
         name,
+        role: "player",
       });
+      unmarkRoomLeft(code);
       // The difficulty and the room state arrive with the snapshot
       return true;
     } catch {

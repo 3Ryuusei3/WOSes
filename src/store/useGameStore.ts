@@ -63,6 +63,9 @@ interface GameState {
   volume: number;
   /** Player name modal (header user button / first visit); not persisted */
   nameModalOpen: boolean;
+  /** "Leave / back home" confirmation (button or browser back); not persisted */
+  exitConfirmOpen: boolean;
+  setExitConfirmOpen: (open: boolean) => void;
   setNameModalOpen: (open: boolean) => void;
   /** Creating a room: the host also plays (no main/shared screen) */
   hostPlays: boolean;
@@ -156,6 +159,8 @@ const useGameStore = create<GameState>()(
         })),
       volume: 0.2,
       setVolume: (volume) => set({ volume }),
+      exitConfirmOpen: false,
+      setExitConfirmOpen: (exitConfirmOpen) => set({ exitConfirmOpen }),
       nameModalOpen: false,
       setNameModalOpen: (nameModalOpen) => set({ nameModalOpen }),
       hostPlays: false,

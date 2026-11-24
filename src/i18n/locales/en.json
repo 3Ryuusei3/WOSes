@@ -139,8 +139,10 @@
     "hideBoard": "HIDE BOARD",
     "exitConfirmTitle": "BACK TO HOME?",
     "exitConfirmText": "YOU'LL LOSE THIS GAME'S PROGRESS.",
-    "exitConfirmHost": "YOU'LL LEAVE THE ROOM AND THE PLAYERS WILL BE LEFT WITHOUT A HOST.",
-    "exitConfirmPlayer": "YOU'LL LEAVE THE ROOM."
+    "leaveRoomTitle": "LEAVE THE ROOM?",
+    "leaveRoomPlayer": "YOU'LL LEAVE ROOM {{code}} AND BE REMOVED FROM THE PLAYERS LIST.",
+    "leaveRoomHost": "YOU'LL LEAVE ROOM {{code}} AND THE PLAYERS WILL BE LEFT WITHOUT A HOST.",
+    "leaveRoomButton": "EXIT"
   },
   "howToPlay": {
     "title": "HOW TO PLAY?",

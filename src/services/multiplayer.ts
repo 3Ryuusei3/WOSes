@@ -463,3 +463,15 @@ export async function withRetry<T>(
   }
   return last;
 }
+
+/** A player leaves the room: removed from the players list for everyone */
+export async function leaveRoom(
+  code: string,
+  playerId: number,
+): Promise<{ error: Error | null }> {
+  const { error } = await supabase.rpc("leave_room", {
+    p_code: code,
+    p_player_id: playerId,
+  });
+  return { error: error ?? null };
+}

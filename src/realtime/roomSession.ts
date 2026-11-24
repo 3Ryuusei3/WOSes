@@ -14,7 +14,19 @@ export interface RoomSession {
   roomId: number;
   playerId: number;
   name: string;
+  /** Missing in sessions saved before hosts were remembered: a player */
+  role?: "host" | "player";
+  /** Host only: run progress, so a reload doesn't start over at level 1 */
+  progress?: HostProgress;
   savedAt: number;
+}
+
+export interface HostProgress {
+  level: number;
+  totalPoints: number;
+  numberOfRounds: number;
+  numberOfPerfectRounds: number;
+  gameTime: number;
 }
 
 const KEY = "woses-room-session";
@@ -77,4 +89,50 @@ export function clearRoomSession(code?: string) {
       /* ignore */
     }
   }
+}
+
+/** Host: keep the run progress in the saved session */
+export function saveHostProgress(code: string, progress: HostProgress) {
+  const current = loadRoomSession(code);
+  if (!current || current.role !== "host") return;
+  const { savedAt: _savedAt, ...rest } = current;
+  void _savedAt;
+  saveRoomSession({ ...rest, progress });
+}
+
+// Rooms this tab left on purpose: an old link to them in the history (back
+// button) must not open the room again
+const LEFT_KEY = "woses-left-rooms";
+
+function readLeft(): string[] {
+  try {
+    return JSON.parse(window.sessionStorage.getItem(LEFT_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function markRoomLeft(code: string) {
+  try {
+    const left = readLeft().filter((c) => c !== code);
+    left.push(code);
+    window.sessionStorage.setItem(LEFT_KEY, JSON.stringify(left.slice(-20)));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function unmarkRoomLeft(code: string) {
+  try {
+    window.sessionStorage.setItem(
+      LEFT_KEY,
+      JSON.stringify(readLeft().filter((c) => c !== code)),
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+export function hasLeftRoom(code: string): boolean {
+  return readLeft().includes(code);
 }

@@ -105,6 +105,22 @@ export default function useRoomSync() {
 
   useEffect(() => () => roomRealtime.leave(), []);
 
+  // Host restored after a reload, but the room is gone -> start screen
+  useEffect(() => {
+    if (players !== "multi" || role !== "host" || !notFound || !roomCode) return;
+    clearRoomSession(roomCode);
+    resetProgress();
+    const s = useGameStore.getState();
+    s.setRole(null);
+    s.setRoomId(null);
+    s.setPlayerId(null);
+    s.setRoomCode("");
+    s.setPlayers("single");
+    s.setMode("start");
+    navigate("/", { replace: true });
+    showToast("La sala ya no existe", "warning", 4000);
+  }, [notFound, players, role, roomCode, navigate]);
+
   // Sesión restaurada que el servidor ya no reconoce -> volver a unirse
   useEffect(() => {
     if (players !== "multi" || role !== "player" || !playerId || !roomCode) return;
@@ -176,8 +192,8 @@ export default function useRoomSync() {
 
     // Jugador que vuelve (recarga) estando la sala en lobby/fin: necesitamos
     // el diccionario para reconstruir las palabras de la última ronda.
+    // (also the host after a reload: it comes back in "room" mode)
     const rejoiningSummary =
-      store.role === "player" &&
       store.mode === "room" &&
       (room.state === "lobby" || room.state === "lost");
     if (rejoiningSummary && (!words || words.length === 0)) return;
@@ -195,8 +211,10 @@ export default function useRoomSync() {
         break;
       case "lobby":
       case "lost": {
-        // El host gestiona su propio fin de ronda (puntos, nivel...).
-        if (store.role !== "player") break;
+        // El host gestiona su propio fin de ronda (puntos, nivel...), salvo
+        // al volver tras recargar (está en "room"): entonces se le lleva al
+        // resumen como a los jugadores (su progreso viene de la sesión).
+        if (store.role !== "player" && store.mode !== "room") break;
         if (!["game", "loading", "room"].includes(store.mode)) break;
         const target = room.state;
         const roundId = round?.id ?? null;

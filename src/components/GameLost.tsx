@@ -22,6 +22,7 @@ import useRoomManager from "../hooks/useRoomManager";
 import gameOverSound from "../assets/gameover.mp3";
 import { START_TIME } from "../constant";
 import { showToast } from "../atoms/Toast";
+import { saveRoomSession } from "../realtime/roomSession";
 import { countLetters, canFormWord } from "../utils";
 
 export default function GameLost() {
@@ -166,6 +167,13 @@ export default function GameLost() {
         setRoomCode(result.data.roomCode);
         setRoomId(result.data.roomId);
         setPlayerId(result.data.playerId);
+        saveRoomSession({
+          code: result.data.roomCode,
+          roomId: result.data.roomId,
+          playerId: result.data.playerId,
+          name: playerName,
+          role: "host",
+        });
 
         resetGameState();
 
