@@ -104,6 +104,13 @@ export default function HostGameView({
             />
           </div>
           <ProgressBar
+            // Phones: the top corners hold the score boxes, so the sound
+            // button goes at the left of the seconds row
+            leading={
+              isMobileLayout ? (
+                <GameSound className="volume-control--inline" />
+              ) : undefined
+            }
             timeLeft={timeLeft}
             percentage={percentage}
             RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
@@ -130,7 +137,7 @@ export default function HostGameView({
             volume={volume}
           />
         )}
-        <GameSound />
+        {!isMobileLayout && <GameSound />}
       </div>
       {isMobile && players === "single" && (
         <KeyboardReserve onActivate={() => wordInputRef.current?.focus()} />

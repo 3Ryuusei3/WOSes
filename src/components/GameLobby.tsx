@@ -30,6 +30,7 @@ import { startRound } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
 import { primeMobileKeyboard } from "../utils/mobileKeyboard";
 import useMobileLayout from "../hooks/useMobileLayout";
+import { playSound } from "../utils/sound";
 
 export default function GameLobby() {
   const {
@@ -74,7 +75,7 @@ export default function GameLobby() {
     if (!audioRef.current) {
       audioRef.current = new Audio(levelPassedSound);
       audioRef.current.volume = volume;
-      audioRef.current.play().catch(() => {});
+      playSound(audioRef.current);
     }
 
     const timer = setTimeout(() => {

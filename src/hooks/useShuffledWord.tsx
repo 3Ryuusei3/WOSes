@@ -12,6 +12,7 @@ import Mechanics from "../types/Mechanics";
 import Word from "../types/Word";
 
 import shuffleSound from "../assets/shuffle.mp3";
+import { playSound } from "../utils/sound";
 
 const createLetterObject = (
   word: string,
@@ -253,7 +254,7 @@ const useShuffledWord = (
       const effectiveVol =
         players === "multi" && role === "player" ? 0 : volumeRef.current;
       audio.volume = effectiveVol;
-      if (effectiveVol > 0) audio.play();
+      if (effectiveVol > 0) playSound(audio);
     };
 
     const interval = setInterval(shuffleAndAddLetter, intervalTime);

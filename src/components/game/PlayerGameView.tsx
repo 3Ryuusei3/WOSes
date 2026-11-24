@@ -20,6 +20,7 @@ import SelectedWord from "../../atoms/SelectedWord";
 import ProgressBar from "../../atoms/ProgressBar";
 import KeyboardReserve from "../../atoms/KeyboardReserve";
 import BackHomeButton from "../../atoms/BackHomeButton";
+import GameSound from "../../atoms/GameSound";
 import useMobileLayout from "../../hooks/useMobileLayout";
 import WordList from "../../atoms/WordList";
 import useMobileUserAgent from "../../hooks/useMobileUserAgent";
@@ -226,6 +227,13 @@ export default function PlayerGameView({
             )}
           </div>
           <ProgressBar
+            // Host that plays (players get no sound button): left of the
+            // seconds row on phones
+            leading={
+              isMobileLayout ? (
+                <GameSound className="volume-control--inline" />
+              ) : undefined
+            }
             timeLeft={timeLeft}
             percentage={percentage}
             RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}

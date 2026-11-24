@@ -26,6 +26,7 @@ import { START_TIME } from "../constant";
 import { showToast } from "../atoms/Toast";
 import { saveRoomSession } from "../realtime/roomSession";
 import { countLetters, canFormWord } from "../utils";
+import { playSound } from "../utils/sound";
 
 export default function GameLost() {
   const { t } = useTranslation();
@@ -203,9 +204,7 @@ export default function GameLost() {
       audioRef.current.addEventListener(
         "canplaythrough",
         () => {
-          audioRef.current
-            ?.play()
-            .catch((err) => console.error("Audio playback failed:", err));
+          playSound(audioRef.current);
         },
         { once: true },
       );

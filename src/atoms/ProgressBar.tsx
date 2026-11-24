@@ -1,4 +1,8 @@
+import type { ReactNode } from "react";
+
 interface ProgressBarProps {
+  /** Shown at the left of the seconds row (e.g. the sound button on phones) */
+  leading?: ReactNode;
   timeLeft: number;
   percentage: number;
   RUNNING_OUT_OF_TIME_PERCENTAGE: number;
@@ -6,6 +10,7 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({
+  leading,
   timeLeft,
   percentage,
   RUNNING_OUT_OF_TIME_PERCENTAGE,
@@ -13,7 +18,14 @@ export default function ProgressBar({
 }: ProgressBarProps) {
   return (
     <div className="v-section">
-      <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
+      {leading ? (
+        <div className="progress__label-row">
+          {leading}
+          <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
+        </div>
+      ) : (
+        <div className="progress__time">{Math.floor(timeLeft / 1000)}s</div>
+      )}
       <div
         className="progress__container"
         style={

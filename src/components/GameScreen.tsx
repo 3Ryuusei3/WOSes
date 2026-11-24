@@ -35,6 +35,7 @@ import {
   type RtBoard,
 } from "../realtime/roomRealtime";
 import { showToast } from "../atoms/Toast";
+import { playSound } from "../utils/sound";
 
 /** Host: cada cuánto reenvía sus letras (cubre móviles que (re)conectan) */
 const BOARD_RESEND_MS = 4000;
@@ -449,7 +450,7 @@ export default function GameScreen() {
         if (hitAudioRef.current && effectiveVolume > 0) {
           try {
             hitAudioRef.current.currentTime = 0;
-            hitAudioRef.current.play().catch(() => {});
+            playSound(hitAudioRef.current);
           } catch (_) {}
         }
       }
@@ -503,7 +504,7 @@ export default function GameScreen() {
       ) {
         if (goalAudioRef.current) {
           goalAudioRef.current.currentTime = 0;
-          goalAudioRef.current.play().catch(() => {});
+          playSound(goalAudioRef.current);
         }
         setHasPlayedGoalSound(true);
       }
@@ -518,7 +519,7 @@ export default function GameScreen() {
       ) {
         if (revealAudioRef.current) {
           revealAudioRef.current.currentTime = 0;
-          revealAudioRef.current.play().catch(() => {});
+          playSound(revealAudioRef.current);
         }
         setHasPlayedRevealSound(true);
       }
@@ -526,7 +527,7 @@ export default function GameScreen() {
       if (timeLeft <= 3000 && !hasPlayedEndSound) {
         if (endAudioRef.current) {
           endAudioRef.current.currentTime = 0;
-          endAudioRef.current.play().catch(() => {});
+          playSound(endAudioRef.current);
         }
         setHasPlayedEndSound(true);
       }

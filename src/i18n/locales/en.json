@@ -58,7 +58,9 @@
     "summary": "SUMMARY",
     "understood": "GOT IT",
     "save": "SAVE",
-    "cancel": "CANCEL"
+    "cancel": "CANCEL",
+    "soundOn": "TURN SOUND ON",
+    "soundOff": "MUTE"
   },
   "difficulties": {
     "easy": "STANDARD",

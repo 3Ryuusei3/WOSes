@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import useGameStore from "../store/useGameStore";
 
 import soundOffIcon from "./../assets/speaker-off.svg";
@@ -6,55 +8,59 @@ import soundHighIcon from "./../assets/speaker-high.svg";
 
 import { isMobileUserAgent } from "../utils/mobileUserAgent";
 
-export default function GameSound() {
+interface GameSoundProps {
+  /** Placement variant (e.g. "volume-control--inline" next to the timer) */
+  className?: string;
+}
+
+/**
+ * Sound button. Desktop: off / low / high. Phones: just on / off — the
+ * page can't change the volume there (iOS always plays at the device
+ * volume), so "off" means nothing is played.
+ */
+export default function GameSound({ className = "" }: GameSoundProps) {
+  const { t } = useTranslation();
   const { volume, setVolume, players, role } = useGameStore();
   const isPlayer = players === "multi" && role === "player";
-  const effectiveVolume = isPlayer ? 0 : volume;
-  const volumeState =
-    effectiveVolume === 0 ? "off" : effectiveVolume === 0.2 ? "low" : "high";
 
-  if (isPlayer) {
-    return null;
-  }
+  // Players in a room are always silent (sound is on the host's screen)
+  if (isPlayer) return null;
+
+  const isPhone = isMobileUserAgent();
+  const volumeState = volume === 0 ? "off" : volume === 0.2 ? "low" : "high";
+
+  const next = () => {
+    if (isPhone) {
+      setVolume(volume === 0 ? 0.4 : 0);
+    } else if (volumeState === "high") {
+      setVolume(0);
+    } else if (volumeState === "off") {
+      setVolume(0.2);
+    } else {
+      setVolume(0.4);
+    }
+  };
+
+  const icon =
+    volumeState === "off"
+      ? soundOffIcon
+      : isPhone || volumeState === "high"
+        ? soundHighIcon
+        : soundLowIcon;
+  const label = volumeState === "off" ? t("common.soundOn") : t("common.soundOff");
 
   return (
-    <>
-      {!isMobileUserAgent() && (
-        <button
-          className="volume-control btn btn--sta btn--xs"
-          onClick={() => {
-            if (volumeState === "high") {
-              setVolume(0);
-            } else if (volumeState === "off") {
-              setVolume(0.2);
-            } else {
-              setVolume(0.4);
-            }
-          }}
-        >
-          <img
-            src={
-              volumeState === "high"
-                ? soundHighIcon
-                : volumeState === "low"
-                  ? soundLowIcon
-                  : soundOffIcon
-            }
-            width={28}
-            height={28}
-            alt="volume"
-            onClick={() => {
-              if (volumeState === "high") {
-                setVolume(0);
-              } else if (volumeState === "off") {
-                setVolume(0.2);
-              } else {
-                setVolume(0.4);
-              }
-            }}
-          />
-        </button>
-      )}
-    </>
+    <button
+      type="button"
+      className={`volume-control btn btn--sta btn--xs ${className}`}
+      onClick={next}
+      aria-label={label}
+      title={label}
+      aria-pressed={volumeState !== "off"}
+      // Mobile game: don't close the device keyboard
+      onMouseDown={(e) => e.preventDefault()}
+    >
+      <img src={icon} width={28} height={28} alt="" />
+    </button>
   );
 }

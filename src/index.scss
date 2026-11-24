@@ -3049,3 +3049,37 @@ html:has(.keyboard-reserve) {
   max-width: 24rem;
   align-self: center;
 }
+
+// Seconds row with something at its left (the sound button on phones)
+.progress__label-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .progress__time {
+    margin-left: auto;
+  }
+}
+// Sound button inside a row (not in a corner)
+.volume-control.volume-control--inline,
+.mobile .volume-control.volume-control--inline {
+  position: static;
+  top: auto;
+  right: auto;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+
+  img {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+}
+.mobile .panel-actions .volume-control {
+  padding-inline: 0.375rem;
+
+  img {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+}

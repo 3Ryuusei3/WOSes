@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 import hitMusic from '../assets/hit.mp3';
+import { playSound } from "../utils/sound";
 
 export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void, volume: number) {
   const [animateError, setAnimateError] = useState(false);
@@ -29,8 +30,7 @@ export default function useInputResponse(possibleWords: string[], inputWord: str
 
   const playHitAudio = () => {
     if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
+      playSound(audioRef.current);
     }
     return audioRef.current;
   };

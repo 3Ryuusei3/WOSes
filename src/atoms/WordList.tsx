@@ -9,6 +9,7 @@ import useWindowSize from "../hooks/useWindowSize";
 
 import { isMobileUserAgent } from "../utils/mobileUserAgent";
 import useMobileLayout from "../hooks/useMobileLayout";
+import { playSound } from "../utils/sound";
 
 interface WordListProps {
   words: Word[];
@@ -42,7 +43,7 @@ export default function WordList({
         audioRef.current.volume = effectiveVol;
         if (effectiveVol > 0) {
           audioRef.current.currentTime = 0;
-          audioRef.current.play().catch(() => {});
+          playSound(audioRef.current);
         }
       }
     }

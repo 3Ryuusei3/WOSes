@@ -8,6 +8,7 @@ import Mechanics from "../types/Mechanics";
 import Difficulty from "../types/Difficulty";
 
 import { START_TIME } from "../constant";
+import { isMobileUserAgent } from "../utils/mobileUserAgent";
 
 interface GameState {
   mode: Mode;
@@ -157,7 +158,8 @@ const useGameStore = create<GameState>()(
               ? rounds(state.numberOfPerfectRounds)
               : rounds,
         })),
-      volume: 0.2,
+      // Phones start muted (sound is opt-in there); desktop at 20%
+      volume: isMobileUserAgent() ? 0 : 0.2,
       setVolume: (volume) => set({ volume }),
       exitConfirmOpen: false,
       setExitConfirmOpen: (exitConfirmOpen) => set({ exitConfirmOpen }),
@@ -187,6 +189,14 @@ const useGameStore = create<GameState>()(
     {
       name: "woses-game-storage",
       storage: createJSONStorage(() => localStorage),
+      // v1: phones that already played get the sound off once (it used to
+      // be on, with no way to turn it off on a phone)
+      version: 1,
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as Partial<GameState>;
+        if (version < 1 && isMobileUserAgent()) state.volume = 0;
+        return state as GameState;
+      },
       partialize: (state) => ({
         playerName: state.playerName,
         volume: state.volume,

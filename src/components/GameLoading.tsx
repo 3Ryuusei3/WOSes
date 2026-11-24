@@ -10,6 +10,7 @@ import KeyboardReserve from "../atoms/KeyboardReserve";
 import useMobileUserAgent from "../hooks/useMobileUserAgent";
 
 import countdownMusic from "../assets/countdown.mp3";
+import { playSound } from "../utils/sound";
 
 export default function GameLoading() {
   const { t } = useTranslation();
@@ -30,7 +31,7 @@ export default function GameLoading() {
       audioRef.current.volume = effectiveVolume;
 
       timeoutRef.current = setTimeout(() => {
-        audioRef.current?.play().catch(() => {});
+        playSound(audioRef.current);
       }, 100);
     }
 
