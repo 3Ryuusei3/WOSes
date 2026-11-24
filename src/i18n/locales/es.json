@@ -142,7 +142,8 @@
     "leaveRoomTitle": "¿SALIR DE LA SALA?",
     "leaveRoomPlayer": "SALDRÁS DE LA SALA {{code}} Y DESAPARECERÁS DE LA LISTA DE JUGADORES.",
     "leaveRoomHost": "SALDRÁS DE LA SALA {{code}} Y LOS JUGADORES SE QUEDARÁN SIN ANFITRIÓN.",
-    "leaveRoomButton": "SALIR"
+    "leaveRoomButton": "SALIR",
+    "tapToType": "TOCA AQUÍ PARA ESCRIBIR"
   },
   "howToPlay": {
     "title": "¿CÓMO JUGAR?",

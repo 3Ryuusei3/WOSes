@@ -33,15 +33,18 @@ function useKeyboardHeight() {
         timers.push(window.setTimeout(resetScroll, ms));
       }
     };
-    document.addEventListener("focusin", keepInPlace);
+    const onFocusIn = () => {
+      keepInPlace();
+      for (const ms of [300, 700]) timers.push(window.setTimeout(measure, ms));
+    };
+    document.addEventListener("focusin", onFocusIn);
     document.addEventListener("focusout", keepInPlace);
     // The page itself never scrolls on this screen (lists scroll inside)
     window.addEventListener("scroll", resetScroll, { passive: true });
 
     const vv = window.visualViewport;
-    const onResize = () => {
+    const measure = () => {
       if (!vv) return;
-      keepInPlace();
       // The keyboard covers the layout viewport from the bottom
       const height = Math.round(window.innerHeight - vv.height);
       if (height < MIN_KEYBOARD_PX) return;
@@ -50,11 +53,21 @@ function useKeyboardHeight() {
       localStorage.setItem(STORAGE_KEY, String(height));
       applyHeight(height);
     };
+    // iOS may report the size mid-animation (a keyboard only partly open):
+    // measure again once the animation is over, or the reserved space stays
+    // too short and the board lays out under the keyboard
+    const onResize = () => {
+      keepInPlace();
+      measure();
+      for (const ms of [250, 500, 900]) {
+        timers.push(window.setTimeout(measure, ms));
+      }
+    };
     vv?.addEventListener("resize", onResize);
     vv?.addEventListener("scroll", keepInPlace);
 
     return () => {
-      document.removeEventListener("focusin", keepInPlace);
+      document.removeEventListener("focusin", onFocusIn);
       document.removeEventListener("focusout", keepInPlace);
       window.removeEventListener("scroll", resetScroll);
       vv?.removeEventListener("resize", onResize);
@@ -87,6 +100,9 @@ export default function KeyboardReserve({ onActivate }: KeyboardReserveProps) {
       // Keep the input focused (keyboard open) when tapping here
       onMouseDown={(e) => e.preventDefault()}
       onClick={onActivate}
-    />
+    >
+      {/* Only seen while the keyboard is closed (it covers this space) */}
+      <span className="keyboard-reserve__hint">{t("game.tapToType")}</span>
+    </button>
   );
 }

@@ -1480,8 +1480,8 @@ main {
 
 .volume-control {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 1rem;
+  right: 1rem;
 
   img {
     display: block;
@@ -1514,8 +1514,8 @@ main {
 
 .difficulty-tag {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  top: 1rem;
+  left: 1rem;
   width: fit-content;
   cursor: pointer;
 }
@@ -2657,8 +2657,8 @@ main {
 // Player button (icon + name): top-left corner, opposite the sound button
 .user-control {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  top: 1rem;
+  left: 1rem;
   max-width: 40%;
   gap: 0.375rem;
 
@@ -2686,8 +2686,8 @@ main {
 // Top-right corner of the panel: "¿Falta algo?" + sound, side by side
 .panel-actions {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 1rem;
+  right: 1rem;
   z-index: 5;
   display: flex;
   align-items: stretch;
@@ -2954,16 +2954,16 @@ main {
 // Desktop game: top-left of the panel, facing the sound button
 .back-control--panel {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  top: 1rem;
+  left: 1rem;
   z-index: 5;
 }
 // Room / mobile summary screens: top-left of the panel (desktop) or of the
 // logo row (mobile), like the user button on the start screen
 .back-control--corner {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  top: 1rem;
+  left: 1rem;
   z-index: 5;
 }
 .mobile .back-control--corner {
@@ -3034,4 +3034,11 @@ html:has(.keyboard-reserve) {
   .player-list {
     width: 100%;
   }
+}
+
+// "Tap here to type": visible only while the device keyboard is closed
+.keyboard-reserve__hint {
+  font-size: 0.75rem;
+  color: var(--clr-text-terciary);
+  pointer-events: none;
 }

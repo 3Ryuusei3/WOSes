@@ -142,7 +142,8 @@
     "leaveRoomTitle": "LEAVE THE ROOM?",
     "leaveRoomPlayer": "YOU'LL LEAVE ROOM {{code}} AND BE REMOVED FROM THE PLAYERS LIST.",
     "leaveRoomHost": "YOU'LL LEAVE ROOM {{code}} AND THE PLAYERS WILL BE LEFT WITHOUT A HOST.",
-    "leaveRoomButton": "EXIT"
+    "leaveRoomButton": "EXIT",
+    "tapToType": "TAP HERE TO TYPE"
   },
   "howToPlay": {
     "title": "HOW TO PLAY?",
