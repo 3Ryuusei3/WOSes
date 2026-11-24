@@ -8,6 +8,7 @@ import Mechanics from "../types/Mechanics";
 import useWindowSize from "../hooks/useWindowSize";
 
 import { isMobileUserAgent } from "../utils/mobileUserAgent";
+import useMobileLayout from "../hooks/useMobileLayout";
 
 interface WordListProps {
   words: Word[];
@@ -48,7 +49,8 @@ export default function WordList({
     prevGuessedCountRef.current = guessedCount;
   }, [words, players, role, volume]);
   const wordRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const isMobile = isMobileUserAgent();
+  // Layout (phones and narrow windows): no names on the rows
+  const isMobile = useMobileLayout();
   const { columns: defaultColumns } = useWindowSize();
   const listRef = useRef<HTMLUListElement>(null);
   const bestColumns = useBestMobileColumns(listRef, words);

@@ -84,7 +84,7 @@ const Instructions = () => {
           </div>
           <ul
             className="wordlist"
-            style={{ "--wordlist-rows": 2 } as React.CSSProperties}
+            style={{ "--wordlist-rows": 2, "--wordlist-columns": 3 } as React.CSSProperties}
           >
             {i18n.language === "es" ? (
               <>
@@ -208,82 +208,33 @@ const Instructions = () => {
       content: (
         <>
           <h4 className="highlight">{t("instructions.pointsSystem")}</h4>
-          <div className="v-section gap-xs">
-            <div
-              className="wordlist"
-              style={{ "--wordlist-rows": 1 } as React.CSSProperties}
-            >
-              <h4 className="lost">{t("instructions.lowPoints")}</h4>
-              <h4 className="highlight">{t("instructions.mediumPoints")}</h4>
-              <h4 className="won">{t("instructions.highPoints")}</h4>
-            </div>
-            <ul
-              className="wordlist"
-              style={{ "--wordlist-rows": 1 } as React.CSSProperties}
-            >
-              {i18n.language === "es" ? (
-                <>
-                  <li className="word active">
-                    <span className="wordLetters">
-                      <span className="letter">B</span>
-                      <span className="letter">A</span>
-                      <span className="letter">I</span>
-                      <span className="letter">L</span>
-                      <span className="letter">A</span>
-                    </span>
-                  </li>
-                  <li className="word active">
-                    <span className="wordLetters">
-                      <span className="letter">A</span>
-                      <span className="letter">L</span>
-                      <span className="letter">Z</span>
-                      <span className="letter">A</span>
-                      <span className="letter">S</span>
-                    </span>
-                  </li>
-                  <li className="word active">
-                    <span className="wordLetters">
-                      <span className="letter">B</span>
-                      <span className="letter">A</span>
-                      <span className="letter">L</span>
-                      <span className="letter">I</span>
-                      <span className="letter">Z</span>
-                      <span className="letter">A</span>
-                    </span>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li className="word active">
-                    <span className="wordLetters">
-                      <span className="letter">B</span>
-                      <span className="letter">A</span>
-                      <span className="letter">I</span>
-                      <span className="letter">L</span>
-                    </span>
-                  </li>
-                  <li className="word active">
-                    <span className="wordLetters">
-                      <span className="letter">B</span>
-                      <span className="letter">A</span>
-                      <span className="letter">Z</span>
-                      <span className="letter">A</span>
-                      <span className="letter">S</span>
-                    </span>
-                  </li>
-                  <li className="word active">
-                    <span className="wordLetters">
-                      <span className="letter">B</span>
-                      <span className="letter">L</span>
-                      <span className="letter">A</span>
-                      <span className="letter">Z</span>
-                      <span className="letter">E</span>
-                      <span className="letter">S</span>
-                    </span>
-                  </li>
-                </>
-              )}
-            </ul>
+          {/* Each example: points label with its word underneath */}
+          <div className="instruction-points">
+            {(i18n.language === "es"
+              ? [
+                  ["lost", "lowPoints", "BAILA"],
+                  ["highlight", "mediumPoints", "ALZAS"],
+                  ["won", "highPoints", "BALIZA"],
+                ]
+              : [
+                  ["lost", "lowPoints", "BAIL"],
+                  ["highlight", "mediumPoints", "BAZAS"],
+                  ["won", "highPoints", "BLAZES"],
+                ]
+            ).map(([color, labelKey, word]) => (
+              <div key={word} className="v-section gap-xs f-ai-c">
+                <h4 className={color}>{t(`instructions.${labelKey}`)}</h4>
+                <div className="word active">
+                  <span className="wordLetters">
+                    {word.split("").map((letter, i) => (
+                      <span key={i} className="letter">
+                        {letter}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </>
       ),

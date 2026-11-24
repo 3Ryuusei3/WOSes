@@ -11,7 +11,7 @@ import useBackgroundAudio from "../hooks/useBackgroundAudio";
 import useSetMechanics from "../hooks/useSetMechanics";
 import useDailyChallenge from "../hooks/useDailyChallenge";
 import useRoomManager from "../hooks/useRoomManager";
-import useMobileUserAgent from "../hooks/useMobileUserAgent";
+import useMobileLayout from "../hooks/useMobileLayout";
 
 import useGameStore from "../store/useGameStore";
 import SegmentedTabs from "../atoms/SegmentedTabs";
@@ -51,14 +51,16 @@ export default function GameStart() {
   const [error, setError] = useState(false);
   const [howToPlayModal, setHowToPlayModal] = useState(false);
   // Mobile: ranking is a tab of the screen instead of a modal
-  const [mobileTab, setMobileTab] = useState<"play" | "ranking">("play");
+  // Mobile: the ranking is its own view (opened with a button, "Volver" to
+  // come back) instead of a modal
+  const [mobileView, setMobileView] = useState<"play" | "ranking">("play");
   // Mobile ranking tab: its own difficulty (doesn't change the game's).
   // null = follow the difficulty selected to play.
   const [rankingTabDifficulty, setRankingTabDifficulty] =
     useState<Difficulty | null>(null);
   const [isDailyChallengeSelected, setIsDailyChallengeSelected] =
     useState(false);
-  const isMobileUa = useMobileUserAgent();
+  const isMobileUa = useMobileLayout();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -257,21 +259,11 @@ export default function GameStart() {
     </button>
   );
 
-  const showForm = !isMobileUa || mobileTab === "play";
+  const showForm = !isMobileUa || mobileView === "play";
 
   return (
     <>
       <div className="game__container f-jc-c pos-rel">
-        {isMobileUa && (
-          <SegmentedTabs
-            tabs={[
-              { key: "play", label: t("common.play") },
-              { key: "ranking", label: t("common.ranking") },
-            ]}
-            active={mobileTab}
-            onChange={setMobileTab}
-          />
-        )}
         <div className="h-section gap-lg">
           {showForm && (
             <div className="home__container">
@@ -302,22 +294,42 @@ export default function GameStart() {
                   {t("gameStart.nameError")}
                 </small>
               </div>
-              <button
-                type="button"
-                className="btn btn--sm btn--ghost mx-auto"
-                onClick={() => setHowToPlayModal(true)}
-              >
-                {t("gameStart.howToPlayButton")}
-              </button>
+              <div className="h-section gap-xs f-jc-c secondary-actions">
+                <button
+                  type="button"
+                  className="btn btn--sm btn--ghost"
+                  onClick={() => setHowToPlayModal(true)}
+                >
+                  {t("gameStart.howToPlayButton")}
+                </button>
+                {isMobileUa && (
+                  <button
+                    type="button"
+                    className="btn btn--sm btn--ghost"
+                    onClick={() => setMobileView("ranking")}
+                  >
+                    {t("common.ranking")}
+                  </button>
+                )}
+              </div>
               {!isMobileUa && (
                 <div className="start-actions">{startButton}</div>
               )}
             </div>
           )}
           {isMobileUa ? (
-            mobileTab === "ranking" && (
-              <div className="score__container--box dark w100 mobile-ranking">
-                {rankingPanel}
+            mobileView === "ranking" && (
+              <div className="v-section gap-md w100">
+                <div className="score__container--box dark w100 mobile-ranking">
+                  {rankingPanel}
+                </div>
+                <button
+                  type="button"
+                  className="btn btn--sm btn--ghost mx-auto"
+                  onClick={() => setMobileView("play")}
+                >
+                  {t("common.back")}
+                </button>
               </div>
             )
           ) : (

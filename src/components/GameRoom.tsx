@@ -8,7 +8,7 @@ import { saveRoomSession } from "../realtime/roomSession";
 import { isValidPlayerName } from "../utils";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../atoms/Toast";
-import useMobileUserAgent from "../hooks/useMobileUserAgent";
+import useMobileLayout from "../hooks/useMobileLayout";
 
 export default function GameRoom() {
   const { t } = useTranslation();
@@ -39,7 +39,7 @@ export default function GameRoom() {
   const [isStarting, setIsStarting] = useState(false);
 
   const isHost = role === "host";
-  const isMobile = useMobileUserAgent();
+  const isMobile = useMobileLayout();
 
   const nonHostPlayers = useMemo(
     () => roomPlayers.filter((p) => p.role !== "host"),

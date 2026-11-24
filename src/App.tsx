@@ -11,7 +11,7 @@ import HomePage from "./components/HomePage";
 import GamePage from "./components/GamePage";
 import { shouldUseFluidScale } from "./hooks/fluidScale";
 import useGameStore from "./store/useGameStore";
-import { isMobileUserAgent } from "./utils/mobileUserAgent";
+import useMobileLayout from "./hooks/useMobileLayout";
 
 function BodyLayoutClassSync() {
   const { pathname } = useLocation();
@@ -19,12 +19,14 @@ function BodyLayoutClassSync() {
   const role = useGameStore((s) => s.role);
   const hasRoomIdInUrl = !!searchParams.get("id");
   const isScaled = shouldUseFluidScale(role, hasRoomIdInUrl);
+  // Phones and narrow windows; updates when the window is resized
+  const isMobile = useMobileLayout();
 
   useEffect(() => {
     // On <html> so the classes can set the root font-size (rem scaling).
     const html = document.documentElement;
 
-    if (isMobileUserAgent()) {
+    if (isMobile) {
       html.classList.add("mobile");
     } else if (pathname === "/game" && isScaled) {
       html.classList.add("fluid-scale");
@@ -33,7 +35,7 @@ function BodyLayoutClassSync() {
     return () => {
       html.classList.remove("mobile", "fluid-scale");
     };
-  }, [pathname, isScaled]);
+  }, [pathname, isScaled, isMobile]);
 
   return null;
 }

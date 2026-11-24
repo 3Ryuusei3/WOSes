@@ -25,7 +25,7 @@ import PlayersPanel from "../atoms/PlayersPanel";
 import { startRound } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
 import { primeMobileKeyboard } from "../utils/mobileKeyboard";
-import useMobileUserAgent from "../hooks/useMobileUserAgent";
+import useMobileLayout from "../hooks/useMobileLayout";
 
 export default function GameLobby() {
   const {
@@ -50,7 +50,7 @@ export default function GameLobby() {
   } = useGameStore();
 
   const isPlayer = players === "multi" && role === "player";
-  const isMobile = useMobileUserAgent();
+  const isMobile = useMobileLayout();
 
   const { t } = useTranslation();
 

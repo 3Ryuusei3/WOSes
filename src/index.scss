@@ -853,6 +853,11 @@ main {
   width: 24rem;
   flex: 0 0 auto;
 }
+// Ranking box lined up with the form's visible content (title top to start
+// button bottom), not with the column's padding
+.fluid-scale .top-scores {
+  margin-block: 1.375rem 0.875rem;
+}
 // Ranking box as tall as the form column
 .fluid-scale .top-scores > .score__container--box {
   flex: 1 1 auto;
@@ -884,7 +889,9 @@ main {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
-  gap: 0.5rem;
+  // Rows get more gap: the buttons' shadow (3px above, 6px below) eats into
+  // it, so this makes rows and columns look equally spaced
+  gap: calc(0.5rem + 0.5625rem) 0.5rem;
 
   .btn {
     width: 100%;
@@ -1884,6 +1891,16 @@ main {
       padding: 0.25rem;
     }
   }
+  // Example words in the modals: fixed-size letters like a game's (the
+  // board's adaptive sizing doesn't apply here)
+  .instruction-slide {
+    .word {
+      container-type: normal;
+    }
+    .letter {
+      --tile: 1.25rem;
+    }
+  }
   .tooltip-container {
     top: -0.5rem;
     right: -0.5rem;
@@ -2298,6 +2315,13 @@ main {
     padding-block: 0.75rem !important;
   }
 
+  // Sound button (only on narrow desktop windows; phones don't show it):
+  // up in the logo row so it doesn't cover the tabs
+  .volume-control {
+    top: -2.75rem;
+    right: 0;
+  }
+
   // Countdown: just the animation, no panel. It shares the screen with the
   // keyboard space, so the animation scales to the height it gets.
   .game__container--loading {
@@ -2449,7 +2473,7 @@ main {
 // Modals with steps / explanations ("Cómo jugar", letter types): title,
 // content and a bottom bar with the actions (no floating arrows)
 .modal__content--steps {
-  max-width: 34rem;
+  max-width: 41.875rem;
   gap: 1.25rem;
   align-items: stretch;
   padding: 1.5rem 1.25rem 1.25rem;
@@ -2472,6 +2496,15 @@ main {
       visibility: visible;
       animation: fadeIn 0.4s ease;
     }
+  }
+
+  // Hidden slides must disappear at once: their words/buttons have
+  // "transition: all", which would also delay hiding them (~0.3s)
+  > .instruction-slide:not(.is-active),
+  > .instruction-slide:not(.is-active) * {
+    visibility: hidden !important;
+    transition: none !important;
+    animation: none !important;
   }
 }
 
@@ -2557,4 +2590,26 @@ main {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
+}
+
+// "Cómo jugar" points slide: label + word, side by side (wrap if needed)
+.instruction-points {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1rem;
+}
+
+// Example word lists in the modals (desktop and mobile): words wrap
+// centered instead of a fixed grid, so they always fit the modal
+.instruction-slide .wordlist {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.5rem;
+}
+
+// Start screen secondary actions ("Cómo jugar", and "Ranking" on mobile)
+.secondary-actions {
+  flex-wrap: wrap;
 }

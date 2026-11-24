@@ -111,7 +111,7 @@ const MECHANICS_INFO: Record<MechanicKey, Omit<MechanicInfo, "key">> = {
     example: (
       <div
         className="wordlist"
-        style={{ "--wordlist-rows": 2 } as React.CSSProperties}
+        style={{ "--wordlist-rows": 2, "--wordlist-columns": 2 } as React.CSSProperties}
       >
         <li className="word active">
           <span className="wordLetters">

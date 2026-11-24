@@ -13,7 +13,7 @@ import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import HelpButton from "../atoms/HelpButton";
 
 import useGameStore from "../store/useGameStore";
-import useMobileUserAgent from "../hooks/useMobileUserAgent";
+import useMobileLayout from "../hooks/useMobileLayout";
 import useLanguageWords from "../hooks/useLanguageWords";
 import useRealtimeConnection from "../hooks/useRealtimeConnection";
 import useRoomManager from "../hooks/useRoomManager";
@@ -66,7 +66,7 @@ export default function GameLost() {
     lastLevelWords.length > 0 &&
     lastLevelWords.every((word) => word.guessed);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const isMobileUa = useMobileUserAgent();
+  const isMobileUa = useMobileLayout();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   // Mobile: ranking is a tab of the screen instead of a modal
