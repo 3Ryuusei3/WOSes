@@ -179,7 +179,8 @@ export default function TopScores({
             onClick={toggleRanking}
           />
         )}
-        <div className="v-section">
+        {/* Title and difficulty centered between the arrows */}
+        <div className="v-section f-ai-c txt-center">
           {hasTooltip ? (
             <>
               <h4 className="highlight">

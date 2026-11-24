@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import TopScores from "../atoms/TopScores";
 import SegmentedTabs from "../atoms/SegmentedTabs";
 import PlayersPanel from "../atoms/PlayersPanel";
+import RoomRankingPanel from "../atoms/RoomRankingPanel";
+import useHostPlays from "../hooks/useHostPlays";
 import GameSound from "../atoms/GameSound";
 import DifficultyTag from "../atoms/DifficultyTag";
 import WordListDisplay from "../atoms/WordListDisplay";
@@ -76,6 +78,8 @@ export default function GameLost() {
   const { words } = useLanguageWords(gameDifficulty);
   const { forceReconnect, isConnected } = useRealtimeConnection();
   const roomManager = useRoomManager();
+  // Host without a main screen: the room ranking, not the global one
+  const hostPlays = useHostPlays() && players === "multi" && role === "host";
 
   // Hook para resetear el estado del juego
   const resetGameState = () => {
@@ -259,7 +263,9 @@ export default function GameLost() {
     );
   }
 
-  const ranking = isDailyChallenge ? (
+  const ranking = hostPlays ? (
+    <RoomRankingPanel />
+  ) : isDailyChallenge ? (
     <TopScores
       hasTooltip
       difficulty="daily"

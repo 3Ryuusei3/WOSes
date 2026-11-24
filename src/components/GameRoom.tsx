@@ -11,6 +11,7 @@ import { isValidPlayerName } from "../utils";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../atoms/Toast";
 import useMobileLayout from "../hooks/useMobileLayout";
+import { primeMobileKeyboard } from "../utils/mobileKeyboard";
 
 export default function GameRoom() {
   const { t } = useTranslation();
@@ -55,6 +56,8 @@ export default function GameRoom() {
 
   const handleStart = async () => {
     if (!roomCode || !canStart || isStarting || !randomWord) return;
+    // Host that plays: the same tap opens its keyboard (see primeMobileKeyboard)
+    primeMobileKeyboard();
     setIsStarting(true);
     try {
       const { gameTime } = useGameStore.getState();

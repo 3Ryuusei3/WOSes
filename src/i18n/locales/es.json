@@ -239,7 +239,9 @@
     "ready": "¿Listo para continuar?",
     "continue": "Continuar",
     "seeWords": "Ver palabras",
-    "checkDefinition": "Ver definición"
+    "checkDefinition": "Ver definición",
+    "rankingTotal": "RANKING TOTAL",
+    "rankingLastRound": "ÚLTIMA RONDA"
   },
   "gameOver": {
     "title": "¡Juego terminado!",

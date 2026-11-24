@@ -254,7 +254,9 @@
     "ready": "Ready to continue?",
     "continue": "Continue",
     "seeWords": "See words",
-    "checkDefinition": "Check definition"
+    "checkDefinition": "Check definition",
+    "rankingTotal": "TOTAL RANKING",
+    "rankingLastRound": "LAST ROUND"
   },
   "gameOver": {
     "title": "Game Over!",

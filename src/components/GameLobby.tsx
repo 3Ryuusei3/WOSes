@@ -23,6 +23,9 @@ import levelPassedSound from "../assets/win.mp3";
 
 import { LEVELS_TO_ADVANCE } from "../constant";
 import PlayersPanel from "../atoms/PlayersPanel";
+import SegmentedTabs from "../atoms/SegmentedTabs";
+import RoomRankingPanel from "../atoms/RoomRankingPanel";
+import useHostPlays from "../hooks/useHostPlays";
 import { startRound } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
 import { primeMobileKeyboard } from "../utils/mobileKeyboard";
@@ -52,6 +55,10 @@ export default function GameLobby() {
 
   const isPlayer = players === "multi" && role === "player";
   const isMobile = useMobileLayout();
+  // Host without a main screen: a tab with the room ranking
+  const hostPlays = useHostPlays() && players === "multi" && role === "host";
+  const [tab, setTab] = useState<"summary" | "ranking">("summary");
+  const showSummary = !hostPlays || tab === "summary";
 
   const { t } = useTranslation();
 
@@ -111,6 +118,9 @@ export default function GameLobby() {
 
   const handleAdvance = useCallback(async () => {
     if (!canAdvance || isAdvancing) return;
+    // Same tap opens the keyboard on iOS for the next round (see
+    // primeMobileKeyboard); also for the host that plays
+    primeMobileKeyboard();
 
     if (players === "multi" && role === "host" && roomCode && randomWord) {
       setIsAdvancing(true);
@@ -136,8 +146,6 @@ export default function GameLobby() {
         setIsAdvancing(false);
       }
     } else {
-      // Same tap opens the keyboard on iOS (see primeMobileKeyboard)
-      primeMobileKeyboard();
       setMode("loading");
     }
   }, [canAdvance, isAdvancing, players, role, roomCode, randomWord, setMode]);
@@ -197,6 +205,22 @@ export default function GameLobby() {
         ) : (
           <h1 className="highlight">{t("lobby.congratulations")}</h1>
         )}
+        {hostPlays && (
+          <SegmentedTabs
+            tabs={[
+              { key: "summary", label: t("common.summary") },
+              { key: "ranking", label: t("common.ranking") },
+            ]}
+            active={tab}
+            onChange={setTab}
+          />
+        )}
+        {hostPlays && tab === "ranking" && (
+          <div className="score__container--box dark w100 mobile-ranking">
+            <RoomRankingPanel />
+          </div>
+        )}
+        {showSummary && (
         <h3>
           {t("lobby.youAdvanced")}
           {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
@@ -206,6 +230,8 @@ export default function GameLobby() {
           )}
           {levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
         </h3>
+        )}
+        {showSummary && (
         <div className="game__summary">
           <LobbyStatsContainer
             level={level}
@@ -233,19 +259,20 @@ export default function GameLobby() {
             </>
           )}
         </div>
-        {secondsToRemove > 0 && (
+        )}
+        {showSummary && secondsToRemove > 0 && (
           <h3
             dangerouslySetInnerHTML={{
               __html: t("lobby.lessTime", { seconds: secondsToRemove }),
             }}
           ></h3>
         )}
-        {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR && (
+        {showSummary && levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR && (
           <h3
             dangerouslySetInnerHTML={{ __html: t("lobby.perfectBonus") }}
           ></h3>
         )}
-        {levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR && (
+        {showSummary && levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR && (
           <h3
             dangerouslySetInnerHTML={{ __html: t("lobby.threeStarBonus") }}
           ></h3>

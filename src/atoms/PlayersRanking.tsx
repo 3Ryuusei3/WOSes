@@ -18,12 +18,15 @@ interface PlayersRankingProps {
   title?: string;
   sortBy?: "score" | "last_round_score";
   toggleable?: boolean;
+  /** Hide the title row (e.g. when tabs above already name the list) */
+  showTitle?: boolean;
 }
 
 export default function PlayersRanking({
   title = "RANKING",
   sortBy = "score",
   toggleable = false,
+  showTitle = true,
 }: PlayersRankingProps) {
   const { playerName } = useGameStore();
   // Lista de jugadores y presencia mantenidas por roomRealtime
@@ -59,6 +62,7 @@ export default function PlayersRanking({
 
   return (
     <div className="v-section gap-sm f-jc-c">
+      {showTitle && (
       <div className="h-section f-jc-sb f-ai-c">
         {toggleable && (
           <img
@@ -82,6 +86,7 @@ export default function PlayersRanking({
           />
         )}
       </div>
+      )}
       <div className="v-section gap-2xs">
         {sorted.length > 0 ? (
           sorted.map((player, index) => {
