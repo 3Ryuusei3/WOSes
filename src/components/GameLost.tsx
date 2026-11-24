@@ -11,6 +11,7 @@ import WordListDisplay from "../atoms/WordListDisplay";
 import StatBox from "../atoms/StatBox";
 import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import HelpButton from "../atoms/HelpButton";
+import BackHomeButton from "../atoms/BackHomeButton";
 
 import useGameStore from "../store/useGameStore";
 import useMobileLayout from "../hooks/useMobileLayout";
@@ -378,7 +379,10 @@ export default function GameLost() {
         )}
         {!isMobileUa && actions}
         {/* Top-right corner: "¿Falta algo?" next to the sound button */}
+        {/* Mobile: top-left of the logo row, facing "¿Falta algo?" */}
+        {isMobileUa && <BackHomeButton className="back-control--corner" />}
         <div className="panel-actions">
+          {!isMobileUa && <BackHomeButton />}
           <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
           <GameSound />
         </div>

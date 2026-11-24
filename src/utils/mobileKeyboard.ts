@@ -1,3 +1,4 @@
+import type { TouchEvent } from "react";
 import { isMobileUserAgent } from "./mobileUserAgent";
 
 /**
@@ -36,4 +37,20 @@ export function primeMobileKeyboard() {
     document.body.appendChild(proxy);
   }
   proxy.focus({ preventScroll: true });
+}
+
+/**
+ * onTouchEnd for the word inputs on phones. Tapping an input that isn't
+ * focused (e.g. after tapping outside it, which closes the keyboard) makes
+ * iOS scroll the page to "show" the input, shifting the whole game up.
+ * Instead we focus it ourselves without scrolling; still inside the tap, so
+ * the keyboard opens all the same.
+ */
+export function focusInputWithoutScroll(
+  e: TouchEvent<HTMLInputElement>,
+) {
+  const input = e.currentTarget;
+  if (input.disabled || document.activeElement === input) return;
+  e.preventDefault();
+  input.focus({ preventScroll: true });
 }

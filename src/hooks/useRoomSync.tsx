@@ -35,7 +35,7 @@ function buildLastLevelWords(possible: string[], correct: RtCorrectWord[]): Word
   });
 }
 
-function resetProgress() {
+export function resetProgress() {
   const s = useGameStore.getState();
   s.setTotalPoints(0);
   s.setLevel(1);

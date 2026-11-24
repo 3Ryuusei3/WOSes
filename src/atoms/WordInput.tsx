@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import useInputResponse from "../hooks/useInputResponse";
 import useMobileUserAgent from "../hooks/useMobileUserAgent";
+import { focusInputWithoutScroll } from "../utils/mobileKeyboard";
 
 export type WordInputHandle = {
   /** Focus the input (on mobile this opens the device keyboard) */
@@ -74,6 +75,9 @@ const WordInput = forwardRef<WordInputHandle, WordInputProps>(
         disabled={percentage === 0}
         ref={inputRef}
         autoFocus={!isMobile}
+        // Mobile: re-focusing after the keyboard was closed must not shift
+        // the page
+        onTouchEnd={isMobile ? focusInputWithoutScroll : undefined}
         // Device keyboard: "send" key, no corrections or capitals
         enterKeyHint="send"
         autoComplete="off"

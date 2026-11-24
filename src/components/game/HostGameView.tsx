@@ -9,6 +9,8 @@ import WordList from "../../atoms/WordList";
 import ProgressBar from "../../atoms/ProgressBar";
 import SelectedWord from "../../atoms/SelectedWord";
 import GameSound from "../../atoms/GameSound";
+import BackHomeButton from "../../atoms/BackHomeButton";
+import useMobileLayout from "../../hooks/useMobileLayout";
 import Word from "../../types/Word";
 import Difficulty from "../../types/Difficulty";
 import { RUNNING_OUT_OF_TIME_PERCENTAGE } from "../../constant";
@@ -65,6 +67,9 @@ export default function HostGameView({
 }: HostGameViewProps) {
   const wordInputRef = useRef<WordInputHandle>(null);
   const isMobile = useMobileUserAgent();
+  // Mobile layout: "back" goes next to the level box (top row); desktop:
+  // the panel's top-left corner
+  const isMobileLayout = useMobileLayout();
 
   return (
     <>
@@ -75,6 +80,7 @@ export default function HostGameView({
         level={level}
         gameDifficulty={gameDifficulty}
         dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
+        showBackHome={isMobileLayout}
       />
       <div
         className="game__container"
@@ -111,6 +117,7 @@ export default function HostGameView({
           gameMechanics={gameMechanics}
           SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
         />
+        {!isMobileLayout && <BackHomeButton className="back-control--panel" />}
         {players === "single" && (
           <WordInput
             ref={wordInputRef}

@@ -57,7 +57,8 @@
     "definition": "Definition",
     "summary": "SUMMARY",
     "understood": "GOT IT",
-    "save": "SAVE"
+    "save": "SAVE",
+    "cancel": "CANCEL"
   },
   "difficulties": {
     "easy": "STANDARD",
@@ -130,12 +131,16 @@
     "reconnect": "Reconnect",
     "playAgain": "Play again",
     "creatingNewRoom": "Creating new room...",
-    "exit": "Exit",
-    "backHome": "Back to home",
+    "exit": "EXIT",
+    "backHome": "BACK TO HOME",
     "skipLevel": "Skip level",
     "hint": "Hint",
     "showBoard": "SHOW BOARD",
-    "hideBoard": "HIDE BOARD"
+    "hideBoard": "HIDE BOARD",
+    "exitConfirmTitle": "BACK TO HOME?",
+    "exitConfirmText": "YOU'LL LOSE THIS GAME'S PROGRESS.",
+    "exitConfirmHost": "YOU'LL LEAVE THE ROOM AND THE PLAYERS WILL BE LEFT WITHOUT A HOST.",
+    "exitConfirmPlayer": "YOU'LL LEAVE THE ROOM."
   },
   "howToPlay": {
     "title": "HOW TO PLAY?",

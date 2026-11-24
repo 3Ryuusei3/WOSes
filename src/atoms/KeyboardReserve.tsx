@@ -20,10 +20,23 @@ function useKeyboardHeight() {
     const saved = Number(localStorage.getItem(STORAGE_KEY));
     if (saved > 0) applyHeight(saved);
 
+    // iOS shifts the page while the keyboard animates in/out, so one reset
+    // isn't enough: repeat it until the animation is over
+    const resetScroll = () => {
+      if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
+    };
+    const timers: number[] = [];
     const keepInPlace = () => {
-      requestAnimationFrame(() => window.scrollTo(0, 0));
+      resetScroll();
+      requestAnimationFrame(resetScroll);
+      for (const ms of [100, 300, 600]) {
+        timers.push(window.setTimeout(resetScroll, ms));
+      }
     };
     document.addEventListener("focusin", keepInPlace);
+    document.addEventListener("focusout", keepInPlace);
+    // The page itself never scrolls on this screen (lists scroll inside)
+    window.addEventListener("scroll", resetScroll, { passive: true });
 
     const vv = window.visualViewport;
     const onResize = () => {
@@ -38,10 +51,15 @@ function useKeyboardHeight() {
       applyHeight(height);
     };
     vv?.addEventListener("resize", onResize);
+    vv?.addEventListener("scroll", keepInPlace);
 
     return () => {
       document.removeEventListener("focusin", keepInPlace);
+      document.removeEventListener("focusout", keepInPlace);
+      window.removeEventListener("scroll", resetScroll);
       vv?.removeEventListener("resize", onResize);
+      vv?.removeEventListener("scroll", keepInPlace);
+      timers.forEach((id) => window.clearTimeout(id));
     };
   }, []);
 }

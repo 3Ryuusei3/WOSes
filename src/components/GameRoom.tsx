@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import BackHomeButton from "../atoms/BackHomeButton";
 import { QRCodeSVG } from "qrcode.react";
 import useGameStore from "../store/useGameStore";
 import useRandomWords from "../hooks/useRandomWords";
@@ -106,6 +107,7 @@ export default function GameRoom() {
   return (
     <>
       <div className="game__container game__container--join">
+        <BackHomeButton className="back-control--corner" />
         <div className="game__room">
           {isHost ? (
             <>

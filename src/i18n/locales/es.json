@@ -57,7 +57,8 @@
     "definition": "Definición",
     "summary": "RESUMEN",
     "understood": "ENTENDIDO",
-    "save": "GUARDAR"
+    "save": "GUARDAR",
+    "cancel": "CANCELAR"
   },
   "difficulties": {
     "easy": "ESTÁNDAR",
@@ -130,12 +131,16 @@
     "reconnect": "Reconectar",
     "playAgain": "Jugar de nuevo",
     "creatingNewRoom": "Creando nueva sala...",
-    "exit": "Salir",
-    "backHome": "Volver al inicio",
+    "exit": "SALIR",
+    "backHome": "VOLVER AL INICIO",
     "skipLevel": "Saltar nivel",
     "hint": "Pista",
     "showBoard": "VER TABLERO",
-    "hideBoard": "OCULTAR TABLERO"
+    "hideBoard": "OCULTAR TABLERO",
+    "exitConfirmTitle": "¿VOLVER AL INICIO?",
+    "exitConfirmText": "PERDERÁS EL PROGRESO DE ESTA PARTIDA.",
+    "exitConfirmHost": "SALDRÁS DE LA SALA Y LOS JUGADORES SE QUEDARÁN SIN ANFITRIÓN.",
+    "exitConfirmPlayer": "SALDRÁS DE LA SALA."
   },
   "howToPlay": {
     "title": "¿CÓMO JUGAR?",

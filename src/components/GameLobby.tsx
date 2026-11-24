@@ -7,6 +7,7 @@ import MechanicsModal from "../atoms/MechanicsModal";
 import WordListDisplay from "../atoms/WordListDisplay";
 import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import HelpButton from "../atoms/HelpButton";
+import BackHomeButton from "../atoms/BackHomeButton";
 import LobbyStatsContainer from "../atoms/LobbyStatsContainer";
 import NextChallengesSection from "../atoms/NextChallengesSection";
 import ReconnectButton from "../atoms/ReconnectButton";
@@ -251,7 +252,10 @@ export default function GameLobby() {
         )}
         {!isMobile && actions}
         {/* Top-right corner: "¿Falta algo?" next to the sound button */}
+        {/* Mobile: top-left of the logo row, facing "¿Falta algo?" */}
+        {isMobile && <BackHomeButton className="back-control--corner" />}
         <div className="panel-actions">
+          {!isMobile && <BackHomeButton />}
           <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
           <GameSound />
         </div>

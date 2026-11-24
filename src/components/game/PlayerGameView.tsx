@@ -19,8 +19,11 @@ import WarningMessage from "../../atoms/WarningMessage";
 import SelectedWord from "../../atoms/SelectedWord";
 import ProgressBar from "../../atoms/ProgressBar";
 import KeyboardReserve from "../../atoms/KeyboardReserve";
+import BackHomeButton from "../../atoms/BackHomeButton";
+import useMobileLayout from "../../hooks/useMobileLayout";
 import WordList from "../../atoms/WordList";
 import useMobileUserAgent from "../../hooks/useMobileUserAgent";
+import { focusInputWithoutScroll } from "../../utils/mobileKeyboard";
 import useGameStore from "../../store/useGameStore";
 import {
   useRoomRealtimeStore,
@@ -79,6 +82,9 @@ export default function PlayerGameView({
 }: PlayerGameViewProps) {
   const { t } = useTranslation();
   const isMobile = useMobileUserAgent();
+  // Mobile layout: "back" next to the level box (top row); desktop: the
+  // panel's top-left corner
+  const isMobileLayout = useMobileLayout();
   // Letras exactamente como las ve el host (llegan por Realtime)
   const rtBoard = useRoomRealtimeStore((s) => s.board);
   const board = localBoard !== undefined ? localBoard : rtBoard;
@@ -189,6 +195,7 @@ export default function PlayerGameView({
         dailyChallengeOriginalDifficulty={
           (board?.daily_original_difficulty as Difficulty | null) ?? null
         }
+        showBackHome={isMobileLayout}
       />
       <div
         className="game__container game__container--player"
@@ -201,6 +208,7 @@ export default function PlayerGameView({
             : undefined
         }
       >
+        {!isMobileLayout && <BackHomeButton className="back-control--panel" />}
         <div className="game__header">
           <div className="v-section">
             {board ? (
@@ -289,6 +297,9 @@ export default function PlayerGameView({
           onKeyDown={handleKeyDown}
           disabled={percentage === 0}
           autoFocus={!isMobile}
+          // Mobile: re-focusing after the keyboard was closed must not
+          // shift the page
+          onTouchEnd={isMobile ? focusInputWithoutScroll : undefined}
           enterKeyHint="send"
           autoComplete="off"
           autoCorrect="off"

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import Word from "../types/Word";
 import Difficulty from "../types/Difficulty";
 import DifficultyTag from "./DifficultyTag";
+import BackHomeButton from "./BackHomeButton";
 
 interface ScoreContainerProps {
   words: Word[];
@@ -12,6 +13,8 @@ interface ScoreContainerProps {
   level: number;
   gameDifficulty: Difficulty;
   dailyChallengeOriginalDifficulty: Difficulty | null;
+  /** Mobile: "back home" button right before the level box */
+  showBackHome?: boolean;
 }
 
 export default function ScoreContainer({
@@ -21,6 +24,7 @@ export default function ScoreContainer({
   level,
   gameDifficulty,
   dailyChallengeOriginalDifficulty,
+  showBackHome = false,
 }: ScoreContainerProps) {
   const { t } = useTranslation();
   const guessedCount = words.filter((w) => w.guessed).length;
@@ -66,24 +70,27 @@ export default function ScoreContainer({
 
   return (
     <div className="score__container score__container--abs" ref={containerRef}>
-      <div
-        className={`score__container--box ${guessedCount === words.length ? "won" : ""}`}
-      >
-        <div className="score__info">
-          {gameDifficulty !== "daily" && (
-            <div className="v-section">
-              <p>{t("common.level").toUpperCase()}</p>
-              <h3>{level}</h3>
+      <div className="score__group">
+        {showBackHome && <BackHomeButton className="back-control--score" />}
+        <div
+          className={`score__container--box ${guessedCount === words.length ? "won" : ""}`}
+        >
+          <div className="score__info">
+            {gameDifficulty !== "daily" && (
+              <div className="v-section">
+                <p>{t("common.level").toUpperCase()}</p>
+                <h3>{level}</h3>
+              </div>
+            )}
+            <div className="v-section gap-2xs">
+              <p>{t("common.difficulty").toUpperCase()}</p>
+              <DifficultyTag
+                gameDifficulty={gameDifficulty}
+                dailyChallengeOriginalDifficulty={
+                  dailyChallengeOriginalDifficulty
+                }
+              />
             </div>
-          )}
-          <div className="v-section gap-2xs">
-            <p>{t("common.difficulty").toUpperCase()}</p>
-            <DifficultyTag
-              gameDifficulty={gameDifficulty}
-              dailyChallengeOriginalDifficulty={
-                dailyChallengeOriginalDifficulty
-              }
-            />
           </div>
         </div>
       </div>
