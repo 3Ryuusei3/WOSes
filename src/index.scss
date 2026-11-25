@@ -5857,3 +5857,39 @@ html:not(.mobile) .game__container--home {
 .selectedLetter.mirrored:not(.dark, .still, .common, .hidden, .fake) {
   background-color: #f3eefb;
 }
+
+// Leaving a solo game: "Rendirse" (saved) / "Abandonar" (not saved), each
+// with a small line saying so; cancel under them
+.back-home-modal__choices .btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding-block: 0.625rem;
+
+  small {
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    opacity: 0.8;
+  }
+}
+.back-home-modal .back-home-modal__cancel {
+  flex: 0 0 auto;
+}
+
+// Phones: level and difficulty centred in their card; lobby / end screen
+// tag right next to the back button
+.mobile .game-hud__card--level {
+  justify-content: center;
+}
+.mobile .game__container:has(> .screen-ribbon) > .difficulty-tag {
+  left: 2.5rem;
+}
+.game-hud__card--level .difficulty-chip {
+  margin-inline: 0;
+}
+.next-challenges.score__container--box > .v-section > .mechanic-chip {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+}

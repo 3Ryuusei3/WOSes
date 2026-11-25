@@ -347,6 +347,29 @@ export default function GameScreen() {
     ],
   );
 
+  // "Rendirse" (exit modal): the game ends now, saved as it is
+  const surrenderRequest = useGameStore((s) => s.surrenderRequest);
+  const lastSurrenderRef = useRef(surrenderRequest);
+  useEffect(() => {
+    if (surrenderRequest === lastSurrenderRef.current) return;
+    lastSurrenderRef.current = surrenderRequest;
+    if (players !== "single" || isEndingLevelRef.current) return;
+    isEndingLevelRef.current = true;
+    hasCalledEndOfLevelRef.current = true;
+    if (gameDifficulty === "daily") {
+      useGameStore.setState({ gameTime: Math.floor(timeLeft / 1000) });
+    }
+    endGameAndSaveScore(totalPoints + currentPoints);
+  }, [
+    surrenderRequest,
+    players,
+    gameDifficulty,
+    timeLeft,
+    endGameAndSaveScore,
+    totalPoints,
+    currentPoints,
+  ]);
+
   const handleEndOfLevel = useCallback(async () => {
     if (isEndingLevelRef.current) return;
     isEndingLevelRef.current = true;

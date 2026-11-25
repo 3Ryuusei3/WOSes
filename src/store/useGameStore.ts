@@ -67,6 +67,10 @@ interface GameState {
   /** "Leave / back home" confirmation (button or browser back); not persisted */
   exitConfirmOpen: boolean;
   setExitConfirmOpen: (open: boolean) => void;
+  /** "Give up" while playing: bumped by the exit modal, GameScreen ends the
+   *  game and saves the score as it is; not persisted */
+  surrenderRequest: number;
+  requestSurrender: () => void;
   setNameModalOpen: (open: boolean) => void;
   /** Creating a room: the host also plays (no main/shared screen) */
   hostPlays: boolean;
@@ -169,6 +173,9 @@ const useGameStore = create<GameState>()(
       setVolume: (volume) => set({ volume }),
       exitConfirmOpen: false,
       setExitConfirmOpen: (exitConfirmOpen) => set({ exitConfirmOpen }),
+      surrenderRequest: 0,
+      requestSurrender: () =>
+        set((state) => ({ surrenderRequest: state.surrenderRequest + 1 })),
       nameModalOpen: false,
       setNameModalOpen: (nameModalOpen) => set({ nameModalOpen }),
       hostPlays: false,
