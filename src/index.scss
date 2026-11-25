@@ -5078,3 +5078,22 @@ html:not(.mobile) .round-timer__warning {
 .mobile-ranking[hidden] {
   display: none !important;
 }
+
+// Room QR: smaller, so the invite card never sticks out of the panel
+.room-invite__qr {
+  width: min(13rem, 60vw);
+  height: auto;
+}
+.room-lobby__split .room-invite__qr {
+  width: 14rem;
+}
+.mobile .room-invite__qr {
+  width: min(11.5rem, 52vw);
+}
+.room-invite__qr svg {
+  display: block;
+}
+.mobile .room-lobby .btn--start {
+  font-size: 1.125rem;
+  padding: 0.75rem 1.5rem;
+}
