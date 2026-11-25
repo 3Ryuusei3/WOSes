@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import Word from "../types/Word";
@@ -50,6 +50,20 @@ export default function GameHud({
   const goalReached = !isDaily && points >= goalPoints;
   const allFound = words.length > 0 && guessedCount === words.length;
 
+  // The moment the round is won (goal reached / every word found): a short
+  // celebration over the board
+  const [burst, setBurst] = useState<"goal" | "all" | null>(null);
+  const prev = useRef({ goalReached, allFound });
+  useEffect(() => {
+    const was = prev.current;
+    prev.current = { goalReached, allFound };
+    const next = allFound && !was.allFound ? "all" : goalReached && !was.goalReached ? "goal" : null;
+    if (!next) return;
+    setBurst(next);
+    const id = setTimeout(() => setBurst(null), 2400);
+    return () => clearTimeout(id);
+  }, [goalReached, allFound]);
+
   return (
     <div className="game-hud">
       <div className="game-hud__side game-hud__side--start">
@@ -79,9 +93,25 @@ export default function GameHud({
         SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
       />
 
+      {burst && (
+        <div className="round-burst" role="status" key={burst}>
+          <span className="round-burst__ribbon">
+            {burst === "all" ? t("game.allWordsFound") : t("game.goalReached")}
+          </span>
+          {Array.from({ length: 10 }, (_, i) => (
+            <span
+              key={i}
+              className="round-burst__spark"
+              style={{ "--i": i } as React.CSSProperties}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+      )}
+
       <div className="game-hud__side game-hud__side--end">
         <div
-          className={`game-hud__card game-hud__card--score ${goalReached ? "is-goal" : ""} ${allFound ? "is-perfect" : ""}`}
+          className={`game-hud__card game-hud__card--score ${goalReached ? "is-goal" : ""} ${allFound ? "is-perfect" : ""} ${burst ? "is-popping" : ""}`}
         >
           <div className="game-hud__stat">
             <span className="game-hud__label">

@@ -136,7 +136,7 @@
     "levelFailed": "Nivel no superado",
     "bonus": "Bonus",
     "perfectLevel": "¡Nivel perfecto!",
-    "allWordsFound": "¡Todas las palabras encontradas!",
+    "allWordsFound": "¡TODAS LAS PALABRAS!",
     "timeBonus": "Bonus de tiempo",
     "perfectBonus": "Bonus perfecto",
     "joinRoom": "Entrar a la sala",
@@ -161,7 +161,8 @@
     "tapToType": "TOCA AQUÍ PARA ESCRIBIR",
     "secondsShort": "SEG",
     "secondsLeft_one": "Queda {{count}} segundo",
-    "secondsLeft_other": "Quedan {{count}} segundos"
+    "secondsLeft_other": "Quedan {{count}} segundos",
+    "goalReached": "¡OBJETIVO CONSEGUIDO!"
   },
   "howToPlay": {
     "title": "¿CÓMO JUGAR?",

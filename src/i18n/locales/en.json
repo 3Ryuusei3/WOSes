@@ -136,7 +136,7 @@
     "levelFailed": "Level failed",
     "bonus": "Bonus",
     "perfectLevel": "Perfect level!",
-    "allWordsFound": "All words found!",
+    "allWordsFound": "EVERY WORD FOUND!",
     "timeBonus": "Time bonus",
     "perfectBonus": "Perfect bonus",
     "joinRoom": "Join room",
@@ -161,7 +161,8 @@
     "tapToType": "TAP HERE TO TYPE",
     "secondsShort": "SEC",
     "secondsLeft_one": "{{count}} second left",
-    "secondsLeft_other": "{{count}} seconds left"
+    "secondsLeft_other": "{{count}} seconds left",
+    "goalReached": "GOAL REACHED!"
   },
   "howToPlay": {
     "title": "HOW TO PLAY?",

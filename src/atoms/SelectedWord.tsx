@@ -84,25 +84,47 @@ export default function SelectedWord({
     });
   }, [shuffledWordObject]);
 
-  // Shuffle animation (FLIP): each tile starts where it was and slides to
-  // its new place. Uses offsetLeft (layout position: ignores the tilt and the
-  // flip animations) and the `translate` property (free from `transform`).
+  // Shuffle animation (FLIP): each tile starts where it was and hops to its
+  // new place. Uses offsetLeft (layout position: ignores the tilt and the
+  // flip animations) and the `translate` / `scale` properties (free from
+  // `transform`, which the flip animations use).
   const tileRefs = useRef(new Map<string, HTMLSpanElement>());
   const lastLeft = useRef(new Map<string, number>());
   useLayoutEffect(() => {
     const now = new Map<string, number>();
     tileRefs.current.forEach((el, key) => now.set(key, el.offsetLeft));
+    const reduced = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    let order = 0;
     now.forEach((left, key) => {
       const before = lastLeft.current.get(key);
       const el = tileRefs.current.get(key);
-      if (before === undefined || !el) return;
+      if (before === undefined || !el || reduced) return;
       const dx = before - left;
       if (Math.abs(dx) < 1) return;
-      el.style.transition = "none";
-      el.style.translate = `${dx}px 0`;
-      void el.offsetWidth; // apply the start position before animating
-      el.style.transition = "";
-      el.style.translate = "";
+      // Each tile hops along an arc (higher the further it goes), a moment
+      // after the previous one, and lands with a small squash
+      const lift = -Math.min(1.6, 0.6 + Math.abs(dx) / el.offsetWidth / 3);
+      el.animate?.(
+        [
+          { translate: `${dx}px 0`, scale: "1" },
+          {
+            translate: `${dx / 2}px ${lift * el.offsetHeight * 0.35}px`,
+            scale: "1.08",
+            offset: 0.45,
+          },
+          { translate: "0 0", scale: "1.04 0.94", offset: 0.85 },
+          { translate: "0 0", scale: "1" },
+        ],
+        {
+          duration: 520,
+          delay: order * 35,
+          easing: "cubic-bezier(0.33, 0, 0.25, 1)",
+          fill: "backwards",
+        },
+      );
+      order += 1;
     });
     lastLeft.current = now;
   }, [tiles]);

@@ -9,16 +9,15 @@ interface RoundTimerProps {
   startedAt: number;
   durationMs: number;
   RUNNING_OUT_OF_TIME_PERCENTAGE: number;
-  /** When the hidden letters show up: a tick on the ring */
+  /** When the hidden letters show up: the ring turns yellow */
   SHOW_LETTERS_PERCENTAGE: number;
 }
 
-const R = 40;
+const R = 44;
 
 /**
  * Round clock: a ring that empties clockwise around the seconds left. Cyan,
- * then yellow once the letters are revealed (tick on the ring), pink at the
- * end.
+ * then yellow once the letters are revealed, pink at the end.
  */
 export default function RoundTimer({
   timeLeft,
@@ -37,14 +36,6 @@ export default function RoundTimer({
         ? "mid"
         : "ok";
 
-  // Tick where the ring ends when the letters show up
-  const angle = (SHOW_LETTERS_PERCENTAGE / 100) * 2 * Math.PI;
-  const tick = (r: number) => ({
-    x: 50 + r * Math.sin(angle),
-    y: 50 - r * Math.cos(angle),
-  });
-  const a = tick(R - 7);
-  const b = tick(R + 7);
 
   return (
     <div
@@ -59,15 +50,6 @@ export default function RoundTimer({
           startedAt={startedAt}
           durationMs={durationMs}
         />
-        {SHOW_LETTERS_PERCENTAGE > 0 && SHOW_LETTERS_PERCENTAGE < 100 && (
-          <line
-            className="round-timer__tick"
-            x1={a.x}
-            y1={a.y}
-            x2={b.x}
-            y2={b.y}
-          />
-        )}
       </svg>
       <span className="round-timer__face">
         <span className="round-timer__secs">{seconds}</span>
