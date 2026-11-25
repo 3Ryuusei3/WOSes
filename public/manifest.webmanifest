@@ -39,5 +39,40 @@
       "sizes": "512x512",
       "purpose": "maskable"
     }
+  ],
+  "categories": [
+    "games",
+    "education",
+    "entertainment"
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Pantalla de inicio de LEXIO"
+    },
+    {
+      "src": "/screenshots/game-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Partida: encuentra los anagramas antes de que acabe el tiempo"
+    },
+    {
+      "src": "/screenshots/home-narrow.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Inicio en el móvil"
+    },
+    {
+      "src": "/screenshots/game-narrow.png",
+      "sizes": "780x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Partida en el móvil"
+    }
   ]
 }

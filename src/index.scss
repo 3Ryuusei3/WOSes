@@ -5129,7 +5129,7 @@ html:not(.mobile) .round-timer__warning {
     grid-template-columns: repeat(var(--wordlist-columns), auto);
     justify-content: center;
     column-gap: 0.5rem;
-    row-gap: 2px;
+    row-gap: 0;
   }
   .word,
   .word.active {
@@ -5138,8 +5138,8 @@ html:not(.mobile) .round-timer__warning {
   }
   .wordlist .wordLetters {
     padding: 0;
-    border-width: 1px;
-    border-radius: 0.1875rem;
+    border-width: 2px;
+    border-radius: 0.25rem;
   }
   // cqw / cqh: the list itself (a size container)
   .letter {
@@ -5147,14 +5147,41 @@ html:not(.mobile) .round-timer__warning {
       1.875rem,
       (
           100cqw - (var(--wordlist-columns, 3) - 1) * 0.5rem -
-            var(--wordlist-columns, 3) * 4px -
+            var(--wordlist-columns, 3) * 6px -
             (var(--sum-letters, 18) - var(--wordlist-columns, 3)) * 1px
         ) / var(--sum-letters, 18),
       max(
         0.6875rem,
-        (100cqh - (var(--wordlist-rows, 8) - 1) * 2px) /
-          var(--wordlist-rows, 8) - 2px
+        100cqh / var(--wordlist-rows, 8) - 4px
       )
     );
+  }
+}
+
+// Found words: a clear outline, and a different one for someone else's
+// words in a room (yours: dark outline + small shadow; theirs: lilac)
+.wordlist {
+  row-gap: 0;
+}
+.word.active:not(.word--other) {
+  border-color: var(--clr-ink);
+  box-shadow: 0 0.125rem 0 var(--clr-ink);
+}
+.word.active.word--other {
+  border-color: var(--clr-mirrored);
+  box-shadow: none;
+}
+.mobile .wordlist {
+  .word.active,
+  .word.active.word--other {
+    box-shadow: none;
+  }
+  .word.active .wordLetters {
+    border-color: var(--clr-ink);
+    box-shadow: 0 1px 0 var(--clr-ink);
+  }
+  .word.active.word--other .wordLetters {
+    border-color: var(--clr-mirrored);
+    box-shadow: none;
   }
 }

@@ -22,7 +22,7 @@ export default function WordList({
   gameMechanics,
   SHOW_LETTERS_PERCENTAGE,
 }: WordListProps) {
-  const { players, role, volume } = useGameStore();
+  const { players, role, volume, hostPlays } = useGameStore();
   const prevGuessedCountRef = useRef<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -72,10 +72,11 @@ export default function WordList({
         <li
           key={`${index}-${wordObj.word}`}
           className={`word ${wordObj.guessed ? "active" : ""} ${
-            // Mobile multiplayer: no names (no room), rows guessed by someone
-            // else get a different highlight instead
-            isMobile &&
+            // Rooms, for those who play: words someone else found look
+            // different from yours (the host's main screen shows them all
+            // the same)
             players === "multi" &&
+            (role === "player" || hostPlays) &&
             wordObj.guessed &&
             wordObj.guessedByName &&
             wordObj.guessedByName !== playerName
