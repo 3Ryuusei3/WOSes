@@ -5815,7 +5815,6 @@ html:not(.mobile) .game__container--home {
     translate: -50% -50%;
     rotate: -45deg;
     pointer-events: none;
-    transform-origin: left center;
     animation: fake-strike 0.25s 0.45s ease-out both;
   }
 }

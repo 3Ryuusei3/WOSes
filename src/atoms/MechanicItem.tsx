@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { getMechanicInfo } from "../constant/mechanics";
 
 interface MechanicItemProps {
@@ -6,6 +7,7 @@ interface MechanicItemProps {
 }
 
 export default function MechanicItem({ mechanicKey, onClick }: MechanicItemProps) {
+  const { t } = useTranslation();
   const mechanicInfo = getMechanicInfo(mechanicKey);
 
   if (!mechanicInfo) {
@@ -28,7 +30,11 @@ export default function MechanicItem({ mechanicKey, onClick }: MechanicItemProps
       }}
       aria-label={`Ver información sobre ${mechanicInfo.label}`}
     >
-      {mechanicInfo.label}
+      {/* Phones: without "LETRA" (same short labels as in the game) */}
+      <span className="mechanic-chip__long">{mechanicInfo.label}</span>
+      <span className="mechanic-chip__short" aria-hidden="true">
+        {t(`mechanicChips.${mechanicKey}.short`)}
+      </span>
     </h4>
   );
 }

@@ -52,9 +52,18 @@ export default function SelectedWord({
       classes.push("still");
     }
 
+    // Dark and hidden letters are never mirrored (they already hide the
+    // letter)
+    const isDark = letter.isDark && gameMechanics.dark;
+    const isHidden = letter.isHidden && gameMechanics.hidden;
     if (
       letter.isMirrored &&
       gameMechanics.mirrored &&
+      // Dark and hidden letters are never shown mirrored
+      !(letter.isDark && gameMechanics.dark) &&
+      !(letter.isHidden && gameMechanics.hidden) &&
+      !isDark &&
+      !isHidden &&
       percentage > SHOW_LETTERS_PERCENTAGE
     ) {
       classes.push("mirrored");
