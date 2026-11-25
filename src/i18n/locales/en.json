@@ -69,7 +69,13 @@
     "medium": "DIFFICULT",
     "hard": "EXPERT",
     "daily": "DAILY CHALLENGE",
-    "tooltip": "Words organized by levels according to the frequency of use perceived by users. The \"EXPERT\" difficulty contains all the words that exist in the dictionary."
+    "tooltip": "Words organized by levels according to the frequency of use perceived by users. The \"EXPERT\" difficulty contains all the words that exist in the dictionary.",
+    "hints": {
+      "easy": "COMMON WORDS",
+      "medium": "LESS FREQUENT",
+      "hard": "EVERY WORD",
+      "daily": "A NEW ONE EVERY DAY"
+    }
   },
   "players": {
     "single": "SOLO",

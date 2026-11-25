@@ -347,7 +347,7 @@ export default function GameStart() {
 
   return (
     <>
-      <div className="game__container f-jc-c pos-rel">
+      <div className="game__container game__container--home f-jc-c pos-rel">
         <div className="h-section gap-lg">
           {showForm && (
             <div className="home__container">

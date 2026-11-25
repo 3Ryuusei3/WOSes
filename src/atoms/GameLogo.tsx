@@ -1,29 +1,35 @@
+import logo from "../assets/lexio-logo.svg";
+
 interface GameLogoProps {
   /** Logo width (in px at the 16px base) when the large variant is shown. */
   width?: number;
   large?: boolean;
+  /** Line under the logo (start screen) */
+  tagline?: string;
 }
 
 /**
- * LEXIO wordmark: cream letters with a dark outline and the X as a tilted
- * yellow sticker. Pure text (no image), so it scales with the root font-size.
+ * LEXIO wordmark (logo 1·6 B: cream letters, loose tilted yellow X). An SVG
+ * with the letters as shapes, so it looks the same everywhere.
  */
-export default function GameLogo({ width = 230, large = false }: GameLogoProps) {
-  // The wordmark is ~3.4 times as wide as its font size
-  const fontRem = (large ? width : 80) / 16 / 3.4;
+export default function GameLogo({
+  width = 230,
+  large = false,
+  tagline,
+}: GameLogoProps) {
+  // rem so the logo follows the fluid root font-size like everything else
+  const widthRem = (large ? width : 110) / 16;
   return (
-    <div className="logo-container">
-      <h1
-        className="logo lexio-logo"
-        style={{ fontSize: `${fontRem}rem` }}
-        aria-label="LEXIO"
-      >
-        <span aria-hidden="true">LE</span>
-        <span className="lexio-logo__x" aria-hidden="true">
-          X
-        </span>
-        <span aria-hidden="true">IO</span>
+    <div className={`logo-container ${tagline ? "logo-container--hero" : ""}`}>
+      <h1 className="logo-heading">
+        <img
+          src={logo}
+          alt="LEXIO"
+          className="logo lexio-logo"
+          style={{ width: `${widthRem}rem` }}
+        />
       </h1>
+      {tagline && <p className="logo-tagline">{tagline}</p>}
     </div>
   );
 }

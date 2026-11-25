@@ -9,12 +9,14 @@ import { ToastContainer } from "../atoms/Toast";
 
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 import GameLogo from "../atoms/GameLogo";
 import PlayerNameModal from "../atoms/PlayerNameModal";
 import ExitConfirmModal from "../atoms/ExitConfirmModal";
 
 import { shouldUseFluidScale } from "../hooks/fluidScale";
+import useMobileLayout from "../hooks/useMobileLayout";
 
 import useGameStore from "../store/useGameStore";
 import useRoomSync from "../hooks/useRoomSync";
@@ -27,6 +29,8 @@ import {
 import { requestExit } from "../utils/leaveToHome";
 
 const GamePage = () => {
+  const { t } = useTranslation();
+  const isMobileLayout = useMobileLayout();
   const { mode, setRoomCode, setMode, players } = useGameStore();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -141,7 +145,12 @@ const GamePage = () => {
       <ToastContainer />
       <PlayerNameModal />
       <ExitConfirmModal />
-      <GameLogo large={isScaled} />
+      {/* Start screen (desktop): big logo with the tagline under it */}
+      {!isMobileLayout && mode === "start" ? (
+        <GameLogo large width={380} tagline={t("gameStart.nameAndDifficulty")} />
+      ) : (
+        <GameLogo large={isScaled} />
+      )}
       <div className="container pos-rel">
         {mode === "start" ? (
           <GameStart />

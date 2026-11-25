@@ -69,7 +69,13 @@
     "medium": "DIFÍCIL",
     "hard": "EXPERTO",
     "daily": "RETO DIARIO",
-    "tooltip": "Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad \"EXPERTO\" contiene todas las palabras que existen en la RAE."
+    "tooltip": "Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad \"EXPERTO\" contiene todas las palabras que existen en la RAE.",
+    "hints": {
+      "easy": "PALABRAS COMUNES",
+      "medium": "MENOS FRECUENTES",
+      "hard": "TODA LA RAE",
+      "daily": "UNO NUEVO CADA DÍA"
+    }
   },
   "players": {
     "single": "SOLO",

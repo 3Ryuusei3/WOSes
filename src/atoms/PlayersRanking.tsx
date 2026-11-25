@@ -96,16 +96,16 @@ export default function PlayersRanking({
                 : (player.score ?? 0);
             const placeClass =
               index === 0
-                ? "won"
+                ? "rank-gold"
                 : index === 1
-                  ? "highlight"
+                  ? "rank-silver"
                   : index === 2
-                    ? "unguessed"
-                    : "lost";
+                    ? "rank-bronze"
+                    : "rank-other";
             const isMe = player.name === playerName;
             return (
               <div
-                className={`h-section gap-sm player-row ${index === 0 ? "player-row--first" : ""} ${isMe ? "player-row--me" : ""}`}
+                className={`h-section gap-sm player-row ${isMe ? "player-row--me" : ""}`}
                 key={player.id}
               >
                 <h5 className={placeClass}>

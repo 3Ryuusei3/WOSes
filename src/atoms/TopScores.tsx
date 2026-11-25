@@ -202,14 +202,15 @@ export default function TopScores({
     };
   }, [isDaily, dailyScores, currentScores]);
 
+  // Podium colours: gold, silver (blue), bronze; the rest muted
   const rankToneClass = (index: number) =>
     index === 0
-      ? "won"
+      ? "rank-gold"
       : index === 1
-        ? "highlight"
+        ? "rank-silver"
         : index === 2
-          ? "unguessed"
-          : "lost";
+          ? "rank-bronze"
+          : "rank-other";
 
   return (
     <div className={`v-section ${hasTooltip ? "gap-xs" : "gap-md"}`}>

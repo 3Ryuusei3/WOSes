@@ -34,18 +34,21 @@ export default function DifficultySelector({
         onClick={() => handleDifficulty("easy")}
       >
         {t("difficulties.easy")}
+        <small className="difficulty-hint">{t("difficulties.hints.easy")}</small>
       </button>
       <button
         className={`btn ${gameDifficulty === "medium" && !isDailyChallengeSelected ? "selected" : ""} btn--sm`}
         onClick={() => handleDifficulty("medium")}
       >
         {t("difficulties.medium")}
+        <small className="difficulty-hint">{t("difficulties.hints.medium")}</small>
       </button>
       <button
         className={`btn ${gameDifficulty === "hard" && !isDailyChallengeSelected ? "selected" : ""} btn--sm btn--lose`}
         onClick={() => handleDifficulty("hard")}
       >
         {t("difficulties.hard")}
+        <small className="difficulty-hint">{t("difficulties.hints.hard")}</small>
       </button>
       {showDailyChallenge && onDailyChallengeClick && (
         <button
@@ -54,6 +57,9 @@ export default function DifficultySelector({
           disabled={loadingDaily}
         >
           {t("dailyChallenge.button")}
+          <small className="difficulty-hint">
+            {t("difficulties.hints.daily")}
+          </small>
         </button>
       )}
       <Tooltip message={t("difficulties.tooltip")}>
