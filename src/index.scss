@@ -4613,7 +4613,7 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
     position: absolute;
     inset: 0 0 auto;
     height: 0.375rem;
-    background: var(--band, var(--accent));
+    background: var(--accent);
     border-bottom: 0.125rem solid var(--clr-ink);
   }
   h3 {
@@ -4627,17 +4627,18 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
     --accent: var(--clr-win);
     rotate: 0.75deg;
   }
-  // Remaining time: red; rounds: green
+  // Time left: always red
   &:nth-child(5n + 3) {
     --accent: #ff3b5c;
     rotate: -0.5deg;
   }
   &:nth-child(5n + 4) {
-    --accent: var(--clr-still);
+    --accent: #ff9a3c;
     rotate: 1deg;
   }
+  // Perfect rounds: always green
   &:nth-child(5n + 5) {
-    --accent: #ffffff;
+    --accent: var(--clr-still);
     rotate: -0.75deg;
   }
 }
@@ -4965,21 +4966,13 @@ html:not(.mobile) .round-timer__warning {
   opacity: 0.85;
 }
 
-// A stat that stands out only changes the tile's top band (and its change in
-// brackets): time penalty in red, perfect round in green
-.stat-grid > .stat-box.stat-box--bad {
-  --band: #ff3b5c;
-
-  .stat-delta {
-    color: #ff6b84;
-    opacity: 1;
-  }
+// A stat that stands out: its change in brackets in red (penalty) or green
+// (perfect round); the tiles keep their own colours
+.stat-grid > .stat-box.stat-box--bad .stat-delta {
+  color: #ff6b84;
+  opacity: 1;
 }
-.stat-grid > .stat-box.stat-box--good {
-  --band: var(--clr-still);
-
-  .stat-delta {
-    color: var(--clr-still);
-    opacity: 1;
-  }
+.stat-grid > .stat-box.stat-box--good .stat-delta {
+  color: var(--clr-still);
+  opacity: 1;
 }
