@@ -207,6 +207,7 @@ export default function TopScores({
     showAllTime &&
     !!highlightCode &&
     !currentScores.some((e) => e.code === highlightCode);
+  const isEmpty = shownCount === 0 && !(showOwnRank && roomRank);
 
   const columnFormat = useMemo(() => {
     if (isDaily) {
@@ -271,7 +272,7 @@ export default function TopScores({
         <div className="v-section f-ai-c txt-center">
           {hasTooltip ? (
             <>
-              <h4 className="highlight">
+              <h4 className="highlight top-scores__title">
                 {isDaily && challengeNumber
                   ? t("dailyChallenge.ranking") +
                     " - " +
@@ -282,11 +283,15 @@ export default function TopScores({
                     ? t("topScores.allTime")
                     : t("topScores.thisWeek")}
               </h4>
-              {!isDaily && <p>{t(`difficulties.${difficulty}`)}</p>}
+              {!isDaily && (
+                <p className="top-scores__sub">
+                  {t(`difficulties.${difficulty}`)}
+                </p>
+              )}
             </>
           ) : (
             <>
-              <h2>
+              <h2 className="top-scores__title">
                 {isDaily
                   ? t("dailyChallenge.ranking")
                   : showAllTime
@@ -324,10 +329,8 @@ export default function TopScores({
           </Tooltip>
         )}
         {/* Nobody yet: a message instead of empty rows */}
-        {shownCount === 0 && !(showOwnRank && roomRank) ? (
-          <p className="ranking__empty">{t("topScores.empty")}</p>
-        ) : (
-        <div className="ranking__grid">
+        {isEmpty && <p className="ranking__empty">{t("topScores.empty")}</p>}
+        <div className={`ranking__grid ${isEmpty ? "is-empty" : ""}`}>
           <div className="ranking__row ranking__row--head">
             <span className="ranking__cell ranking__cell--rank"></span>
             <span className="ranking__cell ranking__cell--name">
@@ -340,7 +343,21 @@ export default function TopScores({
               {isDaily ? t("topScores.columnTime") : t("topScores.columnLevel")}
             </span>
           </div>
-          {/* Only the places that are taken */}
+          {/* Only the places that are taken; the rest are invisible
+              placeholders (phones keep the space of 10 rows, see index.scss) */}
+          {Array.from({ length: 10 - shownCount }, (_, i) => (
+            <div
+              key={`placeholder-${i}`}
+              className="ranking__row ranking__row--placeholder"
+              aria-hidden="true"
+              style={{ order: 100 }}
+            >
+              <span className="ranking__cell ranking__cell--rank">00</span>
+              <span className="ranking__cell ranking__cell--name">·</span>
+              <span className="ranking__cell ranking__cell--num">0</span>
+              <span className="ranking__cell ranking__cell--num">0</span>
+            </div>
+          ))}
           {Array.from({ length: shownCount }, (_, index) => {
             if (isDaily) {
               const entry = dailyScores[index];
@@ -433,7 +450,6 @@ export default function TopScores({
             </>
           )}
         </div>
-        )}
       </div>
     </div>
   );

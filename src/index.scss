@@ -5185,3 +5185,57 @@ html:not(.mobile) .round-timer__warning {
     box-shadow: none;
   }
 }
+
+// Ranking title (TOP SEMANAL / TOP TOTAL / RETO): big enough everywhere
+.top-scores__title {
+  font-size: 1.75rem;
+  line-height: 1.05;
+  color: var(--clr-accent-primary);
+  text-shadow: 0 0.125rem 0 var(--clr-ink);
+}
+.top-scores__sub {
+  font-size: 0.875rem;
+}
+.mobile {
+  .top-scores__title {
+    font-size: 1.375rem;
+  }
+  .top-scores__sub {
+    font-size: 0.75rem;
+  }
+}
+
+// Placeholder rows (no content): hidden on desktop; on phones they keep the
+// space of 10 rows, so the box never changes size
+.ranking .ranking__row.ranking__row--placeholder {
+  display: none;
+}
+.ranking__grid.is-empty {
+  display: none;
+}
+.mobile {
+  .ranking .ranking__row.ranking__row--placeholder {
+    display: grid;
+    visibility: hidden;
+  }
+  // Message and the invisible 10 rows in the same cell: same height
+  .ranking:has(.ranking__empty) {
+    display: grid;
+    min-height: 0;
+  }
+  .ranking__grid.is-empty {
+    display: grid;
+    visibility: hidden;
+  }
+  .ranking__empty,
+  .ranking__grid.is-empty {
+    grid-area: 1 / 1;
+  }
+  .ranking__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    max-width: none;
+  }
+}
