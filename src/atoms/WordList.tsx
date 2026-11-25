@@ -62,6 +62,9 @@ export default function WordList({
           "--wordlist-columns": columns,
           // Same tile size for every word: based on the longest one
           "--letters": Math.max(1, ...words.map((w) => w.word.length)),
+          // Phones: each column as wide as its longest word, so the tiles
+          // can share the whole width (sum of those longest words)
+          "--sum-letters": columnLetters(words, columns),
         } as React.CSSProperties
       }
     >
@@ -108,4 +111,15 @@ export default function WordList({
       ))}
     </ul>
   );
+}
+
+/** Sum, over the columns, of each column's longest word (column-major). */
+function columnLetters(words: Word[], columns: number): number {
+  const rows = Math.max(1, Math.ceil(words.length / columns));
+  let sum = 0;
+  for (let c = 0; c < columns; c++) {
+    const col = words.slice(c * rows, (c + 1) * rows);
+    if (col.length) sum += Math.max(...col.map((w) => w.word.length));
+  }
+  return Math.max(1, sum);
 }
