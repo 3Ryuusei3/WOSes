@@ -1125,7 +1125,7 @@ main {
     transform: rotateX(90deg);
   }
   100% {
-    color: var(--clr-ink);
+    color: var(--clr-fake-ink);
     text-shadow: none;
     background-color: var(--clr-lose);
     transform: rotateX(0deg);
@@ -5790,4 +5790,71 @@ html:not(.mobile) .game__container--home {
     outline: 0.1875rem solid var(--clr-accent-primary);
     outline-offset: 0.125rem;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Letter mechanics, new look
+// ---------------------------------------------------------------------------
+:root {
+  --clr-fake-ink: #9e0b33;
+}
+// Fake letter, once revealed: red letter crossed out with a red "/" that
+// stops short of the corners (drawn a moment after the flip)
+.selectedLetter.fake {
+  color: var(--clr-fake-ink);
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 82%;
+    height: max(2px, 8.5%);
+    background: var(--clr-fake-ink);
+    border-radius: 999px;
+    translate: -50% -50%;
+    rotate: -45deg;
+    pointer-events: none;
+    transform-origin: left center;
+    animation: fake-strike 0.25s 0.45s ease-out both;
+  }
+}
+@keyframes fake-strike {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+// Hidden letter: eye-slash icon instead of "?"
+.hidden-letter-icon {
+  display: block;
+  width: 0.87em;
+  height: 0.87em;
+}
+
+// Mirrored letter (before it turns round): two faint glass reflections
+.selectedLetter.mirrored:not(.dark) {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      125deg,
+      transparent 18%,
+      rgba(255, 255, 255, 0.75) 24%,
+      transparent 31%,
+      transparent 38%,
+      rgba(255, 255, 255, 0.55) 41%,
+      transparent 46%
+    );
+  }
+}
+// ...and a faint cool tint, only on plain tiles (the others keep their colour)
+.selectedLetter.mirrored:not(.dark, .still, .common, .hidden, .fake) {
+  background-color: #f3eefb;
 }

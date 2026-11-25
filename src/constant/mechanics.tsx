@@ -1,4 +1,5 @@
 import React from "react";
+import HiddenLetterIcon from "../atoms/HiddenLetterIcon";
 import Mechanics from "../types/Mechanics";
 
 export type MechanicKey = keyof Mechanics;
@@ -67,7 +68,8 @@ const MECHANICS_INFO: Record<MechanicKey, Omit<MechanicInfo, "key">> = {
     example: (
       <div className="selectedWord">
         <span className="selectedLetter hidden">
-          ?<span className="letterPoints">1</span>
+          <HiddenLetterIcon />
+            <span className="letterPoints">1</span>
         </span>
         <span className="selectedLetter">
           B<span className="letterPoints">3</span>

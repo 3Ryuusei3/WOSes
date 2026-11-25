@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { getLanguageConstants } from "../constant";
+import HiddenLetterIcon from "./HiddenLetterIcon";
 
 import ShuffledWordObjectType from "../types/ShuffledWordObject";
 import Mechanics from "../types/Mechanics";
@@ -68,7 +69,7 @@ export default function SelectedWord({
       gameMechanics.hidden &&
       percentage > SHOW_LETTERS_PERCENTAGE
     ) {
-      return "?";
+      return <HiddenLetterIcon />;
     }
     return letter.letter;
   };

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import HiddenLetterIcon from "./HiddenLetterIcon";
 import { getLanguageConstants } from "../constant";
 
 const Instructions = () => {
@@ -298,7 +299,8 @@ const Instructions = () => {
               B<span className="letterPoints">{POINTS_PER_LETTER.b || 3}</span>
             </span>
             <span className="selectedLetter hidden">
-              ?<span className="letterPoints">1</span>
+              <HiddenLetterIcon />
+            <span className="letterPoints">1</span>
             </span>
             <span className="selectedLetter still">
               I<span className="letterPoints">{POINTS_PER_LETTER.i || 1}</span>
