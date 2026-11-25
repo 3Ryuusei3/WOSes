@@ -55,6 +55,8 @@ interface PlayerGameViewProps {
   markWordGuessed: (word: string) => void;
   percentage: number;
   timeLeft: number;
+  startedAt: number;
+  durationMs: number;
   correctWordsPoints: () => number;
   goalPoints: number;
   /** Host playing too: its own letters (it doesn't receive its broadcast) */
@@ -77,6 +79,8 @@ export default function PlayerGameView({
   markWordGuessed,
   percentage,
   timeLeft,
+  startedAt,
+  durationMs,
   correctWordsPoints,
   goalPoints,
   localBoard,
@@ -235,6 +239,8 @@ export default function PlayerGameView({
               ) : undefined
             }
             timeLeft={timeLeft}
+            startedAt={startedAt}
+            durationMs={durationMs}
             percentage={percentage}
             RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
             SHOW_LETTERS_PERCENTAGE={board?.show_letters_percentage ?? 0}

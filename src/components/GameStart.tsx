@@ -29,6 +29,7 @@ import { isInstalledPwa } from "../utils/pwa";
 
 import Difficulty from "../types/Difficulty";
 import { START_TIME } from "../constant";
+import { isValidPlayerName } from "../utils";
 
 export default function GameStart() {
   const {
@@ -36,6 +37,8 @@ export default function GameStart() {
     setNameModalOpen,
     hostPlays,
     setHostPlays,
+    groupName,
+    setGroupName,
     setMode,
     gameMechanics,
     level,
@@ -64,6 +67,7 @@ export default function GameStart() {
   const [joinMode, setJoinMode] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [codeError, setCodeError] = useState(false);
+  const [groupError, setGroupError] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const { join, joining, joinError, setJoinError } = useJoinRoom();
@@ -157,6 +161,13 @@ export default function GameStart() {
     } else {
       resetGameState();
 
+      // Everyone plays on their device: the game needs a group name (the
+      // host plays with its own name)
+      if (hostPlays && !isValidPlayerName(groupName)) {
+        setGroupError(true);
+        return;
+      }
+
       const roomCode = roomManager.generateRoomCode();
       setRoomCode(roomCode);
 
@@ -164,6 +175,7 @@ export default function GameStart() {
         roomCode,
         playerName,
         gameDifficulty,
+        hostPlays ? groupName : undefined,
       );
 
       if (!result.error && result.data) {
@@ -397,6 +409,33 @@ export default function GameStart() {
                       </span>
                     </span>
                   </label>
+                  {/* Group name: only when everyone plays (the host keeps its
+                      own name). Always laid out so the panel doesn't jump. */}
+                  <div
+                    className={`group-name-field ${hostPlays ? "" : "is-hidden"}`}
+                    aria-hidden={!hostPlays}
+                  >
+                    <input
+                      type="text"
+                      placeholder={t("gameStart.groupName")}
+                      value={groupName}
+                      maxLength={10}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      tabIndex={hostPlays ? 0 : -1}
+                      onChange={(e) => {
+                        setGroupError(false);
+                        setGroupName(e.target.value.toUpperCase());
+                      }}
+                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                    />
+                    <small className={`txt-center ${groupError ? "lost" : ""}`}>
+                      {groupError
+                        ? t("gameStart.groupNameError")
+                        : t("gameStart.groupNameHint")}
+                    </small>
+                  </div>
                 </div>
                 {/* Joining: the room already has its difficulty */}
                 <div

@@ -34,6 +34,8 @@ interface HostGameViewProps {
   percentage: number;
   showLettersPercentage: number;
   timeLeft: number;
+  startedAt: number;
+  durationMs: number;
   playerName: string;
   players: "single" | "multi";
   inputWord: string;
@@ -56,6 +58,8 @@ export default function HostGameView({
   percentage,
   showLettersPercentage,
   timeLeft,
+  startedAt,
+  durationMs,
   playerName,
   players,
   inputWord,
@@ -112,6 +116,8 @@ export default function HostGameView({
               ) : undefined
             }
             timeLeft={timeLeft}
+            startedAt={startedAt}
+            durationMs={durationMs}
             percentage={percentage}
             RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
             SHOW_LETTERS_PERCENTAGE={showLettersPercentage}

@@ -1,5 +1,7 @@
 interface TopScore {
   id: string;
+  /** Room code (multiplayer games) */
+  code?: string;
   name: string;
   score: number;
   level: number;

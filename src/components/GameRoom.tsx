@@ -12,6 +12,8 @@ import { useTranslation } from "react-i18next";
 import { showToast } from "../atoms/Toast";
 import useMobileLayout from "../hooks/useMobileLayout";
 import { primeMobileKeyboard } from "../utils/mobileKeyboard";
+import SegmentedTabs from "../atoms/SegmentedTabs";
+import useGroupName from "../hooks/useGroupName";
 
 export default function GameRoom() {
   const { t } = useTranslation();
@@ -47,6 +49,7 @@ export default function GameRoom() {
   );
   // Without a main screen the host is one more player in the list
   const hostPlays = useHostPlays();
+  const groupName = useGroupName();
   const listedPlayers = useMemo(
     () => (hostPlays ? roomPlayers : nonHostPlayers),
     [hostPlays, roomPlayers, nonHostPlayers],
@@ -90,55 +93,114 @@ export default function GameRoom() {
     await join(roomCode, playerName);
   };
 
-  const copyUrl = () => {
-    navigator.clipboard.writeText(window.location.href);
+  const copyUrl = async () => {
+    // navigator.clipboard only exists on https / localhost
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showToast(t("room.linkCopied"), "info", 2000);
+    } catch {
+      /* nothing to do: the code is on screen */
+    }
   };
 
   const showJoinForm = !isHost && (role !== "player" || !roomId);
 
+  // Host with a main screen on a desktop: QR and players side by side (it is
+  // what the TV shows). Everyone else (host that plays, players, phones):
+  // tabs, so each part gets the whole panel.
+  const mainScreen = isHost && !hostPlays;
+  const useTabs = !(mainScreen && !isMobile);
+  const [roomTab, setRoomTab] = useState<"invite" | "players">(
+    isHost ? "invite" : "players",
+  );
+
+  // QR + room code (anyone in the room can show it to invite others)
+  const invitePanel = (
+    <div className="score__container--box dark room-invite">
+      <div className="room-invite__qr">
+        <QRCodeSVG
+          value={window.location.href}
+          bgColor="#420072"
+          size={256}
+          fgColor="#ddccff"
+          style={{ width: "100%", height: "100%" }}
+        />
+      </div>
+      <button onClick={copyUrl} className="btn btn--sm btn--win mx-auto">
+        {roomCode}
+      </button>
+      <small className="txt-center unguessed">{t("room.scanToJoin")}</small>
+    </div>
+  );
+
   // Players in the room (host and players see the same list)
   const playersPanel = (
-    <div className="v-section gap-md f-jc-c">
-      <div className="v-section score__container--box dark player-list">
-        <div className="v-section gap-lg f-jc-c">
-          <h2 className="highlight">LISTADO DE JUGADORES</h2>
-          <div className="v-section gap-2xs">
-            {listedPlayers.length > 0 ? (
-              listedPlayers.map((player, index) => (
-                <div className="h-section gap-sm" key={player.id}>
-                  <h4 className="won">
-                    {String(index + 1).padStart(2, "0")}
-                  </h4>
-                  <h4
-                    className={player.id === playerId ? "won" : "highlight"}
-                  >
-                    {player.name}
-                  </h4>
-                  {presenceReady && (
-                    <span
-                      className={`presence-dot ${online[`player:${player.id}`] ? "presence-dot--online" : ""}`}
-                      title={
-                        online[`player:${player.id}`]
-                          ? "Conectado"
-                          : "Desconectado"
-                      }
-                    />
-                  )}
-                  <h4 className="unguessed ml-auto">
-                    {player.score}
-                  </h4>
-                </div>
-              ))
-            ) : (
-              <h4 className="lost">
-                TODAVÍA NO HAY
-                <br />
-                JUGADORES EN LA SALA
-              </h4>
-            )}
-          </div>
-        </div>
+    <div className="v-section score__container--box dark player-list room-players">
+      {!useTabs && <h2 className="highlight">{t("room.playersList")}</h2>}
+      <div className="v-section gap-xs">
+        {listedPlayers.length > 0 ? (
+          listedPlayers.map((player, index) => (
+            <div className="h-section gap-sm f-ai-c" key={player.id}>
+              <h3 className="won">{String(index + 1).padStart(2, "0")}</h3>
+              <h3 className={player.id === playerId ? "won" : "highlight"}>
+                {player.name}
+              </h3>
+              {presenceReady && (
+                <span
+                  className={`presence-dot ${online[`${player.role}:${player.id}`] ? "presence-dot--online" : ""}`}
+                  title={
+                    online[`${player.role}:${player.id}`] ? "Conectado" : "Desconectado"
+                  }
+                />
+              )}
+              <h3 className="unguessed ml-auto">{player.score}</h3>
+            </div>
+          ))
+        ) : (
+          <h3 className="lost txt-center">{t("room.noPlayers")}</h3>
+        )}
       </div>
+    </div>
+  );
+
+  // Everyone on their device: the group's name, so all know their game
+  const groupHeading = groupName && (
+    <h2 className="txt-center">
+      <span className="unguessed">{t("room.group")} </span>
+      <span className="won">{groupName}</span>
+    </h2>
+  );
+
+  const roomTabs = (
+    <>
+      {groupHeading}
+      <SegmentedTabs
+        tabs={[
+          { key: "invite", label: t("room.invite") },
+          {
+            key: "players",
+            label: `${t("room.players")} (${listedPlayers.length})`,
+          },
+        ]}
+        active={roomTab}
+        onChange={setRoomTab}
+      />
+      {roomTab === "invite" ? invitePanel : playersPanel}
+    </>
+  );
+
+  const startBlock = (
+    <div className="v-section gap-sm f-jc-c f-ai-c">
+      <button
+        className={`btn ${canStart ? "btn--win" : "btn--lose"}`}
+        disabled={!canStart || isStarting}
+        onClick={handleStart}
+      >
+        {t("room.startGame")}
+      </button>
+      {!canStart && (
+        <small className="txt-center">{t("room.needPlayer")}</small>
+      )}
     </div>
   );
 
@@ -158,95 +220,57 @@ export default function GameRoom() {
     <>
       <div className="game__container game__container--join">
         <BackHomeButton className="back-control--corner" />
-        <div className="game__room">
-          {isHost ? (
-            <>
-              <div className="v-section gap-md f-jc-c">
-                <div className="v-section gap-md">
-                  <div className="score__container--box dark">
-                    <div className="v-section gap-sm f-jc-c f-ai-c">
-                      <QRCodeSVG
-                        value={window.location.href}
-                        bgColor="#420072"
-                        size={170}
-                        fgColor="#ddccff"
-                        // rem so it scales with the rest of the layout
-                        style={{ width: "10.625rem", height: "10.625rem" }}
-                      />
-                      <button
-                        onClick={copyUrl}
-                        className="btn btn--xs btn--win mx-auto"
-                      >
-                        {roomCode}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="v-section gap-sm f-jc-c f-ai-c">
-                    <button
-                      className={`btn ${canStart ? "btn--win" : "btn--lose"}`}
-                      disabled={!canStart || isStarting}
-                      onClick={handleStart}
-                    >
-                      EMPEZAR PARTIDA
-                    </button>
-                    {!canStart && (
-                      <small className="txt-center">
-                        SE NECESITA AL MENOS
-                        <br />1 JUGADOR PARA EMPEZAR
-                      </small>
-                    )}
-                  </div>
-                </div>
+        {isHost ? (
+          <div className="room-lobby">
+            {useTabs ? (
+              roomTabs
+            ) : (
+              <div className="room-lobby__split">
+                {invitePanel}
+                {playersPanel}
               </div>
-              {playersPanel}
-            </>
-          ) : (
-            <>
-              {role !== "player" || !roomId ? (
-                <div className="v-section gap-md f-jc-c">
-                  <h4 className="highlight">
-                    INTRODUCE TU NOMBRE
-                    <br />
-                    PARA UNIRTE A LA SALA
-                  </h4>
-                  <div className="v-section gap-md">
-                    <input
-                      className="mx-auto"
-                      type="text"
-                      placeholder={t("common.typePlayerName")}
-                      value={playerName}
-                      onChange={(e) => {
-                        setNameError(false);
-                        setJoinError(null);
-                        setPlayerName(e.target.value.toUpperCase());
-                      }}
-                    />
-                    <small className={`txt-center ${nameError ? "" : "op-0"}`}>
-                      {t("gameStart.nameError")}
-                    </small>
-                    <small
-                      className={`txt-center lost ${joinError ? "" : "op-0"}`}
-                    >
-                      {joinError || ""}
-                    </small>
-                  </div>
-                </div>
-              ) : (
-                <div className="v-section gap-md room-waiting">
-                  <div className="score__container--box dark">
-                    <div className="v-section gap-xs">
-                      <p className="txt-center">{t("game.waitingForHost")}</p>
-                      <small className="txt-center unguessed">
-                        {t("gameStart.roomCode")} {roomCode}
-                      </small>
-                    </div>
-                  </div>
-                  {playersPanel}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+            )}
+            {startBlock}
+          </div>
+        ) : showJoinForm ? (
+          <div className="game__room">
+            <div className="v-section gap-md f-jc-c">
+              <h4 className="highlight">
+                INTRODUCE TU NOMBRE
+                <br />
+                PARA UNIRTE A LA SALA
+              </h4>
+              <div className="v-section gap-md">
+                <input
+                  className="mx-auto"
+                  type="text"
+                  placeholder={t("common.typePlayerName")}
+                  value={playerName}
+                  onChange={(e) => {
+                    setNameError(false);
+                    setJoinError(null);
+                    setPlayerName(e.target.value.toUpperCase());
+                  }}
+                />
+                <small className={`txt-center ${nameError ? "" : "op-0"}`}>
+                  {t("gameStart.nameError")}
+                </small>
+                <small
+                  className={`txt-center lost ${joinError ? "" : "op-0"}`}
+                >
+                  {joinError || ""}
+                </small>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="room-lobby">
+            <div className="score__container--box dark room-lobby__status">
+              <p className="txt-center">{t("game.waitingForHost")}</p>
+            </div>
+            {roomTabs}
+          </div>
+        )}
         {showJoinForm && !isMobile && joinAction}
       </div>
       {/* Mobile: outside the panel, stuck to the bottom of the screen */}

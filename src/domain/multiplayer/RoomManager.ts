@@ -28,9 +28,16 @@ export class RoomManager {
   async createRoom(
     roomCode: string,
     hostName: string,
-    difficulty: Difficulty
+    difficulty: Difficulty,
+    /** Group name (rooms where the host plays too); empty -> host name */
+    roomName?: string
   ): Promise<DbResponse<RoomInfo>> {
-    const result = await createRoomWithHost(roomCode, hostName, difficulty);
+    const result = await createRoomWithHost(
+      roomCode,
+      hostName,
+      difficulty,
+      roomName
+    );
 
     if (result.error || !result.data) {
       return { data: null, error: result.error };
@@ -119,10 +126,16 @@ export class RoomManager {
     oldRoomCode: string,
     newRoomCode: string,
     hostName: string,
-    difficulty: Difficulty
+    difficulty: Difficulty,
+    roomName?: string
   ): Promise<DbResponse<RoomInfo>> {
-    // Crear la nueva sala
-    const createResult = await this.createRoom(newRoomCode, hostName, difficulty);
+    // Crear la nueva sala (mismo nombre de grupo)
+    const createResult = await this.createRoom(
+      newRoomCode,
+      hostName,
+      difficulty,
+      roomName
+    );
     
     if (createResult.error || !createResult.data) {
       return createResult;

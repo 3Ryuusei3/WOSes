@@ -1,21 +1,12 @@
 import { useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useSearchParams,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import GamePage from "./components/GamePage";
 import { shouldUseFluidScale } from "./hooks/fluidScale";
-import useGameStore from "./store/useGameStore";
 import useMobileLayout from "./hooks/useMobileLayout";
 
 function BodyLayoutClassSync() {
-  const [searchParams] = useSearchParams();
-  const role = useGameStore((s) => s.role);
-  const hasRoomIdInUrl = !!searchParams.get("id");
-  const isScaled = shouldUseFluidScale(role, hasRoomIdInUrl);
+  const isScaled = shouldUseFluidScale();
   // Phones and narrow windows; updates when the window is resized
   const isMobile = useMobileLayout();
 

@@ -60,7 +60,8 @@
     "save": "SAVE",
     "cancel": "CANCEL",
     "soundOn": "TURN SOUND ON",
-    "soundOff": "MUTE"
+    "soundOff": "MUTE",
+    "globalTop": "GLOBAL TOP"
   },
   "difficulties": {
     "easy": "STANDARD",
@@ -92,7 +93,10 @@
     "mainScreenHint": "THIS DEVICE WILL BE THE SCREEN EVERYONE WATCHES",
     "noMainScreenHint": "YOU ALSO PLAY FROM THIS DEVICE",
     "createError": "COULDN'T CREATE THE ROOM",
-    "nameHint": "THIS IS HOW OTHER PLAYERS WILL SEE YOU"
+    "nameHint": "THIS IS HOW OTHER PLAYERS WILL SEE YOU",
+    "groupName": "GROUP NAME",
+    "groupNameHint": "YOUR NAME IN THE GLOBAL RANKING",
+    "groupNameError": "THE GROUP NAME MUST HAVE 3 TO 10 CHARACTERS"
   },
   "game": {
     "lost": "YOU LOST...",
@@ -166,7 +170,8 @@
     "date": "Date",
     "columnScore": "Pts",
     "columnLevel": "Lvl",
-    "columnTime": "Time"
+    "columnTime": "Time",
+    "yourGame": "YOUR GAME"
   },
   "mechanics": {
     "title": "GAME MECHANICS",
@@ -225,9 +230,9 @@
     "firstLetterRequired": "All words start with <strong>{{letter}}</strong>"
   },
   "countdown": {
-    "3": "3",
-    "2": "2",
     "1": "1",
+    "2": "2",
+    "3": "3",
     "go": "Go!",
     "getReady": "Get ready",
     "levelStart": "Let's start!"
@@ -258,7 +263,8 @@
     "seeWords": "See words",
     "checkDefinition": "Check definition",
     "rankingTotal": "TOTAL RANKING",
-    "rankingLastRound": "LAST ROUND"
+    "rankingLastRound": "LAST ROUND",
+    "loadingSummary": "LOADING SUMMARY..."
   },
   "gameOver": {
     "title": "Game Over!",
@@ -343,5 +349,17 @@
     "denied": "ALLOW CAMERA ACCESS TO SCAN",
     "unavailable": "CAMERA NOT AVAILABLE. TYPE THE CODE",
     "invalid": "THAT QR IS NOT A ROOM"
+  },
+  "room": {
+    "players": "PLAYERS",
+    "invite": "INVITE",
+    "scanToJoin": "SCAN THE QR OR JOIN WITH THE CODE",
+    "copyLink": "COPY LINK",
+    "linkCopied": "LINK COPIED",
+    "noPlayers": "NO PLAYERS IN THE ROOM YET",
+    "needPlayer": "AT LEAST 1 PLAYER IS NEEDED TO START",
+    "playersList": "PLAYERS",
+    "startGame": "START GAME",
+    "group": "GROUP"
   }
 }

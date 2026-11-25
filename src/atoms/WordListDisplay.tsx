@@ -8,11 +8,14 @@ import { getDictionaryUrl } from "../utils";
 interface WordListDisplayProps {
   lastLevelWords: Word[];
   columns: number;
+  /** Multiplayer: words guessed by this player get their own colour */
+  playerName?: string;
 }
 
 export default function WordListDisplay({
   lastLevelWords,
   columns,
+  playerName,
 }: WordListDisplayProps) {
   const { t, i18n } = useTranslation();
 
@@ -33,7 +36,14 @@ export default function WordListDisplay({
       >
         {lastLevelWords.map((word, index) => (
           <h4
-            className={`${word.guessed ? "highlight" : "unguessed"}`}
+            className={
+              !word.guessed
+                ? "unguessed"
+                : playerName &&
+                    word.guessedByName === playerName
+                  ? "won"
+                  : "highlight"
+            }
             key={`${index}-${word}`}
           >
             <Link

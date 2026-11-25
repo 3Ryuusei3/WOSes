@@ -111,8 +111,8 @@ export default function PlayersRanking({
                 <h5 className={isMe ? "tip" : "highlight"}>{player.name}</h5>
                 {presenceReady && (
                   <span
-                    className={`presence-dot ${online[`player:${player.id}`] ? "presence-dot--online" : ""}`}
-                    title={online[`player:${player.id}`] ? "Conectado" : "Desconectado"}
+                    className={`presence-dot ${online[`${player.role}:${player.id}`] ? "presence-dot--online" : ""}`}
+                    title={online[`${player.role}:${player.id}`] ? "Conectado" : "Desconectado"}
                   />
                 )}
                 <h5 className={isMe ? "tip ml-auto" : "unguessed ml-auto"}>

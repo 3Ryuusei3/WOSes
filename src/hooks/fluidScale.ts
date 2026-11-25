@@ -1,4 +1,3 @@
-import type Role from '../types/Role';
 import { isMobileUserAgent } from '../utils/mobileUserAgent';
 
 /**
@@ -8,14 +7,10 @@ import { isMobileUserAgent } from '../utils/mobileUserAgent';
  * from the viewport, and every size in index.scss is expressed in rem, so
  * letters, boxes and spacing grow/shrink with the screen. No CSS `zoom`.
  *
- * Players (and people opening a join link) keep the regular 16px base.
+ * Every desktop uses it — host, players and people opening a join link — so
+ * two players on two computers see the game the same way. Phones keep the
+ * regular 16px base (they get the mobile layout instead).
  */
-export function shouldUseFluidScale(
-  role: Role | null,
-  hasRoomIdInUrl: boolean,
-): boolean {
-  if (isMobileUserAgent()) return false;
-  if (role === 'player') return false;
-  if (role === null && hasRoomIdInUrl) return false;
-  return true;
+export function shouldUseFluidScale(): boolean {
+  return !isMobileUserAgent();
 }

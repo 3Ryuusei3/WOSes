@@ -60,7 +60,8 @@
     "save": "GUARDAR",
     "cancel": "CANCELAR",
     "soundOn": "ACTIVAR SONIDO",
-    "soundOff": "SILENCIAR"
+    "soundOff": "SILENCIAR",
+    "globalTop": "TOP GLOBAL"
   },
   "difficulties": {
     "easy": "ESTÁNDAR",
@@ -92,7 +93,10 @@
     "mainScreenHint": "ESTE DISPOSITIVO SERÁ LA PANTALLA QUE VEN TODOS",
     "noMainScreenHint": "TÚ TAMBIÉN JUEGAS DESDE ESTE DISPOSITIVO",
     "createError": "NO SE PUDO CREAR LA SALA",
-    "nameHint": "ASÍ TE VERÁN LOS DEMÁS JUGADORES"
+    "nameHint": "ASÍ TE VERÁN LOS DEMÁS JUGADORES",
+    "groupName": "NOMBRE DEL GRUPO",
+    "groupNameHint": "ASÍ SALDRÉIS EN EL RANKING GLOBAL",
+    "groupNameError": "EL NOMBRE DEL GRUPO DEBE TENER ENTRE 3 Y 10 CARACTERES"
   },
   "game": {
     "lost": "HAS PERDIDO...",
@@ -166,7 +170,8 @@
     "date": "Fecha",
     "columnScore": "Pts",
     "columnLevel": "Nv.",
-    "columnTime": "Tpo"
+    "columnTime": "Tpo",
+    "yourGame": "TU PARTIDA"
   },
   "mechanics": {
     "title": "MECÁNICAS DEL JUEGO",
@@ -243,7 +248,8 @@
     "seeWords": "Ver palabras",
     "checkDefinition": "Ver definición",
     "rankingTotal": "RANKING TOTAL",
-    "rankingLastRound": "ÚLTIMA RONDA"
+    "rankingLastRound": "ÚLTIMA RONDA",
+    "loadingSummary": "CARGANDO RESUMEN..."
   },
   "gameOver": {
     "title": "¡Juego terminado!",
@@ -328,5 +334,17 @@
     "denied": "PERMITE EL ACCESO A LA CÁMARA PARA ESCANEAR",
     "unavailable": "NO SE PUEDE USAR LA CÁMARA. ESCRIBE EL CÓDIGO",
     "invalid": "ESE QR NO ES DE UNA SALA"
+  },
+  "room": {
+    "players": "JUGADORES",
+    "invite": "INVITAR",
+    "scanToJoin": "ESCANEA EL QR O ENTRA CON EL CÓDIGO",
+    "copyLink": "COPIAR ENLACE",
+    "linkCopied": "ENLACE COPIADO",
+    "noPlayers": "TODAVÍA NO HAY JUGADORES EN LA SALA",
+    "needPlayer": "SE NECESITA AL MENOS 1 JUGADOR PARA EMPEZAR",
+    "playersList": "LISTADO DE JUGADORES",
+    "startGame": "EMPEZAR PARTIDA",
+    "group": "GRUPO"
   }
 }

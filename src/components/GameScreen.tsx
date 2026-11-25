@@ -16,7 +16,11 @@ import { calculateProbability } from "../utils";
 import { insertScoreWithNextId } from "../services/rooms";
 import { saveDailyChallengeScore } from "../services/dailyChallenge";
 
-import { SHOW_LETTERS_RANGE, SHUFFLE_INTERVAL } from "../constant";
+import {
+  RUNNING_OUT_OF_TIME_PERCENTAGE,
+  SHOW_LETTERS_RANGE,
+  SHUFFLE_INTERVAL,
+} from "../constant";
 
 import hitSound from "../assets/hit.mp3";
 import goalSound from "../assets/goal.mp3";
@@ -88,9 +92,20 @@ export default function GameScreen() {
     isMulti && rtRound?.started_at
       ? serverIsoToLocalMs(rtRound.started_at, clockOffsetMs)
       : undefined;
-  const { percentage, timeLeft } = useProgressBar(
+  // The clock only re-renders on whole seconds and when crossing these
+  // percentages (bar colour, letter reveal): the bar itself animates in CSS.
+  // Players reveal at the host's threshold, which arrives with the board.
+  const rtBoardRevealPct = useRoomRealtimeStore(
+    (s) => s.board?.show_letters_percentage,
+  );
+  const { percentage, timeLeft, startedAt, durationMs } = useProgressBar(
     roundDuration,
     roundStartedAtMs,
+    [
+      RUNNING_OUT_OF_TIME_PERCENTAGE,
+      showLettersPercentage,
+      ...(rtBoardRevealPct != null ? [rtBoardRevealPct] : []),
+    ],
   );
   const shuffledWordObject = useShuffledWord(
     randomWord,
@@ -572,6 +587,8 @@ export default function GameScreen() {
           markWordGuessed={markWordGuessed}
           percentage={percentage}
           timeLeft={timeLeft}
+          startedAt={startedAt}
+          durationMs={durationMs}
           correctWordsPoints={correctWordsPoints}
           goalPoints={goalPoints}
         />
@@ -588,6 +605,8 @@ export default function GameScreen() {
           percentage={percentage}
           showLettersPercentage={showLettersPercentage}
           timeLeft={timeLeft}
+          startedAt={startedAt}
+          durationMs={durationMs}
           playerName={playerName}
           players={players as "single" | "multi"}
           inputWord={inputWord}

@@ -36,16 +36,29 @@ export interface RoomWordRow {
   room_players?: { name: string } | { name: string }[] | null;
 }
 
+/**
+ * Creates the room and its host player. `roomName` (group name, rooms without
+ * a main screen) is what the global ranking shows; empty -> the host's name.
+ */
 export async function createRoomWithHost(
   code: string,
   hostName: string,
   difficulty: string,
+  roomName?: string,
 ): Promise<DbResponse<{ room: RoomRow; host: RoomPlayerRow }>> {
-  const { data, error } = await supabase.rpc("create_room_with_host", {
-    p_code: code,
-    p_host_name: hostName,
-    p_difficulty: difficulty,
-  });
+  const base = { p_code: code, p_host_name: hostName, p_difficulty: difficulty };
+  let { data, error } = roomName
+    ? await supabase.rpc("create_room_with_host", {
+        ...base,
+        p_room_name: roomName,
+      })
+    : await supabase.rpc("create_room_with_host", base);
+
+  // Database without the 20261125120000_room_group_name migration yet: the
+  // 4-argument function doesn't exist -> create it the old way (host name)
+  if (error && roomName && error.code === "PGRST202") {
+    ({ data, error } = await supabase.rpc("create_room_with_host", base));
+  }
 
   if (error) return { data: null, error };
 

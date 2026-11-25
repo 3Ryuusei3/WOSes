@@ -22,10 +22,12 @@ import useGameStore from "../store/useGameStore";
 import levelPassedSound from "../assets/win.mp3";
 
 import { LEVELS_TO_ADVANCE } from "../constant";
-import PlayersPanel from "../atoms/PlayersPanel";
 import SegmentedTabs from "../atoms/SegmentedTabs";
 import RoomRankingPanel from "../atoms/RoomRankingPanel";
-import useHostPlays from "../hooks/useHostPlays";
+import useBroadcastSummary from "../hooks/useBroadcastSummary";
+import useLastWordsWithNames from "../hooks/useLastWordsWithNames";
+import useRequestSummary from "../hooks/useRequestSummary";
+import { useRoomRealtimeStore } from "../realtime/roomRealtime";
 import { startRound } from "../services/multiplayer";
 import { showToast } from "../atoms/Toast";
 import { primeMobileKeyboard } from "../utils/mobileKeyboard";
@@ -54,12 +56,12 @@ export default function GameLobby() {
     dailyChallengeOriginalDifficulty,
   } = useGameStore();
 
-  const isPlayer = players === "multi" && role === "player";
+  const isMulti = players === "multi";
+  const isPlayer = isMulti && role === "player";
   const isMobile = useMobileLayout();
-  // Host without a main screen: a tab with the room ranking
-  const hostPlays = useHostPlays() && players === "multi" && role === "host";
+  // Multiplayer (any role, any screen): summary of the level / room ranking
   const [tab, setTab] = useState<"summary" | "ranking">("summary");
-  const showSummary = !hostPlays || tab === "summary";
+  const showSummary = !isMulti || tab === "summary";
 
   const { t } = useTranslation();
 
@@ -109,6 +111,57 @@ export default function GameLobby() {
   useRandomWords(gameDifficulty);
   const secondsToRemove = useRemoveSeconds();
 
+  // Only the host computes the level summary: it shares it with the room and
+  // players show what it sends (until then, just the words)
+  const roundId = useRoomRealtimeStore((s) => s.round?.id ?? null);
+  const rtSummary = useRoomRealtimeStore((s) => s.summary);
+  useBroadcastSummary(
+    isMulti && role === "host" && roundId
+      ? {
+          round_id: roundId,
+          kind: "lobby",
+          level,
+          levels_to_advance: levelsToAdvance,
+          last_round_points: lastRoundPoints,
+          total_points: totalPoints,
+          game_time: gameTime,
+          seconds_to_remove: secondsToRemove,
+          number_of_rounds: numberOfRounds,
+          perfect_rounds: numberOfPerfectRounds,
+          mechanics: gameMechanics,
+        }
+      : null,
+  );
+  const playerSummary =
+    isPlayer && rtSummary?.kind === "lobby" && rtSummary.round_id === roundId
+      ? rtSummary
+      : null;
+  const view = isPlayer
+    ? playerSummary && {
+        level: playerSummary.level,
+        levelsToAdvance: playerSummary.levels_to_advance,
+        lastRoundPoints: playerSummary.last_round_points,
+        totalPoints: playerSummary.total_points,
+        gameTime: playerSummary.game_time,
+        secondsToRemove: playerSummary.seconds_to_remove,
+        numberOfRounds: playerSummary.number_of_rounds,
+        numberOfPerfectRounds: playerSummary.perfect_rounds,
+        mechanics: playerSummary.mechanics,
+      }
+    : {
+        level,
+        levelsToAdvance,
+        lastRoundPoints,
+        totalPoints,
+        gameTime,
+        secondsToRemove,
+        numberOfRounds,
+        numberOfPerfectRounds,
+        mechanics: gameMechanics,
+      };
+  const words = useLastWordsWithNames(lastLevelWords, isMulti);
+  useRequestSummary(isPlayer && !playerSummary);
+
   const {
     status: connectionStatus,
     syncNow,
@@ -118,7 +171,8 @@ export default function GameLobby() {
   const showReconnectButton = isPlayer;
 
   const handleAdvance = useCallback(async () => {
-    if (!canAdvance || isAdvancing) return;
+    // Players wait for the host (Enter on the panel must not advance them)
+    if (isPlayer || !canAdvance || isAdvancing) return;
     // Same tap opens the keyboard on iOS for the next round (see
     // primeMobileKeyboard); also for the host that plays
     primeMobileKeyboard();
@@ -149,32 +203,32 @@ export default function GameLobby() {
     } else {
       setMode("loading");
     }
-  }, [canAdvance, isAdvancing, players, role, roomCode, randomWord, setMode]);
-
-  if (players === "multi" && role === "player") {
-    return (
-      <div className="game__container f-jc-c">
-        <PlayersPanel lastLevelWords={lastLevelWords} />
-        <div className="h-section gap-xs f-jc-c mb-sm">
-          <ReconnectButton
-            onClick={syncNow}
-            disabled={isSyncing}
-            connectionStatus={connectionStatus}
-          />
-        </div>
-      </div>
-    );
-  }
+  }, [
+    canAdvance,
+    isAdvancing,
+    isPlayer,
+    players,
+    role,
+    roomCode,
+    randomWord,
+    setMode,
+  ]);
 
   const actions = (
     <div className="h-section gap-xs f-jc-c mb-sm screen-actions">
-      <button
-        onClick={handleAdvance}
-        disabled={!canAdvance || isAdvancing}
-        className={!canAdvance || isAdvancing ? "btn button-disabled" : "btn"}
-      >
-        {t("lobby.playLevel", { level })}
-      </button>
+      {isPlayer ? (
+        <div className="score__container--box dark">
+          <p className="txt-center">{t("game.waitingForHost")}</p>
+        </div>
+      ) : (
+        <button
+          onClick={handleAdvance}
+          disabled={!canAdvance || isAdvancing}
+          className={!canAdvance || isAdvancing ? "btn button-disabled" : "btn"}
+        >
+          {t("lobby.playLevel", { level })}
+        </button>
+      )}
       {showReconnectButton && (
         <ReconnectButton
           onClick={syncNow}
@@ -201,12 +255,12 @@ export default function GameLobby() {
             dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
           />
         </div>
-        {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
+        {view?.levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
           <h1 className="won">{t("lobby.perfect")}</h1>
         ) : (
           <h1 className="highlight">{t("lobby.congratulations")}</h1>
         )}
-        {hostPlays && (
+        {isMulti && (
           <SegmentedTabs
             tabs={[
               { key: "summary", label: t("common.summary") },
@@ -216,68 +270,79 @@ export default function GameLobby() {
             onChange={setTab}
           />
         )}
-        {hostPlays && tab === "ranking" && (
-          <div className="score__container--box dark w100 mobile-ranking">
+        {isMulti && tab === "ranking" && (
+          <div className="score__container--box dark w100 mobile-ranking multi-tab-panel">
             <RoomRankingPanel />
           </div>
         )}
-        {showSummary && (
-        <h3>
-          {t("lobby.youAdvanced")}
-          {levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
-            <span className="won"> {levelsToAdvance} </span>
-          ) : (
-            <span className="highlight"> {levelsToAdvance} </span>
-          )}
-          {levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
-        </h3>
+        {showSummary && view && (
+          <h3>
+            {t("lobby.youAdvanced")}
+            {view.levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
+              <span className="won"> {view.levelsToAdvance} </span>
+            ) : (
+              <span className="highlight"> {view.levelsToAdvance} </span>
+            )}
+            {view.levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
+          </h3>
+        )}
+        {showSummary && !view && (
+          <p className="txt-center unguessed">{t("lobby.loadingSummary")}</p>
         )}
         {showSummary && (
-        <div className="game__summary">
-          <LobbyStatsContainer
-            level={level}
-            levelsToAdvance={levelsToAdvance}
-            lastRoundPoints={lastRoundPoints}
-            totalPoints={totalPoints}
-            gameTime={gameTime}
-            numberOfRounds={numberOfRounds}
-            numberOfPerfectRounds={numberOfPerfectRounds}
-            secondsToRemove={secondsToRemove}
-          />
-          <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
-          {gameMechanics && (
-            <>
-              <NextChallengesSection
-                gameMechanics={gameMechanics}
-                canAdvance={canAdvance}
-                onMechanicClick={handleMechanicClick}
+          <div className="game__summary">
+            {view && (
+              <LobbyStatsContainer
+                level={view.level}
+                levelsToAdvance={view.levelsToAdvance}
+                lastRoundPoints={view.lastRoundPoints}
+                totalPoints={view.totalPoints}
+                gameTime={view.gameTime}
+                numberOfRounds={view.numberOfRounds}
+                numberOfPerfectRounds={view.numberOfPerfectRounds}
+                secondsToRemove={view.secondsToRemove}
               />
-              <MechanicsModal
-                isOpen={isModalOpen}
-                setModalOpen={setIsModalOpen}
-                mechanicType={selectedMechanic}
-              />
-            </>
-          )}
-        </div>
+            )}
+            <WordListDisplay
+              lastLevelWords={words}
+              columns={3}
+              playerName={isMulti ? playerName : undefined}
+            />
+            {view?.mechanics && (
+              <>
+                <NextChallengesSection
+                  gameMechanics={view.mechanics}
+                  canAdvance={canAdvance}
+                  onMechanicClick={handleMechanicClick}
+                />
+                <MechanicsModal
+                  isOpen={isModalOpen}
+                  setModalOpen={setIsModalOpen}
+                  mechanicType={selectedMechanic}
+                />
+              </>
+            )}
+          </div>
         )}
-        {showSummary && secondsToRemove > 0 && (
+        {showSummary && view && view.secondsToRemove > 0 && (
           <h3
             dangerouslySetInnerHTML={{
-              __html: t("lobby.lessTime", { seconds: secondsToRemove }),
+              __html: t("lobby.lessTime", { seconds: view.secondsToRemove }),
             }}
           ></h3>
         )}
-        {showSummary && levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR && (
-          <h3
-            dangerouslySetInnerHTML={{ __html: t("lobby.perfectBonus") }}
-          ></h3>
-        )}
-        {showSummary && levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR && (
-          <h3
-            dangerouslySetInnerHTML={{ __html: t("lobby.threeStarBonus") }}
-          ></h3>
-        )}
+        {showSummary &&
+          view?.levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR && (
+            <h3
+              dangerouslySetInnerHTML={{ __html: t("lobby.perfectBonus") }}
+            ></h3>
+          )}
+        {showSummary &&
+          view?.levelsToAdvance === LEVELS_TO_ADVANCE.THREE_STAR && (
+            <h3
+              dangerouslySetInnerHTML={{ __html: t("lobby.threeStarBonus") }}
+            ></h3>
+          )}
         {!isMobile && actions}
         {/* Top-right corner: "¿Falta algo?" next to the sound button */}
         {/* Mobile: top-left of the logo row, facing "¿Falta algo?" */}

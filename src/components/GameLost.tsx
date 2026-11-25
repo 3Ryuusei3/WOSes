@@ -4,9 +4,12 @@ import { useTranslation } from "react-i18next";
 
 import TopScores from "../atoms/TopScores";
 import SegmentedTabs from "../atoms/SegmentedTabs";
-import PlayersPanel from "../atoms/PlayersPanel";
 import RoomRankingPanel from "../atoms/RoomRankingPanel";
-import useHostPlays from "../hooks/useHostPlays";
+import useBroadcastSummary from "../hooks/useBroadcastSummary";
+import useLastWordsWithNames from "../hooks/useLastWordsWithNames";
+import useRequestSummary from "../hooks/useRequestSummary";
+import useGroupName from "../hooks/useGroupName";
+import { useRoomRealtimeStore } from "../realtime/roomRealtime";
 import GameSound from "../atoms/GameSound";
 import DifficultyTag from "../atoms/DifficultyTag";
 import WordListDisplay from "../atoms/WordListDisplay";
@@ -74,13 +77,53 @@ export default function GameLost() {
   const isMobileUa = useMobileLayout();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
-  // Mobile: ranking is a tab of the screen instead of a modal
+  // Single player on mobile: ranking is a tab of the screen instead of a
+  // modal. Multiplayer (any device): summary / room ranking / global top.
   const [mobileTab, setMobileTab] = useState<"summary" | "ranking">("summary");
+  const [multiTab, setMultiTab] = useState<"summary" | "ranking" | "top">(
+    "summary",
+  );
   const { words } = useLanguageWords(gameDifficulty);
   const { forceReconnect, isConnected } = useRealtimeConnection();
   const roomManager = useRoomManager();
-  // Host without a main screen: the room ranking, not the global one
-  const hostPlays = useHostPlays() && players === "multi" && role === "host";
+  const isMulti = players === "multi";
+  const isPlayer = isMulti && role === "player";
+
+  // The host shares the final numbers; players show what it sends
+  const roundId = useRoomRealtimeStore((s) => s.round?.id ?? null);
+  const rtSummary = useRoomRealtimeStore((s) => s.summary);
+  useBroadcastSummary(
+    isMulti && role === "host" && roundId
+      ? {
+          round_id: roundId,
+          kind: "lost",
+          level,
+          levels_to_advance: 0,
+          last_round_points: 0,
+          total_points: totalPoints,
+          game_time: 0,
+          seconds_to_remove: 0,
+          number_of_rounds: numberOfRounds,
+          perfect_rounds: numberOfPerfectRounds,
+          mechanics: null,
+        }
+      : null,
+  );
+  const playerSummary =
+    isPlayer && rtSummary?.kind === "lost" && rtSummary.round_id === roundId
+      ? rtSummary
+      : null;
+  const stats = isPlayer
+    ? playerSummary && {
+        level: playerSummary.level,
+        totalPoints: playerSummary.total_points,
+        numberOfRounds: playerSummary.number_of_rounds,
+        numberOfPerfectRounds: playerSummary.perfect_rounds,
+      }
+    : { level, totalPoints, numberOfRounds, numberOfPerfectRounds };
+  const namedLastWords = useLastWordsWithNames(lastLevelWords, isMulti);
+  useRequestSummary(isPlayer && !playerSummary);
+  const groupName = useGroupName();
 
   // Hook para resetear el estado del juego
   const resetGameState = () => {
@@ -156,11 +199,13 @@ export default function GameLost() {
 
         // Usar RoomManager para crear nueva sala
         const newRoomCode = roomManager.generateRoomCode();
+        const { hostPlays, groupName } = useGameStore.getState();
         const result = await roomManager.createNewRoomForRematch(
           roomCode,
           newRoomCode,
           playerName,
           gameDifficulty,
+          hostPlays ? groupName : undefined,
         );
 
         if (result.error || !result.data) {
@@ -231,40 +276,7 @@ export default function GameLost() {
     }
   }, [volume]);
 
-  if (players === "multi" && role === "player") {
-    const waitingActions = (
-      <div className="h-section gap-xs f-jc-c screen-actions">
-        <button className="btn btn--sm btn--lose" onClick={handleExit}>
-          {t("game.exit")}
-        </button>
-        {!isConnected && (
-          <button onClick={forceReconnect} className="btn btn--sm">
-            {t("game.reconnect")}
-          </button>
-        )}
-      </div>
-    );
-
-    return (
-      <>
-        <div className="game__container f-jc-c">
-          <PlayersPanel lastLevelWords={lastLevelWords} />
-          <div className="v-section gap-md f-jc-c mt-sm">
-            <div className="score__container--box dark">
-              <p className="txt-center">{t("game.waitingForHost")}</p>
-            </div>
-          </div>
-          {!isMobileUa && waitingActions}
-        </div>
-        {/* Mobile: outside the panel, stuck to the bottom of the screen */}
-        {isMobileUa && waitingActions}
-      </>
-    );
-  }
-
-  const ranking = hostPlays ? (
-    <RoomRankingPanel />
-  ) : isDailyChallenge ? (
+  const ranking = isDailyChallenge ? (
     <TopScores
       hasTooltip
       difficulty="daily"
@@ -274,9 +286,25 @@ export default function GameLost() {
     <TopScores hasTooltip difficulty={gameDifficulty} />
   );
 
-  const showSummary = !isMobileUa || mobileTab === "summary";
+  const showSummary = isMulti
+    ? multiTab === "summary"
+    : !isMobileUa || mobileTab === "summary";
 
-  const actions = (
+  const actions = isPlayer ? (
+    <div className="h-section gap-xs f-jc-c mb-sm screen-actions">
+      <div className="score__container--box dark">
+        <p className="txt-center">{t("game.waitingForHost")}</p>
+      </div>
+      <button className="btn btn--sm btn--lose" onClick={handleExit}>
+        {t("game.exit")}
+      </button>
+      {!isConnected && (
+        <button onClick={forceReconnect} className="btn btn--sm">
+          {t("game.reconnect")}
+        </button>
+      )}
+    </div>
+  ) : (
     <div className="h-section gap-xs f-jc-c mb-sm screen-actions">
       {!isDailyChallenge && players === "multi" && (
         <button className="btn btn--sm btn--lose" onClick={handleExit}>
@@ -297,6 +325,68 @@ export default function GameLost() {
     </div>
   );
 
+  const reviewBlock = (isDailyChallenge ? (
+            <div className="game__review">
+              <div className="v-section">
+                <StatBox
+                  label={t("common.totalPoints")}
+                  value={totalPoints}
+                  size="sm"
+                />
+              </div>
+              <div className="v-section">
+                <StatBox
+                  label={t("common.remainingTime")}
+                  value={`${gameTime}s`}
+                  size="sm"
+                />
+              </div>
+            </div>
+          ) : stats ? (
+            <div
+              className={`game__review ${isMulti ? "game__review--grid" : ""}`}
+            >
+              <div className="v-section">
+                <StatBox
+                  label={t("common.reachedLevel")}
+                  value={stats.level}
+                  size="sm"
+                />
+              </div>
+              <div className="v-section">
+                <StatBox
+                  label={t("common.totalPoints")}
+                  value={stats.totalPoints}
+                  size="sm"
+                />
+              </div>
+              <div className="v-section">
+                <StatBox
+                  label={t("common.numberOfRounds")}
+                  value={stats.numberOfRounds}
+                  size="sm"
+                />
+              </div>
+              <div className="v-section">
+                <StatBox
+                  label={t("common.perfectRounds")}
+                  value={stats.numberOfPerfectRounds}
+                  size="sm"
+                />
+              </div>
+            </div>
+          ) : (
+            <p className="txt-center unguessed">{t("lobby.loadingSummary")}</p>
+          ));
+
+  const wordsBlock = (
+    <WordListDisplay
+      lastLevelWords={namedLastWords}
+      columns={3}
+      playerName={isMulti ? playerName : undefined}
+    />
+  );
+
   return (
     <>
       <div className="game__container game__container--lost f-jc-c">
@@ -315,79 +405,76 @@ export default function GameLost() {
         ) : (
           <h1 className="lost">{t("game.lost")}</h1>
         )}
-        {isMobileUa && (
+        {isMulti ? (
           <SegmentedTabs
             tabs={[
               { key: "summary", label: t("common.summary") },
               { key: "ranking", label: t("common.ranking") },
+              { key: "top", label: t("common.globalTop") },
             ]}
-            active={mobileTab}
-            onChange={setMobileTab}
+            active={multiTab}
+            onChange={setMultiTab}
           />
+        ) : (
+          isMobileUa && (
+            <SegmentedTabs
+              tabs={[
+                { key: "summary", label: t("common.summary") },
+                { key: "ranking", label: t("common.ranking") },
+              ]}
+              active={mobileTab}
+              onChange={setMobileTab}
+            />
+          )
         )}
-        {showSummary &&
-          (isDailyChallenge ? (
-            <div className="game__review">
-              <div className="v-section">
-                <StatBox
-                  label={t("common.totalPoints")}
-                  value={totalPoints}
-                  size="sm"
-                />
-              </div>
-              <div className="v-section">
-                <StatBox
-                  label={t("common.remainingTime")}
-                  value={`${gameTime}s`}
-                  size="sm"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="game__review">
-              <div className="v-section">
-                <StatBox
-                  label={t("common.reachedLevel")}
-                  value={level}
-                  size="sm"
-                />
-              </div>
-              <div className="v-section">
-                <StatBox
-                  label={t("common.totalPoints")}
-                  value={totalPoints}
-                  size="sm"
-                />
-              </div>
-              <div className="v-section">
-                <StatBox
-                  label={t("common.numberOfRounds")}
-                  value={numberOfRounds}
-                  size="sm"
-                />
-              </div>
-              <div className="v-section">
-                <StatBox
-                  label={t("common.perfectRounds")}
-                  value={numberOfPerfectRounds}
-                  size="sm"
-                />
-              </div>
-            </div>
-          ))}
-        {showSummary && (
+        {showSummary && isMulti && (
+          // Desktop: points and levels (2x2) on the left, words on the right
+          <div className="lost-summary">
+            {reviewBlock}
+            {wordsBlock}
+          </div>
+        )}
+        {showSummary && !isMulti && reviewBlock}
+        {showSummary && !isMulti && (
           <div className="game__summary">
-            <div className="v-section gap-md">
-              <WordListDisplay lastLevelWords={lastLevelWords} columns={3} />
-            </div>
+            <div className="v-section gap-md">{wordsBlock}</div>
             {!isMobileUa && (
               <div className="score__container--box pos-rel">{ranking}</div>
             )}
           </div>
         )}
-        {isMobileUa && mobileTab === "ranking" && (
+        {!isMulti && isMobileUa && mobileTab === "ranking" && (
           <div className="score__container--box dark w100 mobile-ranking">
             {ranking}
+          </div>
+        )}
+        {isMulti && multiTab === "ranking" && (
+          <div className="score__container--box dark w100 mobile-ranking multi-tab-panel">
+            <RoomRankingPanel />
+          </div>
+        )}
+        {isMulti && multiTab === "top" && (
+          <div className="score__container--box dark w100 mobile-ranking multi-tab-panel">
+            {stats && (
+              <h4 className="txt-center highlight">
+                {groupName && (
+                  <>
+                    <span className="won">{groupName}</span>
+                    {" · "}
+                  </>
+                )}
+                {t("common.reachedLevel")}{" "}
+                <span className="won">{stats.level}</span>
+                {" · "}
+                <span className="won">{stats.totalPoints}</span>{" "}
+                {t("common.points")}
+              </h4>
+            )}
+            <TopScores
+              hasTooltip
+              difficulty={gameDifficulty}
+              highlightCode={roomCode || undefined}
+            />
           </div>
         )}
         {!isMobileUa && actions}

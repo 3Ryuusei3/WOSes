@@ -27,7 +27,7 @@ import {
 import { requestExit } from "../utils/leaveToHome";
 
 const GamePage = () => {
-  const { mode, setRoomCode, setMode, role, players } = useGameStore();
+  const { mode, setRoomCode, setMode, players } = useGameStore();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
@@ -133,7 +133,7 @@ const GamePage = () => {
     }
   }, [mode, roomId, pathname, search, navigate]);
 
-  const isScaled = shouldUseFluidScale(role, !!roomId);
+  const isScaled = shouldUseFluidScale();
 
   return (
     <main>

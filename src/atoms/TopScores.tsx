@@ -9,7 +9,12 @@ import TopScore from "../types/TopScore";
 import Difficulty from "../types/Difficulty";
 import { DailyChallengeRankingEntry } from "../types/DailyChallenge";
 
-import { getAllTimeTopScores, getWeeklyTopScores } from "../services/rooms";
+import {
+  getAllTimeTopScores,
+  getRoomRank,
+  getWeeklyTopScores,
+  type RoomRank,
+} from "../services/rooms";
 import { getDailyChallengeRanking } from "../services/dailyChallenge";
 import { onScoreAdded } from "../realtime/scoresRealtime";
 
@@ -24,12 +29,16 @@ interface TopScoresProps {
   hasTooltip?: boolean;
   difficulty?: Difficulty;
   challengeNumber?: number;
+  /** Multiplayer game to highlight (its room code); also shows its position
+   *  under the list when it is not in the top 10 */
+  highlightCode?: string;
 }
 
 export default function TopScores({
   hasTooltip = false,
   difficulty = "hard",
   challengeNumber,
+  highlightCode,
 }: TopScoresProps) {
   const { t, i18n } = useTranslation();
   const { highestScore } = useGameStore();
@@ -39,6 +48,7 @@ export default function TopScores({
     [],
   );
   const [showAllTime, setShowAllTime] = useState(true);
+  const [roomRank, setRoomRank] = useState<RoomRank | null>(null);
 
   const isDaily = difficulty === "daily";
   const today = new Date().toLocaleDateString();
@@ -46,6 +56,7 @@ export default function TopScores({
   const mapScores = (
     data: {
       id: number;
+      code?: string;
       name: string;
       score: number;
       level: number;
@@ -55,6 +66,7 @@ export default function TopScores({
   ): TopScore[] =>
     data.map((item) => ({
       id: String(item.id),
+      code: item.code,
       name: item.name,
       score: item.score,
       level: item.level,
@@ -87,6 +99,15 @@ export default function TopScores({
 
         if (allTimeData) setAllTimeScores(mapScores(allTimeData));
         if (weeklyData) setWeeklyScores(mapScores(weeklyData));
+
+        if (highlightCode) {
+          const { data: rankData } = await getRoomRank(
+            highlightCode,
+            difficulty,
+            currentLanguage,
+          );
+          setRoomRank(rankData);
+        }
       }
     } catch (error) {
       console.error("Error fetching scores:", error);
@@ -113,13 +134,36 @@ export default function TopScores({
       unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [highestScore, difficulty, i18n.language, isDaily, challengeNumber]);
+  }, [
+    highestScore,
+    difficulty,
+    i18n.language,
+    isDaily,
+    challengeNumber,
+    highlightCode,
+  ]);
+
+  // The host saves the final score a moment after everyone reaches the end
+  // screen: retry a couple of times until this game shows up
+  useEffect(() => {
+    if (!highlightCode || isDaily || roomRank) return;
+    const ids = [3000, 8000].map((ms) => setTimeout(fetchScores, ms));
+    return () => ids.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightCode, isDaily, roomRank === null]);
 
   const toggleRanking = () => {
     setShowAllTime((prev) => !prev);
   };
 
   const currentScores = showAllTime ? allTimeScores : weeklyScores;
+  // This game outside the visible top 10: its position goes under the list
+  // (the rank is computed against the all-time ranking)
+  const showOwnRank =
+    !isDaily &&
+    showAllTime &&
+    !!highlightCode &&
+    !currentScores.some((e) => e.code === highlightCode);
 
   const columnFormat = useMemo(() => {
     if (isDaily) {
@@ -277,13 +321,21 @@ export default function TopScores({
                 </div>
               );
             }
-            const entry = currentScores[index] || {
+            const entry: Partial<TopScore> & {
+              name: string;
+              score: number;
+              level: number;
+            } = currentScores[index] || {
               name: "",
               score: 0,
               level: 0,
             };
+            const isMine = !!highlightCode && entry.code === highlightCode;
             return (
-              <div key={index} className="ranking__row">
+              <div
+                key={index}
+                className={`ranking__row ${isMine ? "ranking__row--mine" : ""}`}
+              >
                 <span className="ranking__cell ranking__cell--rank">
                   <span className={rankToneClass(index)}>
                     {String(index + 1).padStart(2, "0")}
@@ -305,6 +357,27 @@ export default function TopScores({
               </div>
             );
           })}
+          {showOwnRank && roomRank && (
+            <>
+              <div className="ranking__row ranking__row--gap">
+                <span className="ranking__cell ranking__cell--rank">···</span>
+              </div>
+              <div className="ranking__row ranking__row--mine">
+                <span className="ranking__cell ranking__cell--rank">
+                  {String(roomRank.rank).padStart(2, "0")}
+                </span>
+                <span className="ranking__cell ranking__cell--name">
+                  {roomRank.name || t("topScores.yourGame")}
+                </span>
+                <span className="ranking__cell ranking__cell--num">
+                  {String(roomRank.score).padStart(columnFormat.scoreLen, "0")}
+                </span>
+                <span className="ranking__cell ranking__cell--num">
+                  {String(roomRank.level).padStart(columnFormat.levelLen, "0")}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

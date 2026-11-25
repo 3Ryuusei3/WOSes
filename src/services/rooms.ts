@@ -3,6 +3,8 @@ import { PostgrestError } from "@supabase/supabase-js";
 
 interface ScoreRecord {
   id: number;
+  /** Room code: identifies a multiplayer game in the rankings */
+  code?: string;
   name: string;
   score: number;
   level: number;
@@ -39,6 +41,62 @@ export async function getAllTimeTopScores(
     .order("rounds", { ascending: true })
     .order("perfects", { ascending: false })
     .limit(limit);
+}
+
+export interface RoomRank {
+  /** 1-based position in the all-time ranking of its difficulty */
+  rank: number;
+  name: string;
+  score: number;
+  level: number;
+}
+
+/**
+ * Position of one finished game (room) in the all-time ranking, with the same
+ * order as getAllTimeTopScores: level desc, then score asc, then rounds asc.
+ * null while the room has no final score yet.
+ */
+export async function getRoomRank(
+  code: string,
+  difficulty: string,
+  language: string,
+): Promise<DbResponse<RoomRank>> {
+  const { data: room, error } = await supabase
+    .from("rooms")
+    .select("name, score, level, rounds")
+    .eq("code", code)
+    .eq("state", "lost")
+    .not("level", "is", null)
+    .not("score", "is", null)
+    .maybeSingle();
+  if (error || !room) return { data: null, error };
+
+  const { level, score } = room as { level: number; score: number };
+  const rounds = (room as { rounds: number | null }).rounds ?? 0;
+  const { count, error: countError } = await supabase
+    .from("rooms")
+    .select("id", { count: "exact", head: true })
+    .eq("difficulty", difficulty)
+    .eq("language", language)
+    .eq("state", "lost")
+    .not("level", "is", null)
+    .not("score", "is", null)
+    .or(
+      `level.gt.${level},` +
+        `and(level.eq.${level},score.lt.${score}),` +
+        `and(level.eq.${level},score.eq.${score},rounds.lt.${rounds})`,
+    );
+  if (countError) return { data: null, error: countError };
+
+  return {
+    data: {
+      rank: (count ?? 0) + 1,
+      name: (room as { name: string }).name,
+      score,
+      level,
+    },
+    error: null,
+  };
 }
 
 // Get weekly top scores for a specific difficulty and language

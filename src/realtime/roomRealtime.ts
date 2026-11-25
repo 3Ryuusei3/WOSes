@@ -21,6 +21,9 @@ export type RoomConnection = "idle" | "connecting" | "connected" | "reconnecting
 export interface RtRoom {
   id: number;
   code: string;
+  /** Game's name in the rankings: the group (or the host with a main
+   *  screen). Missing until the room_group_name migration is applied. */
+  name?: string | null;
   state: string; // room | loading | game | lobby | lost
   current_word: string | null;
   difficulty: string | null;
@@ -61,6 +64,30 @@ export interface RtBoard {
   host_plays?: boolean;
 }
 
+/**
+ * Host -> everyone: the summary of the level that just ended. Only the host
+ * computes it (levels advanced, next level's time and mechanics...), so it is
+ * broadcast like the board and resent while the room sits in lobby / lost,
+ * so a phone that (re)connects or reloads also gets it.
+ */
+export interface RtSummary {
+  /** The round that just ended */
+  round_id: number;
+  kind: "lobby" | "lost";
+  /** Lobby: level about to be played. Lost: level reached */
+  level: number;
+  levels_to_advance: number;
+  last_round_points: number;
+  total_points: number;
+  /** Lobby: duration of the next round, in seconds */
+  game_time: number;
+  seconds_to_remove: number;
+  number_of_rounds: number;
+  perfect_rounds: number;
+  /** Lobby: mechanics of the next level */
+  mechanics: Mechanics | null;
+}
+
 export interface RtCorrectWord {
   round_id: number;
   word: string;
@@ -84,6 +111,8 @@ export interface RoomIdentity {
   role: "host" | "player";
   playerId: number;
   name: string;
+  /** Host only: room without main screen (the host plays too) */
+  hostPlays?: boolean;
 }
 
 interface RoomRealtimeState {
@@ -97,9 +126,14 @@ interface RoomRealtimeState {
   wordsByRound: Record<number, RtCorrectWord[]>;
   /** Letras del host para la ronda actual (null hasta recibirlas) */
   board: RtBoard | null;
+  /** Resumen del último nivel que envía el host (lobby / fin) */
+  summary: RtSummary | null;
   /** Claves de presence conectadas: `host:<id>` / `player:<id>` */
   online: Record<string, true>;
   presenceReady: boolean;
+  /** The host announced (presence) that it plays too: players know it from
+   *  the waiting room on, before any board arrives. Sticky for the room. */
+  hostPlaysPresence: boolean;
   /** serverTime - localTime, en ms */
   clockOffsetMs: number;
   syncing: boolean;
@@ -120,8 +154,10 @@ const initialState = (): RoomRealtimeState => ({
   players: [],
   wordsByRound: {},
   board: null,
+  summary: null,
   online: {},
   presenceReady: false,
+  hostPlaysPresence: false,
   clockOffsetMs: 0,
   syncing: false,
   lastSyncAt: 0,
@@ -157,6 +193,8 @@ const SNAPSHOT_TIMEOUT_MS = 6000;
 class RoomRealtimeManager {
   private channel: RealtimeChannel | null = null;
   private identity: RoomIdentity | null = null;
+  /** Host: last summary sent, to answer players that ask for it */
+  private lastSummary: RtSummary | null = null;
   private watchdog: ReturnType<typeof setInterval> | null = null;
   private resyncPromise: Promise<boolean> | null = null;
   private recreating = false;
@@ -221,6 +259,7 @@ class RoomRealtimeManager {
     const ch = this.channel;
     this.channel = null;
     this.identity = null;
+    this.lastSummary = null;
     if (ch) this.disposing = this.disposeChannel(ch);
     this.set(initialState());
   }
@@ -293,6 +332,29 @@ class RoomRealtimeManager {
       .catch(() => {});
   }
 
+  /** Host: envía el resumen del último nivel (lobby / fin) a todos. */
+  sendSummary(summary: RtSummary) {
+    this.lastSummary = summary;
+    const ch = this.channel;
+    if (!ch || this.get().connection !== "connected") return;
+    void ch
+      .send({ type: "broadcast", event: "summary", payload: summary })
+      .catch(() => {});
+  }
+
+  /**
+   * Jugador sin resumen (recarga, reconexión, broadcast perdido): se lo pide
+   * al host, que contesta al recibir el mensaje. No depende de los timers del
+   * host, que el navegador ralentiza si su pestaña está en segundo plano.
+   */
+  requestSummary() {
+    const ch = this.channel;
+    if (!ch || this.get().connection !== "connected") return;
+    void ch
+      .send({ type: "broadcast", event: "summary_request", payload: {} })
+      .catch(() => {});
+  }
+
   /** Fuerza reconexión del socket y del canal + resync. */
   async forceReconnect() {
     if (!this.identity) return;
@@ -335,6 +397,16 @@ class RoomRealtimeManager {
         if (this.channel !== ch) return;
         this.applyBoard(payload as RtBoard);
       })
+      .on("broadcast", { event: "summary" }, ({ payload }) => {
+        if (this.channel !== ch) return;
+        this.applySummary(payload as RtSummary);
+      })
+      .on("broadcast", { event: "summary_request" }, () => {
+        if (this.channel !== ch) return;
+        if (this.identity?.role === "host" && this.lastSummary) {
+          this.sendSummary(this.lastSummary);
+        }
+      })
       .on("broadcast", { event: "players" }, ({ payload }) => {
         if (this.channel !== ch) return;
         const p = payload as { players: RtPlayer[]; server_time: string };
@@ -342,9 +414,17 @@ class RoomRealtimeManager {
       })
       .on("presence", { event: "sync" }, () => {
         if (this.channel !== ch) return;
+        const state = ch.presenceState<{ role?: string; host_plays?: boolean }>();
         const online: Record<string, true> = {};
-        for (const key of Object.keys(ch.presenceState())) online[key] = true;
-        this.set({ online, presenceReady: true });
+        for (const key of Object.keys(state)) online[key] = true;
+        const hostPlays = Object.values(state).some((metas) =>
+          metas.some((m) => m.role === "host" && m.host_plays === true),
+        );
+        this.set({
+          online,
+          presenceReady: true,
+          hostPlaysPresence: this.get().hostPlaysPresence || hostPlays,
+        });
       })
       .subscribe((status) => {
         if (this.channel !== ch) return;
@@ -354,6 +434,7 @@ class RoomRealtimeManager {
             role: id.role,
             playerId: id.playerId,
             name: id.name,
+            host_plays: id.role === "host" && id.hostPlays === true,
             at: Date.now(),
           });
           // Nos hemos podido perder eventos mientras no estábamos unidos
@@ -517,7 +598,21 @@ class RoomRealtimeManager {
     // Las letras de una ronda anterior ya no sirven
     const board =
       s.board && p.round && s.board.round_id < p.round.id ? null : s.board;
-    this.set({ room: p.room, round: p.round, wordsByRound, board });
+    // El resumen de un nivel anterior tampoco
+    const summary =
+      s.summary && p.round && s.summary.round_id < p.round.id
+        ? null
+        : s.summary;
+    this.set({ room: p.room, round: p.round, wordsByRound, board, summary });
+  }
+
+  private applySummary(sm: RtSummary) {
+    if (!sm || !sm.round_id || (sm.kind !== "lobby" && sm.kind !== "lost")) {
+      return;
+    }
+    const round = this.get().round;
+    if (round && sm.round_id < round.id) return;
+    this.set({ summary: sm });
   }
 
   private applyBoard(b: RtBoard) {

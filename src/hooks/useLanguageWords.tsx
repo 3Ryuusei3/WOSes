@@ -20,26 +20,26 @@ const DIFFICULTY_WORDS_EN = {
   hard: wordsDataEn,
 };
 
+type WordsDifficulty = keyof typeof DIFFICULTY_WORDS_ES;
+
+const isWordsDifficulty = (value: unknown): value is WordsDifficulty =>
+  typeof value === "string" && Object.prototype.hasOwnProperty.call(DIFFICULTY_WORDS_ES, value);
+
 const useLanguageWords = (difficulty: Difficulty) => {
   const { i18n } = useTranslation();
   const { dailyChallengeOriginalDifficulty } = useGameStore();
 
   const getWordsForLanguage = () => {
-    const effectiveDifficulty =
-      difficulty === "daily" && dailyChallengeOriginalDifficulty
-        ? dailyChallengeOriginalDifficulty
-        : difficulty === "daily"
-          ? "medium"
-          : difficulty;
+    const requested =
+      difficulty === "daily" ? dailyChallengeOriginalDifficulty : difficulty;
+    // Unknown values (old saved state, a room or daily challenge with another
+    // name) fall back to medium instead of crashing the whole page
+    const effectiveDifficulty: WordsDifficulty = isWordsDifficulty(requested)
+      ? requested
+      : "medium";
 
-    if (i18n.language === "en") {
-      return DIFFICULTY_WORDS_EN[
-        effectiveDifficulty as "easy" | "medium" | "hard"
-      ].words;
-    }
-    return DIFFICULTY_WORDS_ES[
-      effectiveDifficulty as "easy" | "medium" | "hard"
-    ].words;
+    const table = i18n.language === "en" ? DIFFICULTY_WORDS_EN : DIFFICULTY_WORDS_ES;
+    return table[effectiveDifficulty].words;
   };
 
   return {

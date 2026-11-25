@@ -71,6 +71,10 @@ interface GameState {
   /** Creating a room: the host also plays (no main/shared screen) */
   hostPlays: boolean;
   setHostPlays: (hostPlays: boolean) => void;
+  /** Room without main screen: the group's name (global ranking), apart
+   *  from the host's own player name. Remembered. */
+  groupName: string;
+  setGroupName: (name: string) => void;
   setVolume: (volume: number) => void;
   currentChallengeNumber: number | null;
   setCurrentChallengeNumber: (num: number | null) => void;
@@ -81,6 +85,8 @@ interface GameState {
   dailyChallengeInitialTime: number | null;
   setDailyChallengeInitialTime: (time: number | null) => void;
 }
+
+const VALID_DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard", "daily"];
 
 const useGameStore = create<GameState>()(
   persist(
@@ -167,6 +173,8 @@ const useGameStore = create<GameState>()(
       setNameModalOpen: (nameModalOpen) => set({ nameModalOpen }),
       hostPlays: false,
       setHostPlays: (hostPlays) => set({ hostPlays }),
+      groupName: "",
+      setGroupName: (groupName) => set({ groupName }),
       previousRoundsWords: [],
       setPreviousRoundsWords: (words) =>
         set((state) => ({
@@ -197,12 +205,22 @@ const useGameStore = create<GameState>()(
         if (version < 1 && isMobileUserAgent()) state.volume = 0;
         return state as GameState;
       },
+      // Saved state from older versions may hold a difficulty that no longer
+      // exists: keep the default instead of breaking the game
+      merge: (persisted, current) => {
+        const state = { ...(persisted as Partial<GameState>) };
+        if (!VALID_DIFFICULTIES.includes(state.gameDifficulty as Difficulty)) {
+          delete state.gameDifficulty;
+        }
+        return { ...current, ...state };
+      },
       partialize: (state) => ({
         playerName: state.playerName,
         volume: state.volume,
         gameDifficulty: state.gameDifficulty,
         // Remembered choice; also survives a reload of the host mid-game
         hostPlays: state.hostPlays,
+        groupName: state.groupName,
       }),
     },
   ),

@@ -1182,14 +1182,31 @@ main {
   height: 0.875rem;
   border: var(--border-width) solid var(--clr-border-secondary);
   box-shadow: 0 0 0 var(--box-shadow-width) var(--clr-border-primary);
-  background: linear-gradient(
-    to right,
-    var(--clr-progress-color) 0%,
-    var(--clr-progress-color) var(--remaining-percentage),
-    var(--clr-progress-bg) var(--remaining-percentage),
-    var(--clr-progress-bg) 100%
-  );
-  transition: all 0.1s linear;
+  background: var(--clr-progress-bg);
+  overflow: hidden;
+}
+
+// Remaining time: scaled down from the left by a CSS animation (GPU), not by
+// re-rendering React every frame
+.progress__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--clr-progress-color);
+  transform-origin: left center;
+  will-change: transform;
+  animation-name: progress-drain;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  transition: background-color 0.3s ease;
+}
+
+@keyframes progress-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
 }
 
 .progress__reveal-marker {
@@ -1371,6 +1388,21 @@ main {
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
+  }
+
+  // This multiplayer game in the global ranking (rows are display: contents,
+  // so the cells carry the colour)
+  .ranking__row--mine > .ranking__cell,
+  .ranking__row--mine > .ranking__cell > span {
+    color: var(--clr-win) !important;
+    text-shadow: 0 var(--text-shadow-position) 0 var(--clr-win-highlight);
+  }
+
+  // "···" between the top 10 and this game's own position
+  .ranking__row--gap > .ranking__cell {
+    grid-column: 1 / -1;
+    opacity: 0.6;
+    line-height: 0.8;
   }
 
   .ranking__row--head > .ranking__cell {
@@ -3081,5 +3113,158 @@ html:has(.keyboard-reserve) {
   img {
     width: 0.875rem;
     height: 0.875rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Room before the game: invite (QR) / players
+// ---------------------------------------------------------------------------
+.room-lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  width: 100%;
+  max-width: 32rem;
+  margin-inline: auto;
+
+  > .segmented-tabs {
+    width: 100%;
+  }
+
+  // Host with a main screen (desktop): QR and players side by side, big
+  &:has(.room-lobby__split) {
+    max-width: 60rem;
+  }
+}
+
+.room-lobby__split {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 2rem;
+
+  .room-invite__qr {
+    width: 20rem;
+  }
+
+  .room-players {
+    flex: 1 1 0;
+    min-width: 20rem;
+  }
+}
+
+.room-invite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.room-invite__qr {
+  width: min(17rem, 70vw);
+  aspect-ratio: 1;
+  line-height: 0;
+}
+
+.room-players {
+  gap: 1rem;
+  min-height: 16rem;
+}
+
+// Summary / ranking / global top tabs: readable width on wide desktops
+.multi-tab-panel {
+  max-width: 40rem;
+  margin-inline: auto;
+  gap: 0.75rem;
+}
+
+.mobile {
+  .room-lobby {
+    gap: 0.75rem;
+  }
+
+  .room-invite__qr {
+    width: min(15rem, 62vw);
+  }
+
+  .room-players {
+    min-height: 0;
+  }
+}
+
+// Room ranking inside the multiplayer tabs: readable on a desktop screen
+html:not(.mobile) .multi-tab-panel {
+  h5 {
+    font-size: 1.5rem;
+  }
+  .presence-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+}
+
+// Multiplayer end screen, summary tab: stats 2x2 | last words
+.lost-summary {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1.5rem;
+  width: 100%;
+
+  > .score__container--box {
+    flex: 0 1 auto;
+  }
+}
+
+.game__review--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: center;
+  gap: 1rem;
+}
+
+.mobile .lost-summary {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+// Create room, everyone on their device: group name under the switch. Hidden
+// (not removed) with a main screen so the panel keeps its height.
+.group-name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  input {
+    width: 100%;
+  }
+
+  &.is-hidden {
+    visibility: hidden;
+  }
+}
+
+// Three difficulties (create room, no daily challenge): one row whenever they
+// fit, so the box isn't so tall; narrow panels go back to 2 + 1
+.mode-panel {
+  container-type: inline-size;
+}
+
+.difficulty-selector:not(:has(.btn--daily)) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  .btn:last-of-type:nth-of-type(odd) {
+    grid-column: auto;
+  }
+}
+
+@container (max-width: 21rem) {
+  .difficulty-selector:not(:has(.btn--daily)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    .btn:last-of-type:nth-of-type(odd) {
+      grid-column: span 2;
+    }
   }
 }

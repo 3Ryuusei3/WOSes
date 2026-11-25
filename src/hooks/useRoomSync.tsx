@@ -95,6 +95,7 @@ export default function useRoomSync() {
         role,
         playerId,
         name: useGameStore.getState().playerName,
+        hostPlays: role === "host" && useGameStore.getState().hostPlays,
       });
     } else {
       roomRealtime.leave();
