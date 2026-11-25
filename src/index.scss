@@ -4627,12 +4627,13 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
     --accent: var(--clr-win);
     rotate: 0.75deg;
   }
+  // Remaining time: red; rounds: green
   &:nth-child(5n + 3) {
-    --accent: var(--clr-mirrored);
+    --accent: #ff3b5c;
     rotate: -0.5deg;
   }
   &:nth-child(5n + 4) {
-    --accent: #ff9a3c;
+    --accent: var(--clr-still);
     rotate: 1deg;
   }
   &:nth-child(5n + 5) {
