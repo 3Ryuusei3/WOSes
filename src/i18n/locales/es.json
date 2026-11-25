@@ -186,7 +186,11 @@
     "columnScore": "Pts",
     "columnLevel": "Nv.",
     "columnTime": "Tpo",
-    "yourGame": "TU PARTIDA"
+    "yourGame": "TU PARTIDA",
+    "inAllTime": "¡HAS ENTRADO EN EL TOP TOTAL! PUESTO {{rank}}",
+    "inWeekly": "¡HAS ENTRADO EN EL TOP SEMANAL! PUESTO {{rank}}",
+    "notIn": "ESTA VEZ NO HAS ENTRADO EN EL RANKING",
+    "notInHint": "EL 10º DEL TOP SEMANAL LLEGÓ AL NIVEL {{level}}"
   },
   "mechanics": {
     "title": "MECÁNICAS DEL JUEGO",

@@ -4976,3 +4976,105 @@ html:not(.mobile) .round-timer__warning {
   color: var(--clr-still);
   opacity: 1;
 }
+
+// Tile colours by name (each screen says which stat gets which colour)
+.stat-grid > .stat-box {
+  &.stat-box--yellow {
+    --accent: var(--clr-accent-primary);
+  }
+  &.stat-box--cyan {
+    --accent: var(--clr-win);
+  }
+  &.stat-box--red {
+    --accent: #ff3b5c;
+  }
+  &.stat-box--orange {
+    --accent: #ff9a3c;
+  }
+  &.stat-box--green {
+    --accent: var(--clr-still);
+  }
+}
+
+// End screen: room under the ribbon, stats in one row (2 × 2 in rooms),
+// words + ranking side by side, a smaller ranking that fits the screen
+.game__container--lost {
+  > .stat-grid {
+    max-width: 56rem;
+    margin: 0.75rem auto 0;
+  }
+  .stat-grid--2x2 {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .game__summary {
+    align-items: flex-start;
+  }
+  .lost-words {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .game__summary > .score__container--box {
+    flex: 1 1 0;
+    max-width: 30rem;
+    padding: 0.875rem 1rem;
+    gap: 0.5rem;
+  }
+  .ranking {
+    min-width: 0 !important;
+  }
+  .ranking__grid {
+    font-size: 1rem;
+    row-gap: 0.125rem;
+  }
+  .ranking .ranking__row {
+    padding-block: 0.0625rem;
+  }
+  .ranking__row--head > .ranking__cell {
+    font-size: 0.625rem;
+  }
+  .game__summary h2 {
+    font-size: 1.5rem;
+  }
+  .game__summary img[alt^="arrow"] {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+.mobile .game__container--lost > .stat-grid {
+  margin-top: 0.5rem;
+}
+
+// Where this game landed in the ranking (single player), under the words
+.ranking-note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.625rem 1rem;
+  font-size: 1rem;
+  text-align: center;
+  color: var(--clr-cream);
+  background: var(--clr-bg-primary-dim);
+  border: var(--ink-w) dashed var(--clr-border-secondary);
+  border-radius: 1rem;
+
+  small {
+    font-size: 0.75rem;
+    color: var(--clr-muted);
+  }
+  &--in {
+    color: var(--clr-ink);
+    background: var(--clr-still);
+    border-style: solid;
+    border-color: var(--clr-ink);
+    box-shadow: 0 0.25rem 0 var(--clr-ink);
+  }
+}
+.mobile .ranking-note {
+  font-size: 0.8125rem;
+  padding: 0.5rem 0.75rem;
+}
+.mobile-ranking[hidden] {
+  display: none !important;
+}

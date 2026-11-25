@@ -186,7 +186,11 @@
     "columnScore": "Pts",
     "columnLevel": "Lvl",
     "columnTime": "Time",
-    "yourGame": "YOUR GAME"
+    "yourGame": "YOUR GAME",
+    "inAllTime": "YOU MADE THE ALL-TIME TOP! PLACE {{rank}}",
+    "inWeekly": "YOU MADE THIS WEEK'S TOP! PLACE {{rank}}",
+    "notIn": "YOU DIDN'T MAKE THE RANKING THIS TIME",
+    "notInHint": "THIS WEEK'S 10TH REACHED LEVEL {{level}}"
   },
   "mechanics": {
     "title": "GAME MECHANICS",

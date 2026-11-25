@@ -30,17 +30,20 @@ export default function LobbyStatsContainer({
   return (
     <div className="stat-grid">
       <StatBox
+        accent="yellow"
         label={t("common.levelPoints", { level: level - levelsToAdvance })}
         value={lastRoundPoints}
         size="sm"
       />
       <StatBox
+        accent="cyan"
         label={t("common.totalPoints")}
         value={totalPoints}
         delta={lastRoundPoints > 0 ? `+${lastRoundPoints}` : undefined}
         size="sm"
       />
       <StatBox
+        accent="red"
         label={t("common.remainingTime")}
         value={`${gameTime}${t("common.seconds")}`}
         tone={perfect ? "good" : secondsToRemove > 0 ? "bad" : undefined}
@@ -54,12 +57,14 @@ export default function LobbyStatsContainer({
         size="sm"
       />
       <StatBox
+        accent="orange"
         label={t("common.numberOfRounds")}
         value={numberOfRounds}
         delta="+1"
         size="sm"
       />
       <StatBox
+        accent="green"
         label={t("common.perfectRounds")}
         value={numberOfPerfectRounds}
         tone={perfect ? "good" : undefined}

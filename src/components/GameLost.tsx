@@ -88,6 +88,12 @@ export default function GameLost() {
     "summary" | "words" | "ranking" | "top"
   >("summary");
   const { words } = useLanguageWords(gameDifficulty);
+  // Single player: did this game make it into the ranking?
+  const [placement, setPlacement] = useState<{
+    allTime: number | null;
+    weekly: number | null;
+    weeklyLast: { level: number; score: number } | null;
+  } | null>(null);
   const { forceReconnect, isConnected } = useRealtimeConnection();
   const roomManager = useRoomManager();
   const isMulti = players === "multi";
@@ -287,8 +293,40 @@ export default function GameLost() {
       challengeNumber={currentChallengeNumber!}
     />
   ) : (
-    <TopScores hasTooltip difficulty={gameDifficulty} />
+    <TopScores
+      hasTooltip
+      difficulty={gameDifficulty}
+      ownGame={
+        isMulti ? undefined : { name: playerName, score: totalPoints, level }
+      }
+      onOwnPlacement={isMulti ? undefined : setPlacement}
+    />
   );
+
+  // Under the words: where this game landed in the ranking (single player)
+  const placementNote =
+    !isMulti && !isDailyChallenge && placement ? (
+      placement.allTime ? (
+        <p className="ranking-note ranking-note--in">
+          {t("topScores.inAllTime", { rank: placement.allTime })}
+        </p>
+      ) : placement.weekly ? (
+        <p className="ranking-note ranking-note--in">
+          {t("topScores.inWeekly", { rank: placement.weekly })}
+        </p>
+      ) : (
+        <p className="ranking-note">
+          {t("topScores.notIn")}
+          {placement.weeklyLast && (
+            <small>
+              {t("topScores.notInHint", {
+                level: placement.weeklyLast.level,
+              })}
+            </small>
+          )}
+        </p>
+      )
+    ) : null;
 
   const showSummary = isMulti
     ? multiTab === "summary"
@@ -329,66 +367,61 @@ export default function GameLost() {
     </div>
   );
 
-  const reviewBlock = (isDailyChallenge ? (
-            <div className="game__review">
-              <div className="v-section">
-                <StatBox
-                  label={t("common.totalPoints")}
-                  value={totalPoints}
-                  size="sm"
-                />
-              </div>
-              <div className="v-section">
-                <StatBox
-                  label={t("common.remainingTime")}
-                  value={`${gameTime}s`}
-                  size="sm"
-                />
-              </div>
-            </div>
-          ) : stats ? (
-            <div
-              className={`game__review ${isMulti ? "game__review--grid" : ""}`}
-            >
-              <div className="v-section">
-                <StatBox
-                  label={t("common.reachedLevel")}
-                  value={stats.level}
-                  size="sm"
-                />
-              </div>
-              <div className="v-section">
-                <StatBox
-                  label={t("common.totalPoints")}
-                  value={stats.totalPoints}
-                  size="sm"
-                />
-              </div>
-              <div className="v-section">
-                <StatBox
-                  label={t("common.numberOfRounds")}
-                  value={stats.numberOfRounds}
-                  size="sm"
-                />
-              </div>
-              <div className="v-section">
-                <StatBox
-                  label={t("common.perfectRounds")}
-                  value={stats.numberOfPerfectRounds}
-                  size="sm"
-                />
-              </div>
-            </div>
-          ) : (
-            <p className="txt-center unguessed">{t("lobby.loadingSummary")}</p>
-          ));
+  const reviewBlock = isDailyChallenge ? (
+    <div className="stat-grid">
+      <StatBox
+        label={t("common.totalPoints")}
+        value={totalPoints}
+        accent="cyan"
+        size="sm"
+      />
+      <StatBox
+        label={t("common.remainingTime")}
+        value={`${gameTime}s`}
+        accent="red"
+        size="sm"
+      />
+    </div>
+  ) : stats ? (
+    <div className={`stat-grid ${isMulti ? "stat-grid--2x2" : ""}`}>
+      <StatBox
+        label={t("common.reachedLevel")}
+        value={stats.level}
+        accent="yellow"
+        size="sm"
+      />
+      <StatBox
+        label={t("common.totalPoints")}
+        value={stats.totalPoints}
+        accent="cyan"
+        size="sm"
+      />
+      <StatBox
+        label={t("common.numberOfRounds")}
+        value={stats.numberOfRounds}
+        accent="orange"
+        size="sm"
+      />
+      <StatBox
+        label={t("common.perfectRounds")}
+        value={stats.numberOfPerfectRounds}
+        accent="green"
+        size="sm"
+      />
+    </div>
+  ) : (
+    <p className="txt-center unguessed">{t("lobby.loadingSummary")}</p>
+  );
 
   const wordsBlock = (
-    <WordListDisplay
-      lastLevelWords={namedLastWords}
-      columns={3}
-      playerName={isMulti ? playerName : undefined}
-    />
+    <div className="v-section gap-sm lost-words">
+      <WordListDisplay
+        lastLevelWords={namedLastWords}
+        columns={3}
+        playerName={isMulti ? playerName : undefined}
+      />
+      {placementNote}
+    </div>
   );
 
   return (
@@ -448,15 +481,20 @@ export default function GameLost() {
         {showSummary && !isMulti && reviewBlock}
         {showSummary && !isMulti && !isMobileUa && (
           <div className="game__summary">
-            <div className="v-section gap-md">{wordsBlock}</div>
+            {wordsBlock}
             <div className="score__container--box pos-rel">{ranking}</div>
           </div>
         )}
         {isMobileUa &&
           (isMulti ? multiTab === "words" : mobileTab === "words") &&
           wordsBlock}
-        {!isMulti && isMobileUa && mobileTab === "ranking" && (
-          <div className="score__container--box dark w100 mobile-ranking">
+        {/* Always mounted on phones (hidden outside its tab), so the note
+            under the words knows where this game landed */}
+        {!isMulti && isMobileUa && (
+          <div
+            className="score__container--box dark w100 mobile-ranking"
+            hidden={mobileTab !== "ranking"}
+          >
             {ranking}
           </div>
         )}

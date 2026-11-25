@@ -32,6 +32,14 @@ interface TopScoresProps {
   /** Multiplayer game to highlight (its room code); also shows its position
    *  under the list when it is not in the top 10 */
   highlightCode?: string;
+  /** Single player's game just finished: highlighted when it's in the list,
+   *  and its place (or null) reported for each ranking */
+  ownGame?: { name: string; score: number; level: number };
+  onOwnPlacement?: (placement: {
+    allTime: number | null;
+    weekly: number | null;
+    weeklyLast: TopScore | null;
+  }) => void;
 }
 
 export default function TopScores({
@@ -39,6 +47,8 @@ export default function TopScores({
   difficulty = "hard",
   challengeNumber,
   highlightCode,
+  ownGame,
+  onOwnPlacement,
 }: TopScoresProps) {
   const { t, i18n } = useTranslation();
   const { highestScore } = useGameStore();
@@ -151,6 +161,35 @@ export default function TopScores({
     return () => ids.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightCode, isDaily, roomRank === null]);
+
+  // Where the player's own (single player) game landed in each list
+  const isOwn = (e: Partial<TopScore> | undefined) =>
+    !!ownGame &&
+    !!e &&
+    e.name === ownGame.name &&
+    e.score === ownGame.score &&
+    e.level === ownGame.level;
+  const ownAllTime = ownGame ? allTimeScores.findIndex(isOwn) : -1;
+  const ownWeekly = ownGame ? weeklyScores.findIndex(isOwn) : -1;
+  const loaded = allTimeScores.length > 0 || weeklyScores.length > 0;
+  useEffect(() => {
+    if (!ownGame || !onOwnPlacement || !loaded) return;
+    onOwnPlacement({
+      allTime: ownAllTime >= 0 ? ownAllTime + 1 : null,
+      weekly: ownWeekly >= 0 ? ownWeekly + 1 : null,
+      weeklyLast: weeklyScores.length >= 10 ? weeklyScores[9] : null,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ownAllTime, ownWeekly, loaded, weeklyScores.length]);
+
+  // Our own game is saved a moment after the end screen shows up: look again
+  // a couple of times until it's in
+  useEffect(() => {
+    if (!ownGame || isDaily) return;
+    const ids = [2500, 6000].map((ms) => setTimeout(fetchScores, ms));
+    return () => ids.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!ownGame, isDaily]);
 
   const toggleRanking = () => {
     setShowAllTime((prev) => !prev);
@@ -334,7 +373,9 @@ export default function TopScores({
               score: 0,
               level: 0,
             };
-            const isMine = !!highlightCode && entry.code === highlightCode;
+            const isMine =
+              (!!highlightCode && entry.code === highlightCode) ||
+              isOwn(entry);
             return (
               <div
                 key={index}
