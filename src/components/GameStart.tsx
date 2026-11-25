@@ -283,6 +283,10 @@ export default function GameStart() {
     }
   };
 
+  const retryNote = alreadyPlayed && shownRankingDifficulty === "daily" && (
+    <p className="daily-retry-note">{t("dailyChallenge.retryNote")}</p>
+  );
+
   const rankingPanel = (
     <>
       {/* Mobile only: on desktop the ranking follows the selected difficulty */}
@@ -301,21 +305,19 @@ export default function GameStart() {
           size="sm"
         />
       )}
-      {alreadyPlayed && shownRankingDifficulty === "daily" && (
-        <p className="daily-retry-note">{t("dailyChallenge.retryNote")}</p>
-      )}
-      {shownRankingDifficulty === "daily" && !dailyChallenge ? (
-        <p className="txt-center">{t("common.loading")}</p>
-      ) : (
-        <TopScores
-          difficulty={shownRankingDifficulty}
-          challengeNumber={
-            shownRankingDifficulty === "daily"
-              ? dailyChallenge?.challenge_number
-              : undefined
-          }
-        />
-      )}
+      {/* Desktop: the note on top; phones: under the box (same box size
+          for every ranking) */}
+      {!isMobileUa && retryNote}
+      {/* Daily challenge still loading: same box (title, empty rows) */}
+      <TopScores
+        difficulty={shownRankingDifficulty}
+        challengeNumber={
+          shownRankingDifficulty === "daily"
+            ? dailyChallenge?.challenge_number
+            : undefined
+        }
+        loading={shownRankingDifficulty === "daily" && !dailyChallenge}
+      />
     </>
   );
 
@@ -523,6 +525,7 @@ export default function GameStart() {
                 <div className="score__container--box dark w100 mobile-ranking">
                   {rankingPanel}
                 </div>
+                {retryNote}
                 <button
                   type="button"
                   className="btn btn--sm btn--ghost mx-auto"

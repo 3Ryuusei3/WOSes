@@ -40,6 +40,8 @@ interface TopScoresProps {
     weekly: number | null;
     weeklyLast: TopScore | null;
   }) => void;
+  /** Data not there yet (daily challenge loading): "loading" in the box */
+  loading?: boolean;
 }
 
 export default function TopScores({
@@ -49,6 +51,7 @@ export default function TopScores({
   highlightCode,
   ownGame,
   onOwnPlacement,
+  loading = false,
 }: TopScoresProps) {
   const { t, i18n } = useTranslation();
   const { highestScore } = useGameStore();
@@ -85,7 +88,9 @@ export default function TopScores({
 
   const fetchScores = async () => {
     try {
-      if (isDaily && challengeNumber) {
+      if (isDaily) {
+        // Challenge not loaded yet: nothing to ask for
+        if (!challengeNumber) return;
         const { data: dailyData, error: dailyError } =
           await getDailyChallengeRanking(challengeNumber);
         if (dailyError) throw dailyError;
@@ -259,7 +264,9 @@ export default function TopScores({
   return (
     <div className={`v-section ${hasTooltip ? "gap-xs" : "gap-md"}`}>
       <div className="h-section f-jc-sb f-ai-c">
-        {!isDaily && (
+        {/* The daily challenge has one ranking (no arrows): same-size gaps
+            instead, so the box looks and measures the same */}
+        {!isDaily ? (
           <img
             src={arrowLeft}
             alt="arrow-left"
@@ -267,6 +274,8 @@ export default function TopScores({
             height={46}
             onClick={toggleRanking}
           />
+        ) : (
+          <span className="top-scores__arrow-gap" aria-hidden="true" />
         )}
         {/* Title and difficulty centered between the arrows */}
         <div className="v-section f-ai-c txt-center">
@@ -299,19 +308,21 @@ export default function TopScores({
                     : t("topScores.thisWeek")}
               </h2>
               {isDaily ? (
-                <p>
-                  {t("dailyChallenge.challengeNumber", {
-                    number: challengeNumber,
-                  })}{" "}
-                  - {today}
+                <p className="txt-center top-scores__sub">
+                  {challengeNumber
+                    ? `${t("dailyChallenge.challengeNumber", { number: challengeNumber })} · `
+                    : ""}
+                  {today}
                 </p>
               ) : (
-                <p className="txt-center">{t(`difficulties.${difficulty}`)}</p>
+                <p className="txt-center top-scores__sub">
+                  {t(`difficulties.${difficulty}`)}
+                </p>
               )}
             </>
           )}
         </div>
-        {!isDaily && (
+        {!isDaily ? (
           <img
             src={arrowRight}
             alt="arrow-right"
@@ -319,6 +330,8 @@ export default function TopScores({
             height={46}
             onClick={toggleRanking}
           />
+        ) : (
+          <span className="top-scores__arrow-gap" aria-hidden="true" />
         )}
       </div>
 
@@ -329,7 +342,11 @@ export default function TopScores({
           </Tooltip>
         )}
         {/* Nobody yet: a message instead of empty rows */}
-        {isEmpty && <p className="ranking__empty">{t("topScores.empty")}</p>}
+        {isEmpty && (
+          <p className="ranking__empty">
+            {loading ? t("common.loading") : t("topScores.empty")}
+          </p>
+        )}
         <div className={`ranking__grid ${isEmpty ? "is-empty" : ""}`}>
           <div className="ranking__row ranking__row--head">
             <span className="ranking__cell ranking__cell--rank"></span>

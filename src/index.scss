@@ -5981,3 +5981,10 @@ html:not(.mobile) main:has(.game__container--home) {
     flex: 0 0 auto;
   }
 }
+
+// Daily challenge ranking: arrow-sized gaps where the arrows would be
+.top-scores__arrow-gap {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+}
