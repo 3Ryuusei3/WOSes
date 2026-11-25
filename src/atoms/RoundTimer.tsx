@@ -37,12 +37,17 @@ export default function RoundTimer({
         : "ok";
 
 
+  // Last 10 seconds: a beat every second (the key restarts the animation)
+  // and a warning under the clock
+  const urgent = seconds > 0 && seconds <= 10;
+
   return (
     <div
-      className={`round-timer round-timer--${tone}`}
+      className={`round-timer round-timer--${tone} ${urgent ? "round-timer--urgent" : ""}`}
       role="timer"
       aria-label={t("game.secondsLeft", { count: seconds })}
     >
+      <div className="round-timer__beat" key={urgent ? seconds : "calm"}>
       <svg className="round-timer__ring" viewBox="0 0 100 100" aria-hidden="true">
         <circle className="round-timer__track" cx="50" cy="50" r={R} />
         <RingFill
@@ -55,6 +60,12 @@ export default function RoundTimer({
         <span className="round-timer__secs">{seconds}</span>
         <small className="round-timer__unit">{t("game.secondsShort")}</small>
       </span>
+      </div>
+      {urgent && (
+        <span className="round-timer__warning" role="status">
+          {t("game.lastSecondsWarning")}
+        </span>
+      )}
     </div>
   );
 }

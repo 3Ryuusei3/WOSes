@@ -162,7 +162,9 @@
     "secondsShort": "SEG",
     "secondsLeft_one": "Queda {{count}} segundo",
     "secondsLeft_other": "Quedan {{count}} segundos",
-    "goalReached": "¡OBJETIVO CONSEGUIDO!"
+    "goalReached": "¡OBJETIVO CONSEGUIDO!",
+    "wordMeaningHint": "TOCA UNA PALABRA PARA VER SU SIGNIFICADO EN LA RAE. SI NO APARECE, PRUEBA A BUSCARLA CON TILDE",
+    "lastSecondsWarning": "¡ÚLTIMOS SEGUNDOS!"
   },
   "howToPlay": {
     "title": "¿CÓMO JUGAR?",

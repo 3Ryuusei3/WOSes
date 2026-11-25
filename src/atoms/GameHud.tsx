@@ -50,6 +50,14 @@ export default function GameHud({
   const goalReached = !isDaily && points >= goalPoints;
   const allFound = words.length > 0 && guessedCount === words.length;
 
+  // Round won: the page background warms up (see html.is-round-won) and
+  // stays so until the round ends
+  useEffect(() => {
+    const html = document.documentElement;
+    html.classList.toggle("is-round-won", goalReached || allFound);
+    return () => html.classList.remove("is-round-won");
+  }, [goalReached, allFound]);
+
   // The moment the round is won (goal reached / every word found): a short
   // celebration over the board
   const [burst, setBurst] = useState<"goal" | "all" | null>(null);

@@ -71,12 +71,8 @@
   font-family: var(--font-display);
   font-weight: 400;
   color: var(--clr-text-secondary);
+  // The dots are drawn by body::before (they drift slowly)
   background-color: var(--clr-bg-primary);
-  background-image: radial-gradient(
-    var(--clr-border-primary) 0.125rem,
-    transparent 0.1625rem
-  );
-  background-size: 1.375rem 1.375rem;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   font-variant-numeric: tabular-nums;
@@ -3515,8 +3511,8 @@ html:not(.mobile) .multi-tab-panel {
   font-size: 1.5rem;
 }
 
-// Last level's words on the lobby / end screens: same tiles as the board,
-// with every letter shown (missed words muted)
+// Last level's words on the lobby / end screens: plain words in columns,
+// found ones lit, missed ones muted; each opens the dictionary
 .word-review {
   background-color: var(--clr-dark);
   box-shadow: none;
@@ -3525,54 +3521,6 @@ html:not(.mobile) .multi-tab-panel {
     text-shadow: none;
   }
 }
-.wordlist--review {
-  // Sized by its words (it sits in a box next to other boxes)
-  grid-template-columns: repeat(var(--wordlist-columns), auto);
-  width: auto;
-  justify-content: center;
-  column-gap: 0.875rem;
-
-  .word {
-    text-decoration: none;
-    color: inherit !important;
-  }
-  .letter {
-    width: 1.5rem;
-    height: 1.5rem;
-    font-size: 0.9375rem;
-    transform: none;
-
-    span {
-      opacity: 1;
-    }
-  }
-  .word--missed .letter {
-    color: var(--clr-text-terciary);
-  }
-  .word:hover {
-    border-color: var(--clr-cream);
-  }
-  .word:focus-visible {
-    outline: 0.1875rem solid var(--clr-accent-primary);
-    outline-offset: 0.0625rem;
-  }
-}
-.mobile .wordlist--review {
-  container-type: normal;
-  column-gap: 0.5rem;
-
-  .word {
-    container-type: normal;
-  }
-  // Fits the phone's width whatever the columns and the longest word
-  .letter {
-    --tile: min(
-      1.25rem,
-      (100vw - 5rem) / var(--wordlist-columns, 3) / var(--letters, 7) - 2px
-    );
-  }
-}
-
 // Panels that get focus (Enter to continue): no focus ring
 .game__container:focus {
   outline: none;
@@ -4668,4 +4616,287 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
   .round-burst__spark {
     display: none;
   }
+}
+
+.word-review {
+  gap: 0.5rem;
+}
+.word-review__hint {
+  max-width: 36rem;
+  margin-inline: auto;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: var(--clr-muted);
+  text-align: center;
+  text-shadow: none;
+}
+.word-review__list {
+  display: grid;
+  grid-template-rows: repeat(var(--wordlist-rows), auto);
+  grid-template-columns: repeat(var(--wordlist-columns), auto);
+  grid-auto-flow: column;
+  justify-content: center;
+  gap: 0.125rem 1.75rem;
+  margin-top: 0.25rem;
+}
+.word-review__word {
+  display: inline-block;
+  padding: 0.0625rem 0.375rem;
+  font-size: 1.25rem;
+  letter-spacing: 0.03em;
+  border-radius: 0.5rem;
+  color: var(--clr-text-terciary) !important;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
+  transition:
+    background-color 0.15s ease,
+    text-decoration-color 0.15s ease;
+
+  &.is-found {
+    color: var(--clr-accent-primary) !important;
+    text-shadow: 0 0.125rem 0 var(--clr-ink);
+  }
+  &.is-other {
+    color: var(--clr-cream) !important;
+    text-shadow: 0 0.125rem 0 var(--clr-ink);
+  }
+  &:hover,
+  &:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    text-decoration-color: currentColor;
+  }
+  &:focus-visible {
+    outline: 0.125rem solid var(--clr-accent-primary);
+  }
+}
+.mobile {
+  .word-review__list {
+    gap: 0 0.75rem;
+  }
+  .word-review__word {
+    font-size: 0.9375rem;
+    padding: 0.0625rem 0.25rem;
+  }
+  .word-review__hint {
+    font-size: 0.5625rem;
+  }
+}
+
+// Stat tiles with some life: each with its colour band, value in that
+// colour, slightly tilted like stickers
+.stat-grid > .stat-box {
+  --accent: var(--clr-accent-primary);
+  position: relative;
+  overflow: hidden;
+  padding-top: 0.875rem;
+  border-width: var(--ink-w);
+  box-shadow: 0 0.3125rem 0 var(--clr-ink);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 0.375rem;
+    background: var(--accent);
+    border-bottom: 0.125rem solid var(--clr-ink);
+  }
+  h3 {
+    color: var(--accent);
+  }
+  &:nth-child(5n + 1) {
+    --accent: var(--clr-accent-primary);
+    rotate: -1deg;
+  }
+  &:nth-child(5n + 2) {
+    --accent: var(--clr-win);
+    rotate: 0.75deg;
+  }
+  &:nth-child(5n + 3) {
+    --accent: var(--clr-lose);
+    rotate: -0.5deg;
+  }
+  &:nth-child(5n + 4) {
+    --accent: var(--clr-still);
+    rotate: 1deg;
+  }
+  &:nth-child(5n + 5) {
+    --accent: var(--clr-mirrored);
+    rotate: -0.75deg;
+  }
+  h3.stat-good {
+    color: var(--clr-still);
+  }
+  h3.stat-bad {
+    color: var(--clr-lose);
+  }
+}
+.mobile .stat-grid > .stat-box {
+  rotate: none;
+  padding-top: 0.625rem;
+
+  &::before {
+    height: 0.25rem;
+  }
+}
+
+// Next challenge: dark card with a yellow outline (the yellow was too much)
+.next-challenges.score__container--box {
+  color: var(--clr-cream);
+  background: var(--clr-dark);
+  border-color: var(--clr-accent-primary);
+  box-shadow: 0 var(--ink-drop-lg) 0 var(--clr-ink);
+
+  > p {
+    align-self: center;
+    padding: 0.125rem 0.75rem;
+    color: var(--clr-ink);
+    background: var(--clr-accent-primary);
+    border: 0.125rem solid var(--clr-ink);
+    border-radius: 999px;
+  }
+  .no-challenges-info {
+    color: var(--clr-cream);
+    text-shadow: 0 0.125rem 0 var(--clr-ink);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Background: dots drifting slowly forever (a fixed layer moved with a
+// transform, so it's cheap). Round won: a warm yellow glow and yellow dots
+// fade in over the purple and stay until the round ends.
+// ---------------------------------------------------------------------------
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: -1.375rem;
+  z-index: -1;
+  pointer-events: none;
+  background-size: 1.375rem 1.375rem;
+  animation: bg-drift 14s linear infinite;
+}
+body::before {
+  background-image: radial-gradient(
+    var(--clr-border-primary) 0.125rem,
+    transparent 0.1625rem
+  );
+}
+body::after {
+  opacity: 0;
+  background-image:
+    radial-gradient(rgba(255, 204, 31, 0.55) 0.125rem, transparent 0.1625rem),
+    radial-gradient(
+      ellipse 80% 55% at 50% 0%,
+      rgba(255, 204, 31, 0.28),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 50% 100%,
+      rgba(255, 154, 60, 0.22),
+      transparent 70%
+    );
+  background-size:
+    1.375rem 1.375rem,
+    100% 100%,
+    100% 100%;
+  transition: opacity 1.2s ease;
+}
+html.is-round-won body::after {
+  opacity: 1;
+}
+@keyframes bg-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(1.375rem, 1.375rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+  }
+}
+
+// Last 10 seconds: the clock beats every second and a warning shows under it
+.round-timer--urgent {
+  .round-timer__beat {
+    animation: clock-beat 0.45s cubic-bezier(0.34, 1.6, 0.64, 1);
+  }
+}
+.round-timer__beat {
+  position: absolute;
+  inset: 0;
+}
+@keyframes clock-beat {
+  0% {
+    scale: 1;
+  }
+  35% {
+    scale: 1.14;
+  }
+  100% {
+    scale: 1;
+  }
+}
+.round-timer__warning {
+  position: absolute;
+  top: calc(100% + 0.625rem);
+  left: 50%;
+  translate: -50% 0;
+  z-index: 6;
+  padding: 0.25rem 0.875rem;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+  color: var(--clr-ink);
+  background: var(--clr-lose);
+  border: var(--ink-w) solid var(--clr-ink);
+  border-radius: 999px;
+  box-shadow: 0 0.25rem 0 var(--clr-ink);
+  animation: warning-in 0.35s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+@keyframes warning-in {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+.mobile .round-timer__warning {
+  top: calc(100% + 0.25rem);
+  padding: 0.0625rem 0.5rem;
+  font-size: 0.625rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .round-timer--urgent .round-timer__beat {
+    animation: none;
+  }
+}
+
+// Last seconds: the clock goes pink and its warning takes the place of the
+// "find anagrams" ribbon (hidden meanwhile)
+.round-timer--urgent {
+  --clr-progress-color: var(--clr-lose);
+
+  .round-timer__face {
+    background: var(--clr-lose);
+  }
+}
+.game-hud:has(.round-timer--urgent) + .game__container .warning-message--default {
+  visibility: hidden;
+}
+html:not(.mobile) .round-timer__warning {
+  top: calc(100% + 1.125rem);
+  font-size: 1.125rem;
+  padding: 0.25rem 1.125rem;
+}
+.mobile .round-timer__warning {
+  top: calc(100% + 1.125rem);
+  font-size: 0.75rem;
+  padding: 0.125rem 0.75rem;
 }

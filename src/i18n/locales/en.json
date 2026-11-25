@@ -162,7 +162,9 @@
     "secondsShort": "SEC",
     "secondsLeft_one": "{{count}} second left",
     "secondsLeft_other": "{{count}} seconds left",
-    "goalReached": "GOAL REACHED!"
+    "goalReached": "GOAL REACHED!",
+    "wordMeaningHint": "TAP A WORD TO SEE ITS MEANING. IF IT DOESN'T SHOW UP, TRY IT WITH ACCENTS",
+    "lastSecondsWarning": "LAST SECONDS!"
   },
   "howToPlay": {
     "title": "HOW TO PLAY?",
