@@ -74,18 +74,38 @@ export default function GameLoading() {
     }
   }, [volume, players, role]);
 
+  const go = countdown <= 0;
+  const label = go ? t("game.start") : String(Math.ceil(countdown));
+
   return (
     <>
       <div className="game__container game__container--loading">
         <h2 className="highlight">{t("game.gameStartsIn")}</h2>
-        <div className="loading__container">
-          <h2 className="highlight">
-            {countdown <= 0 ? t("game.start") : Math.ceil(countdown)}
-          </h2>
-          <div className="loading__container--box loading__container--box-xl"></div>
-          <div className="loading__container--box loading__container--box-lg"></div>
-          <div className="loading__container--box loading__container--box-md"></div>
-          <div className="loading__container--box"></div>
+        {/* Each number pops in on a fresh tile (the key restarts the
+            animation) with a ring that spreads out; "¡YA!" in green with
+            sparks */}
+        <div className="loading__container countdown" role="timer">
+          <div className="countdown__stack" aria-hidden="true">
+            <span />
+            <span />
+          </div>
+          <span
+            key={`ring-${label}`}
+            className={`countdown__ring ${go ? "is-go" : ""}`}
+            aria-hidden="true"
+          />
+          <div key={label} className={`countdown__tile ${go ? "is-go" : ""}`}>
+            <span>{label}</span>
+          </div>
+          {go &&
+            Array.from({ length: 12 }, (_, i) => (
+              <span
+                key={i}
+                className="countdown__spark"
+                style={{ "--i": i } as React.CSSProperties}
+                aria-hidden="true"
+              />
+            ))}
         </div>
       </div>
       {/* Mobile: the keyboard may already be open (started with a tap) */}
