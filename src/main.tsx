@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import '@fontsource/lilita-one/latin-400.css'
 import './index.scss'
 import './i18n/config'
+import './utils/installPrompt'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

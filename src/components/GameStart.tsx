@@ -23,6 +23,7 @@ import PlayersSelector, { type StartMode } from "../atoms/PlayersSelector";
 import QrScannerModal from "../atoms/QrScannerModal";
 import UserBadge from "../atoms/UserBadge";
 import HelpButton from "../atoms/HelpButton";
+import InstallModal from "../atoms/InstallModal";
 import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import useJoinRoom from "../hooks/useJoinRoom";
 import { saveRoomSession, unmarkRoomLeft } from "../realtime/roomSession";
@@ -71,6 +72,8 @@ export default function GameStart() {
   const [groupError, setGroupError] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  // Phones, in the browser: "Descargar" explains how to install the app
+  const [installOpen, setInstallOpen] = useState(false);
   const { join, joining, joinError, setJoinError } = useJoinRoom();
   // Installed app: the phone's camera app would open the QR link in the
   // browser, outside the app, so we offer an in-app scanner instead
@@ -91,6 +94,7 @@ export default function GameStart() {
   const [isDailyChallengeSelected, setIsDailyChallengeSelected] =
     useState(false);
   const isMobileUa = useMobileLayout();
+  const showInstall = isMobileUa && !isInstalledPwa();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -513,6 +517,15 @@ export default function GameStart() {
                     {t("common.ranking")}
                   </button>
                 )}
+                {showInstall && (
+                  <button
+                    type="button"
+                    className="btn btn--sm btn--ghost"
+                    onClick={() => setInstallOpen(true)}
+                  >
+                    {t("install.button")}
+                  </button>
+                )}
               </div>
               {!isMobileUa && (
                 <div className="start-actions">{startButton}</div>
@@ -551,6 +564,7 @@ export default function GameStart() {
       </div>
       {/* Mobile: outside the panel, stuck to the bottom of the screen */}
       {isMobileUa && <div className="screen-actions">{startButton}</div>}
+      <InstallModal isOpen={installOpen} setOpen={setInstallOpen} />
       <WordFeedbackModal
         isOpen={feedbackOpen}
         setModalOpen={setFeedbackOpen}

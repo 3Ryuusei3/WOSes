@@ -422,5 +422,27 @@
     "created": "ROOM READY!",
     "youAreIn": "YOU'RE IN!",
     "roomTitle": "ROOM {{code}}"
+  },
+  "install": {
+    "button": "DOWNLOAD",
+    "title": "GET LEXIO",
+    "intro": "ADD IT TO YOUR HOME SCREEN AND PLAY IT LIKE AN APP, FULL SCREEN.",
+    "ios": "IPHONE / IPAD",
+    "android": "ANDROID",
+    "installNow": "INSTALL NOW",
+    "steps": {
+      "ios": [
+        "OPEN LEXIO IN <b>SAFARI</b>",
+        "TAP <b>SHARE</b> (AT THE BOTTOM, OR IN THE ··· MENU)",
+        "CHOOSE <b>ADD TO HOME SCREEN</b>",
+        "TAP <b>ADD</b> AND LEXIO IS ON YOUR HOME SCREEN"
+      ],
+      "android": [
+        "OPEN LEXIO IN <b>CHROME</b>",
+        "TAP THE <b>⋮</b> MENU (TOP RIGHT)",
+        "CHOOSE <b>INSTALL APP</b> OR <b>ADD TO HOME SCREEN</b>",
+        "CONFIRM WITH <b>INSTALL</b> AND LEXIO IS ON YOUR HOME SCREEN"
+      ]
+    }
   }
 }

@@ -407,5 +407,27 @@
     "created": "¡SALA CREADA!",
     "youAreIn": "¡ESTÁS DENTRO!",
     "roomTitle": "SALA {{code}}"
+  },
+  "install": {
+    "button": "DESCARGAR",
+    "title": "DESCARGA LEXIO",
+    "intro": "AÑÁDELO A TU PANTALLA DE INICIO Y JUEGA COMO EN UNA APP, A PANTALLA COMPLETA.",
+    "ios": "IPHONE / IPAD",
+    "android": "ANDROID",
+    "installNow": "INSTALAR AHORA",
+    "steps": {
+      "ios": [
+        "ABRE LEXIO EN <b>SAFARI</b>",
+        "PULSA <b>COMPARTIR</b> (ABAJO, O DENTRO DEL MENÚ ···)",
+        "ELIGE <b>AÑADIR A PANTALLA DE INICIO</b>",
+        "PULSA <b>AÑADIR</b> Y YA TIENES LEXIO CON SU ICONO"
+      ],
+      "android": [
+        "ABRE LEXIO EN <b>CHROME</b>",
+        "PULSA EL MENÚ <b>⋮</b> (ARRIBA A LA DERECHA)",
+        "ELIGE <b>INSTALAR APLICACIÓN</b> O <b>AÑADIR A PANTALLA DE INICIO</b>",
+        "CONFIRMA CON <b>INSTALAR</b> Y YA TIENES LEXIO CON SU ICONO"
+      ]
+    }
   }
 }
