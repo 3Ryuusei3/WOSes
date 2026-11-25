@@ -4173,11 +4173,6 @@ html:not(.mobile) .game__container--home .difficulty-hint {
     top: 0.125rem;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .selectedLetter {
-    transition: none;
-  }
-}
 
 // Board rows: only as wide as their word (the found strip hugs the letters),
 // right-aligned in equal columns; the whole list no wider than it needs
@@ -4612,12 +4607,6 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
 .mobile .round-burst {
   top: calc(100% + 5rem);
 }
-@media (prefers-reduced-motion: reduce) {
-  .round-burst__spark {
-    display: none;
-  }
-}
-
 .word-review {
   gap: 0.5rem;
 }
@@ -4813,13 +4802,6 @@ html.is-round-won body::after {
     transform: translate(1.375rem, 1.375rem);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after {
-    animation: none;
-  }
-}
-
 // Last 10 seconds: the clock beats every second and a warning shows under it
 .round-timer--urgent {
   .round-timer__beat {
@@ -4872,12 +4854,6 @@ html.is-round-won body::after {
   padding: 0.0625rem 0.5rem;
   font-size: 0.625rem;
 }
-@media (prefers-reduced-motion: reduce) {
-  .round-timer--urgent .round-timer__beat {
-    animation: none;
-  }
-}
-
 // Last seconds: the clock goes pink and its warning takes the place of the
 // "find anagrams" ribbon (hidden meanwhile)
 .round-timer--urgent {

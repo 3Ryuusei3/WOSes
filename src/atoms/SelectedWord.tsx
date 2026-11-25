@@ -93,14 +93,11 @@ export default function SelectedWord({
   useLayoutEffect(() => {
     const now = new Map<string, number>();
     tileRefs.current.forEach((el, key) => now.set(key, el.offsetLeft));
-    const reduced = window.matchMedia?.(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
     let order = 0;
     now.forEach((left, key) => {
       const before = lastLeft.current.get(key);
       const el = tileRefs.current.get(key);
-      if (before === undefined || !el || reduced) return;
+      if (before === undefined || !el) return;
       const dx = before - left;
       if (Math.abs(dx) < 1) return;
       // Each tile hops along an arc (higher the further it goes), a moment
