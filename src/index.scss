@@ -5893,3 +5893,61 @@ html:not(.mobile) .game__container--home {
   width: auto;
   margin: 0;
 }
+
+// Player's last word: an empty row keeps its place until the first word
+.attempt.attempt--placeholder {
+  visibility: hidden;
+}
+
+// "Últimas palabras" info button: inside the box's corner
+.word-review > .tooltip-container {
+  top: 0.5rem;
+  right: 0.5rem;
+}
+.word-review .tooltip-content {
+  max-width: 16rem;
+}
+
+// Toasts on phones: readable text
+.mobile .toast__message {
+  font-size: 0.9375rem;
+}
+
+// Challenge / "Cómo jugar" modals: bigger text and tiles (there's room)
+.modal .instruction-slide {
+  h4 {
+    font-size: 1.375rem;
+  }
+  h6 {
+    font-size: 1.0625rem;
+  }
+}
+.mobile .modal {
+  .modal__content h2 {
+    font-size: 1.5rem;
+  }
+  .instruction-slide {
+    h4 {
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+    h6 {
+      font-size: 0.875rem;
+      line-height: 1.25;
+    }
+    .letter {
+      --tile: 1.5rem;
+    }
+  }
+  .selectedLetter {
+    --box: 2.75rem;
+  }
+}
+// ...but a long example word (6+ tiles) still fits the modal's width
+.mobile .modal .selectedWord:has(> :nth-child(6)) .selectedLetter {
+  --box: min(2.75rem, (100vw - 6rem) / 7.5);
+}
+.mobile .tooltip-content p {
+  font-size: 0.8125rem;
+  line-height: 1.3;
+}

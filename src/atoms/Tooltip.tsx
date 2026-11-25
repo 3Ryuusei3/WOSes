@@ -17,6 +17,7 @@ export default function Tooltip({ message, children }: TooltipProps) {
   const [position, setPosition] = useState<Position>({ top: 'auto', bottom: '2.5rem', left: '-0.625rem', right: 'auto' });
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const pointerType = useRef<string>("mouse");
 
   const updatePosition = () => {
     if (!tooltipRef.current || !containerRef.current) return;
@@ -50,6 +51,16 @@ export default function Tooltip({ message, children }: TooltipProps) {
     setPosition(positions);
   };
 
+  // Open: a tap anywhere else closes it
+  useEffect(() => {
+    if (!isVisible) return;
+    const close = (e: PointerEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setIsVisible(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [isVisible]);
+
   useEffect(() => {
     if (isVisible) {
       updatePosition();
@@ -67,9 +78,19 @@ export default function Tooltip({ message, children }: TooltipProps) {
     <div
       ref={containerRef}
       className="tooltip-container"
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-      onClick={() => setIsVisible(!isVisible)}
+      // Hover only with a real mouse; on touch screens a tap opens / closes
+      // it (a tap also fires mouseenter, which used to open and close it)
+      onPointerEnter={(e) => e.pointerType === "mouse" && setIsVisible(true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && setIsVisible(false)}
+      onPointerDown={(e) => {
+        pointerType.current = e.pointerType;
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        // A mouse already opened it on hover: the click keeps it open
+        if (pointerType.current === "mouse") setIsVisible(true);
+        else setIsVisible((v) => !v);
+      }}
     >
       {children}
       {isVisible && (

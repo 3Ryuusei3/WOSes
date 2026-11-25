@@ -189,7 +189,6 @@ export default function GameScreen() {
   const isEndingLevelRef = useRef<boolean>(false);
   const wordsRef = useRef(words);
 
-  const playerRoundPoints = 0; // Ahora se calcula en PlayerGameView
 
   useEffect(() => {
     wordsRef.current = words;
@@ -595,7 +594,6 @@ export default function GameScreen() {
         // sees its own letters (it doesn't receive its own broadcast)
         <PlayerGameView
           localBoard={hostPlays ? board : undefined}
-          playerRoundPoints={playerRoundPoints}
           showReconnectButton={showReconnectButton}
           connectionStatus={connectionStatus}
           syncNow={syncNow}

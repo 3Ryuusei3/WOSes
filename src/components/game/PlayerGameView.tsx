@@ -39,7 +39,6 @@ interface PlayerAttempt {
 }
 
 interface PlayerGameViewProps {
-  playerRoundPoints: number;
   showReconnectButton: boolean;
   connectionStatus: string;
   syncNow: () => void;
@@ -63,7 +62,6 @@ interface PlayerGameViewProps {
 }
 
 export default function PlayerGameView({
-  playerRoundPoints,
   showReconnectButton,
   connectionStatus,
   syncNow,
@@ -254,9 +252,6 @@ export default function PlayerGameView({
           />
         )}
         <div className="h-section gap-xs player-actions">
-          <button className="btn btn--deco btn--xs">
-            {t("common.points")} {playerRoundPoints}
-          </button>
           {!boardLocked && (
             <button
               type="button"
@@ -287,6 +282,13 @@ export default function PlayerGameView({
         <div
           className={`attemptList ${boardVisible ? "attemptList--last" : ""}`}
         >
+          {/* Board visible: the last word's row is always there (empty
+              until the first word), so nothing moves when it appears */}
+          {boardVisible && playerAttempts.length === 0 && (
+            <h4 className="attempt attempt--placeholder txt-center" aria-hidden="true">
+              {"\u00a0"}
+            </h4>
+          )}
           {(boardVisible ? playerAttempts.slice(0, 1) : playerAttempts).map(
             (it, idx) => (
               <h4

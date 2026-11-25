@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import Word from "../types/Word";
 import useGameStore from "../store/useGameStore";
 import { getDictionaryUrl } from "../utils";
+import Tooltip from "./Tooltip";
 
 interface WordListDisplayProps {
   lastLevelWords: Word[];
@@ -28,8 +29,12 @@ export default function WordListDisplay({
   const markOthers = !!playerName && (role === "player" || hostPlays);
 
   return (
-    <div className="v-section score__container--box word-review">
+    <div className="v-section score__container--box word-review pos-rel">
       <p>{t("common.lastWords")}</p>
+      {/* What tapping a word does (RAE), on hover / tap */}
+      <Tooltip message={t("game.wordMeaningHint")}>
+        <div className="info-icon">i</div>
+      </Tooltip>
       <ul
         className="word-review__list"
         style={
