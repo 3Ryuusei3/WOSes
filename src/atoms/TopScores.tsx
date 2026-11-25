@@ -299,7 +299,7 @@ export default function TopScores({
               return (
                 <div
                   key={index}
-                  className={`ranking__row ${!entry?.name ? "ranking__row--empty" : index === 0 ? "ranking__row--first" : ""}`}
+                  className={`ranking__row ${!entry?.name ? "ranking__row--empty" : index < 3 ? `ranking__row--p${index + 1}` : ""}`}
                 >
                   <span className="ranking__cell ranking__cell--rank">
                     <span className={rankToneClass(index)}>
@@ -338,7 +338,7 @@ export default function TopScores({
             return (
               <div
                 key={index}
-                className={`ranking__row ${isMine ? "ranking__row--mine" : !entry.name ? "ranking__row--empty" : index === 0 ? "ranking__row--first" : ""}`}
+                className={`ranking__row ${isMine ? "ranking__row--mine" : !entry.name ? "ranking__row--empty" : index < 3 ? `ranking__row--p${index + 1}` : ""}`}
               >
                 <span className="ranking__cell ranking__cell--rank">
                   <span className={rankToneClass(index)}>

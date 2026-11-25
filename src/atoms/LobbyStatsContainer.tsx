@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import LobbyStatsRow from "./LobbyStatsRow";
+import StatBox from "./StatBox";
 import { LEVELS_TO_ADVANCE } from "../constant";
 
 interface LobbyStatsContainerProps {
@@ -13,6 +13,7 @@ interface LobbyStatsContainerProps {
   secondsToRemove: number;
 }
 
+/** Level summary as a row of stat tiles */
 export default function LobbyStatsContainer({
   level,
   levelsToAdvance,
@@ -24,40 +25,33 @@ export default function LobbyStatsContainer({
   secondsToRemove,
 }: LobbyStatsContainerProps) {
   const { t } = useTranslation();
-
-  const timeClassName =
-    levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR
-      ? "won"
-      : secondsToRemove > 0
-        ? "lost"
-        : "highlight";
-
-  const perfectRoundsClassName =
-    levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? "won" : "highlight";
+  const perfect = levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR;
 
   return (
-    <div className="score__container--box f-jc-c">
-      <div className="score__container--stats">
-        <LobbyStatsRow
-          label={t("common.levelPoints", { level: level - levelsToAdvance })}
-          value={lastRoundPoints}
-        />
-        <LobbyStatsRow label={t("common.totalPoints")} value={totalPoints} />
-        <LobbyStatsRow
-          label={t("common.remainingTime")}
-          value={`${gameTime}${t("common.seconds")}`}
-          valueClassName={timeClassName}
-        />
-        <LobbyStatsRow
-          label={t("common.numberOfRounds")}
-          value={numberOfRounds}
-        />
-        <LobbyStatsRow
-          label={t("common.perfectRounds")}
-          value={numberOfPerfectRounds}
-          valueClassName={perfectRoundsClassName}
-        />
-      </div>
+    <div className="stat-grid">
+      <StatBox
+        label={t("common.levelPoints", { level: level - levelsToAdvance })}
+        value={lastRoundPoints}
+        size="sm"
+      />
+      <StatBox label={t("common.totalPoints")} value={totalPoints} size="sm" />
+      <StatBox
+        label={t("common.remainingTime")}
+        value={`${gameTime}${t("common.seconds")}`}
+        valueClassName={perfect ? "stat-good" : secondsToRemove > 0 ? "stat-bad" : ""}
+        size="sm"
+      />
+      <StatBox
+        label={t("common.numberOfRounds")}
+        value={numberOfRounds}
+        size="sm"
+      />
+      <StatBox
+        label={t("common.perfectRounds")}
+        value={numberOfPerfectRounds}
+        valueClassName={perfect ? "stat-good" : ""}
+        size="sm"
+      />
     </div>
   );
 }

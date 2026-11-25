@@ -21,7 +21,7 @@ export default function NextChallengesSection({
     : false;
 
   return (
-    <div className="v-section score__container--box">
+    <div className="v-section score__container--box next-challenges">
       <p>{t("lobby.nextChallenges")}</p>
       {canAdvance && !areAllMechanicsFalse && (
         <Tooltip message={t("lobby.challengeTooltip")}>

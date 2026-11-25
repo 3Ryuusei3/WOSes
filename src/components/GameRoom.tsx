@@ -196,7 +196,7 @@ export default function GameRoom() {
   const startBlock = (
     <div className="v-section gap-sm f-jc-c f-ai-c">
       <button
-        className={`btn ${canStart ? "btn--win" : "btn--lose"}`}
+        className="btn btn--start"
         disabled={!canStart || isStarting}
         onClick={handleStart}
       >
@@ -224,6 +224,16 @@ export default function GameRoom() {
     <>
       <div className="game__container game__container--join">
         <BackHomeButton className="back-control--corner" />
+        {/* Ribbon on the panel's top edge: what this screen is */}
+        <h1
+          className={`screen-ribbon ${showJoinForm && !isHost ? "" : "screen-ribbon--green"}`}
+        >
+          {isHost
+            ? t("room.created")
+            : showJoinForm
+              ? t("room.roomTitle", { code: roomCode })
+              : t("room.youAreIn")}
+        </h1>
         {isHost ? (
           <div className="room-lobby">
             {useTabs ? (

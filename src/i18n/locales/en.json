@@ -156,7 +156,10 @@
     "leaveRoomPlayer": "YOU'LL LEAVE ROOM {{code}} AND BE REMOVED FROM THE PLAYERS LIST.",
     "leaveRoomHost": "YOU'LL LEAVE ROOM {{code}} AND THE PLAYERS WILL BE LEFT WITHOUT A HOST.",
     "leaveRoomButton": "EXIT",
-    "tapToType": "TAP HERE TO TYPE"
+    "tapToType": "TAP HERE TO TYPE",
+    "secondsShort": "SEC",
+    "secondsLeft_one": "{{count}} second left",
+    "secondsLeft_other": "{{count}} seconds left"
   },
   "howToPlay": {
     "title": "HOW TO PLAY?",
@@ -393,6 +396,9 @@
     "needPlayer": "AT LEAST 1 PLAYER IS NEEDED TO START",
     "playersList": "PLAYERS",
     "startGame": "START GAME",
-    "group": "GROUP"
+    "group": "GROUP",
+    "created": "ROOM READY!",
+    "youAreIn": "YOU'RE IN!",
+    "roomTitle": "ROOM {{code}}"
   }
 }

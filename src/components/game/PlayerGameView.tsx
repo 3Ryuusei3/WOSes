@@ -14,12 +14,10 @@ const NO_MECHANICS: Mechanics = {
   still: false,
   mirrored: false,
 };
-import ScoreContainer from "../../atoms/ScoreContainer";
+import GameHud from "../../atoms/GameHud";
 import WarningMessage from "../../atoms/WarningMessage";
 import SelectedWord from "../../atoms/SelectedWord";
-import ProgressBar from "../../atoms/ProgressBar";
 import KeyboardReserve from "../../atoms/KeyboardReserve";
-import BackHomeButton from "../../atoms/BackHomeButton";
 import GameSound from "../../atoms/GameSound";
 import useMobileLayout from "../../hooks/useMobileLayout";
 import WordList from "../../atoms/WordList";
@@ -191,7 +189,7 @@ export default function PlayerGameView({
 
   return (
     <>
-      <ScoreContainer
+      <GameHud
         words={words}
         correctWordsPoints={correctWordsPoints}
         goalPoints={goalPoints}
@@ -200,7 +198,13 @@ export default function PlayerGameView({
         dailyChallengeOriginalDifficulty={
           (board?.daily_original_difficulty as Difficulty | null) ?? null
         }
-        showBackHome={isMobileLayout}
+        timeLeft={timeLeft}
+        startedAt={startedAt}
+        durationMs={durationMs}
+        percentage={percentage}
+        RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
+        SHOW_LETTERS_PERCENTAGE={board?.show_letters_percentage ?? 0}
+        trailing={!isMobileLayout ? <GameSound className="volume-control--hud" /> : undefined}
       />
       <div
         className="game__container game__container--player"
@@ -213,7 +217,8 @@ export default function PlayerGameView({
             : undefined
         }
       >
-        {!isMobileLayout && <BackHomeButton className="back-control--panel" />}
+        {/* Host that plays, on a phone: sound in the board's corner */}
+        {isMobileLayout && <GameSound className="volume-control--panel" />}
         <div className="game__header">
           <div className="v-section">
             {board ? (
@@ -230,21 +235,6 @@ export default function PlayerGameView({
               <p className="txt-center">{t("game.waitingForHost")}</p>
             )}
           </div>
-          <ProgressBar
-            // Host that plays (players get no sound button): left of the
-            // seconds row on phones
-            leading={
-              isMobileLayout ? (
-                <GameSound className="volume-control--inline" />
-              ) : undefined
-            }
-            timeLeft={timeLeft}
-            startedAt={startedAt}
-            durationMs={durationMs}
-            percentage={percentage}
-            RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
-            SHOW_LETTERS_PERCENTAGE={board?.show_letters_percentage ?? 0}
-          />
         </div>
         {boardVisible && (
           <WordList

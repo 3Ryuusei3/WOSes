@@ -1,3 +1,4 @@
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { getLanguageConstants } from "../constant";
 
@@ -72,15 +73,52 @@ export default function SelectedWord({
     return letter.letter;
   };
 
+  // Stable identity per tile (letter + its occurrence; the fake one apart),
+  // so a shuffle moves the same tiles instead of rebuilding them
+  const tiles = useMemo(() => {
+    const seen: Record<string, number> = {};
+    return shuffledWordObject.map((letter) => {
+      const base = `${letter.isFake ? "fake:" : ""}${letter.letter}`;
+      seen[base] = (seen[base] ?? 0) + 1;
+      return { letter, key: `${base}#${seen[base]}` };
+    });
+  }, [shuffledWordObject]);
+
+  // Shuffle animation (FLIP): each tile starts where it was and slides to
+  // its new place. Uses offsetLeft (layout position: ignores the tilt and the
+  // flip animations) and the `translate` property (free from `transform`).
+  const tileRefs = useRef(new Map<string, HTMLSpanElement>());
+  const lastLeft = useRef(new Map<string, number>());
+  useLayoutEffect(() => {
+    const now = new Map<string, number>();
+    tileRefs.current.forEach((el, key) => now.set(key, el.offsetLeft));
+    now.forEach((left, key) => {
+      const before = lastLeft.current.get(key);
+      const el = tileRefs.current.get(key);
+      if (before === undefined || !el) return;
+      const dx = before - left;
+      if (Math.abs(dx) < 1) return;
+      el.style.transition = "none";
+      el.style.translate = `${dx}px 0`;
+      void el.offsetWidth; // apply the start position before animating
+      el.style.transition = "";
+      el.style.translate = "";
+    });
+    lastLeft.current = now;
+  }, [tiles]);
+
   return (
     <div
-      key={shuffledWordObject.map((letter) => letter.letter).join("")}
       className="selectedWord"
       style={{ "--count": shuffledWordObject.length } as React.CSSProperties}
     >
-      {shuffledWordObject.map((letter, index) => (
+      {tiles.map(({ letter, key }) => (
         <span
-          key={`${index}-${letter.letter}`}
+          key={key}
+          ref={(el) => {
+            if (el) tileRefs.current.set(key, el);
+            else tileRefs.current.delete(key);
+          }}
           className={getLetterClasses(letter)}
         >
           {getDisplayLetter(letter)}

@@ -156,7 +156,10 @@
     "leaveRoomPlayer": "SALDRÁS DE LA SALA {{code}} Y DESAPARECERÁS DE LA LISTA DE JUGADORES.",
     "leaveRoomHost": "SALDRÁS DE LA SALA {{code}} Y LOS JUGADORES SE QUEDARÁN SIN ANFITRIÓN.",
     "leaveRoomButton": "SALIR",
-    "tapToType": "TOCA AQUÍ PARA ESCRIBIR"
+    "tapToType": "TOCA AQUÍ PARA ESCRIBIR",
+    "secondsShort": "SEG",
+    "secondsLeft_one": "Queda {{count}} segundo",
+    "secondsLeft_other": "Quedan {{count}} segundos"
   },
   "howToPlay": {
     "title": "¿CÓMO JUGAR?",
@@ -378,6 +381,9 @@
     "needPlayer": "SE NECESITA AL MENOS 1 JUGADOR PARA EMPEZAR",
     "playersList": "LISTADO DE JUGADORES",
     "startGame": "EMPEZAR PARTIDA",
-    "group": "GRUPO"
+    "group": "GRUPO",
+    "created": "¡SALA CREADA!",
+    "youAreIn": "¡ESTÁS DENTRO!",
+    "roomTitle": "SALA {{code}}"
   }
 }

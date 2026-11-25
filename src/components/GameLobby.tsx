@@ -8,6 +8,7 @@ import WordListDisplay from "../atoms/WordListDisplay";
 import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import HelpButton from "../atoms/HelpButton";
 import BackHomeButton from "../atoms/BackHomeButton";
+import LevelStars from "../atoms/LevelStars";
 import LobbyStatsContainer from "../atoms/LobbyStatsContainer";
 import NextChallengesSection from "../atoms/NextChallengesSection";
 import ReconnectButton from "../atoms/ReconnectButton";
@@ -243,7 +244,7 @@ export default function GameLobby() {
     <>
       <div
         ref={containerRef}
-        className="game__container f-jc-c"
+        className="game__container game__container--lobby f-jc-c"
         onKeyDown={(e) => e.key === "Enter" && handleAdvance()}
         tabIndex={0}
         role="button"
@@ -276,6 +277,8 @@ export default function GameLobby() {
           </div>
         )}
         {showSummary && view && (
+          <div className="lobby-advance">
+          <LevelStars levelsToAdvance={view.levelsToAdvance} />
           <h3>
             {t("lobby.youAdvanced")}
             {view.levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
@@ -285,6 +288,7 @@ export default function GameLobby() {
             )}
             {view.levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
           </h3>
+          </div>
         )}
         {showSummary && !view && (
           <p className="txt-center unguessed">{t("lobby.loadingSummary")}</p>

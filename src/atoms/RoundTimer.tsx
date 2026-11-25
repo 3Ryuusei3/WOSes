@@ -1,0 +1,109 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
+interface RoundTimerProps {
+  timeLeft: number;
+  /** Time left, 100 → 0 */
+  percentage: number;
+  /** Round start (local ms) and length: the ring is a CSS animation */
+  startedAt: number;
+  durationMs: number;
+  RUNNING_OUT_OF_TIME_PERCENTAGE: number;
+  /** When the hidden letters show up: a tick on the ring */
+  SHOW_LETTERS_PERCENTAGE: number;
+}
+
+const R = 40;
+
+/**
+ * Round clock: a ring that empties clockwise around the seconds left. Cyan,
+ * then yellow once the letters are revealed (tick on the ring), pink at the
+ * end.
+ */
+export default function RoundTimer({
+  timeLeft,
+  percentage,
+  startedAt,
+  durationMs,
+  RUNNING_OUT_OF_TIME_PERCENTAGE,
+  SHOW_LETTERS_PERCENTAGE,
+}: RoundTimerProps) {
+  const { t } = useTranslation();
+  const seconds = Math.max(0, Math.ceil(timeLeft / 1000));
+  const tone =
+    percentage < RUNNING_OUT_OF_TIME_PERCENTAGE
+      ? "late"
+      : percentage < SHOW_LETTERS_PERCENTAGE
+        ? "mid"
+        : "ok";
+
+  // Tick where the ring ends when the letters show up
+  const angle = (SHOW_LETTERS_PERCENTAGE / 100) * 2 * Math.PI;
+  const tick = (r: number) => ({
+    x: 50 + r * Math.sin(angle),
+    y: 50 - r * Math.cos(angle),
+  });
+  const a = tick(R - 7);
+  const b = tick(R + 7);
+
+  return (
+    <div
+      className={`round-timer round-timer--${tone}`}
+      role="timer"
+      aria-label={t("game.secondsLeft", { count: seconds })}
+    >
+      <svg className="round-timer__ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle className="round-timer__track" cx="50" cy="50" r={R} />
+        <RingFill
+          key={`${startedAt}-${durationMs}`}
+          startedAt={startedAt}
+          durationMs={durationMs}
+        />
+        {SHOW_LETTERS_PERCENTAGE > 0 && SHOW_LETTERS_PERCENTAGE < 100 && (
+          <line
+            className="round-timer__tick"
+            x1={a.x}
+            y1={a.y}
+            x2={b.x}
+            y2={b.y}
+          />
+        )}
+      </svg>
+      <span className="round-timer__face">
+        <span className="round-timer__secs">{seconds}</span>
+        <small className="round-timer__unit">{t("game.secondsShort")}</small>
+      </span>
+    </div>
+  );
+}
+
+/**
+ * The ring empties with a CSS animation (not a React render per frame). A
+ * negative delay starts it already "elapsed" ms in (reloads, late joins,
+ * multiplayer clock sync); it is frozen at mount and the parent remounts it
+ * via `key` when the round's start or length changes.
+ */
+function RingFill({
+  startedAt,
+  durationMs,
+}: {
+  startedAt: number;
+  durationMs: number;
+}) {
+  const [elapsed] = useState(() =>
+    Math.min(durationMs, Math.max(0, Date.now() - startedAt)),
+  );
+  return (
+    <circle
+      className="round-timer__fill"
+      cx="50"
+      cy="50"
+      r={R}
+      pathLength={100}
+      style={{
+        animationDuration: `${durationMs}ms`,
+        animationDelay: `-${elapsed}ms`,
+      }}
+    />
+  );
+}

@@ -1,3 +1,12 @@
+@font-face {
+  font-family: "Lilita Digits";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./assets/fonts/lilita-digits.woff2") format("woff2");
+  unicode-range: U+0030-0039;
+}
+
 :root {
   --clr-bg-primary: #420072;
   --clr-bg-primary-dim: #4e0582;
@@ -50,8 +59,10 @@
   --clr-ink: #24004a;
   --clr-cream: #fff6dc;
   --clr-muted: #c9b8ea;
-  // One typeface for the whole game
-  --font-display: "Lilita One", system-ui, sans-serif;
+  // One typeface for the whole game. Its digits all have the same width
+  // ("Lilita Digits", tabular copy of Lilita's numbers) so numbers that
+  // change never shift what's around them.
+  --font-display: "Lilita Digits", "Lilita One", system-ui, sans-serif;
   --ink-w: 0.1875rem; // outline of buttons, tiles, inputs
   --ink-w-lg: 0.25rem; // outline of panels
   --ink-drop: 0.3125rem; // solid shadow under buttons
@@ -1088,13 +1099,13 @@ main {
 
 @keyframes selectedLetter {
   0% {
-    color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    text-shadow: none;
     transform: rotateX(180deg);
   }
   50% {
-    color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    text-shadow: none;
     transform: rotateX(90deg);
   }
   100% {
@@ -1106,20 +1117,20 @@ main {
 
 @keyframes fakeSelectedLetter {
   0% {
-    color: var(--clr-text-secondary);
-    background-color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    background-color: var(--clr-cream);
+    text-shadow: none;
     transform: rotateX(180deg);
   }
   50% {
-    color: var(--clr-text-secondary);
-    background-color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    background-color: var(--clr-cream);
+    text-shadow: none;
     transform: rotateX(90deg);
   }
   100% {
-    color: var(--clr-text-primary);
-    text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
+    color: var(--clr-ink);
+    text-shadow: none;
     background-color: var(--clr-lose);
     transform: rotateX(0deg);
   }
@@ -1127,21 +1138,20 @@ main {
 
 @keyframes hiddenSelectedLetter {
   0% {
-    color: var(--clr-text-secondary);
-    background-color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    background-color: var(--clr-cream);
+    text-shadow: none;
     transform: rotateX(180deg);
   }
   50% {
-    color: var(--clr-text-secondary);
-    background-color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    background-color: var(--clr-cream);
+    text-shadow: none;
     transform: rotateX(90deg);
   }
   100% {
-    color: var(--clr-text-primary);
-    text-shadow: 0px var(--text-shadow-position) 0
-      var(--clr-accent-primary-highlight);
+    color: var(--clr-ink);
+    text-shadow: none;
     background-color: var(--clr-accent-primary);
     transform: rotateX(0deg);
   }
@@ -1170,34 +1180,34 @@ main {
 
 @keyframes commonSelectedLetter {
   0% {
-    color: var(--clr-text-secondary);
-    background-color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    background-color: var(--clr-cream);
+    text-shadow: none;
     transform: rotateX(180deg);
   }
   50% {
-    color: var(--clr-text-secondary);
-    background-color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    background-color: var(--clr-cream);
+    text-shadow: none;
     transform: rotateX(90deg);
   }
   100% {
-    color: var(--clr-text-primary);
+    color: var(--clr-ink);
     background-color: var(--clr-tip);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
+    text-shadow: none;
     transform: rotateX(0deg);
   }
 }
 
 @keyframes mirroredSelectedLetter {
   0% {
-    color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    text-shadow: none;
     transform: rotateX(180deg) scaleX(-1);
   }
   50% {
-    color: var(--clr-text-secondary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-text-secondary);
+    color: transparent;
+    text-shadow: none;
     transform: rotateX(90deg) scaleX(-1);
   }
   100% {
@@ -3558,7 +3568,7 @@ html:not(.mobile) .multi-tab-panel {
   .letter {
     --tile: min(
       1.25rem,
-      (100vw - 3.5rem) / var(--wordlist-columns, 3) / var(--letters, 7) - 1px
+      (100vw - 5rem) / var(--wordlist-columns, 3) / var(--letters, 7) - 2px
     );
   }
 }
@@ -3909,4 +3919,612 @@ html:not(.mobile) .game__container--home .difficulty-hint {
 // Phone game screens: smaller logo, it shares the row with the score boxes
 .mobile body:has(.keyboard-reserve) main .lexio-logo {
   width: 4.25rem !important;
+}
+
+// ---------------------------------------------------------------------------
+// Game bar (A · Partida): back + level | round clock | points + words
+// ---------------------------------------------------------------------------
+.game-hud {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+.game-hud__side {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-width: 0;
+
+  &--end {
+    justify-content: flex-end;
+  }
+}
+.game-hud__card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.625rem 1.25rem;
+  background: var(--clr-bg-secondary);
+  border: var(--ink-w-lg) solid var(--clr-ink);
+  border-radius: 1.25rem;
+  box-shadow: 0 var(--ink-drop) 0 var(--clr-ink);
+
+  &--level {
+    rotate: -1.5deg;
+  }
+  &--score {
+    rotate: 1.5deg;
+  }
+  // Goal reached / every word found
+  &.is-goal {
+    background: var(--clr-still);
+
+    .game-hud__label,
+    .game-hud__value,
+    .game-hud__value small {
+      color: var(--clr-ink);
+      text-shadow: none;
+    }
+  }
+}
+.game-hud__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+.game-hud__label {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--clr-muted);
+}
+.game-hud__value {
+  font-size: 1.875rem;
+  color: var(--clr-accent-primary);
+  text-shadow: 0 0.125rem 0 var(--clr-ink);
+
+  small {
+    font-size: 1.25rem;
+    color: var(--clr-muted);
+  }
+  &--words {
+    color: var(--clr-win);
+  }
+}
+.back-control--hud,
+.volume-control--hud {
+  position: static;
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  border-width: var(--ink-w-lg);
+  border-radius: 50%;
+  box-shadow: 0 var(--ink-drop) 0 var(--clr-ink);
+
+  svg,
+  img {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+}
+
+// Round clock: ring that empties clockwise around the seconds left
+.round-timer {
+  --timer: 7rem;
+  position: relative;
+  width: var(--timer);
+  height: var(--timer);
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--clr-ink);
+  border: var(--ink-w-lg) solid var(--clr-ink);
+  box-shadow: 0 0.4375rem 0 var(--clr-ink);
+  --clr-progress-color: var(--clr-win);
+
+  &--mid {
+    --clr-progress-color: var(--clr-accent-primary);
+  }
+  &--late {
+    --clr-progress-color: var(--clr-lose);
+  }
+}
+.round-timer__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  rotate: -90deg;
+  overflow: visible;
+}
+.round-timer__track {
+  fill: none;
+  stroke: var(--clr-ink);
+  stroke-width: 20;
+}
+.round-timer__fill {
+  fill: none;
+  stroke: var(--clr-progress-color);
+  stroke-width: 20;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  animation-name: ring-drain;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  transition: stroke 0.3s ease;
+}
+@keyframes ring-drain {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+.round-timer__tick {
+  stroke: var(--clr-ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.round-timer__face {
+  position: absolute;
+  inset: 22%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: var(--clr-ink);
+  background: var(--clr-cream);
+  border: var(--ink-w-lg) solid var(--clr-ink);
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+.round-timer--late .round-timer__face {
+  background: var(--clr-lose);
+}
+.round-timer__secs {
+  font-size: calc(var(--timer) * 0.3);
+}
+.round-timer__unit {
+  font-size: calc(var(--timer) * 0.1);
+}
+
+// Board panel: the "find anagrams" ribbon sits on its top edge
+.game__container:has(.game__header) {
+  position: relative;
+  padding-top: 2.75rem;
+}
+.game__header .warning-message--default {
+  position: absolute;
+  top: -1.375rem;
+  left: 50%;
+  translate: -50% 0;
+  margin: 0;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+// Phones
+.mobile {
+  .game-hud {
+    grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
+  }
+  // Back button and level share the first two columns
+  .game-hud__side--start {
+    display: contents;
+  }
+  .game-hud__side--end {
+    justify-content: stretch;
+
+    .game-hud__card {
+      flex: 1 1 auto;
+    }
+  }
+  .game-hud__card {
+    justify-content: center;
+    gap: 0.625rem;
+    padding: 0.375rem 0.5rem;
+    border-width: var(--ink-w-lg);
+    border-radius: 0.875rem;
+    box-shadow: 0 0.25rem 0 var(--clr-ink);
+  }
+  .game-hud__label {
+    display: none;
+  }
+  .game-hud__value {
+    font-size: 1.25rem;
+
+    small {
+      font-size: 0.75rem;
+    }
+  }
+  .game-hud__card .btn--xs {
+    font-size: 0.5625rem;
+    padding: 0.125rem 0.375rem;
+  }
+  .back-control--hud {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 0;
+
+    svg {
+      width: 1.125rem !important;
+      height: 1.125rem !important;
+    }
+  }
+  .round-timer {
+    --timer: 3.75rem;
+    border-width: var(--ink-w);
+    box-shadow: 0 0.25rem 0 var(--clr-ink);
+  }
+  .round-timer__face {
+    inset: 17%;
+    border-width: var(--ink-w);
+  }
+  .round-timer__secs {
+    font-size: 1.1875rem;
+  }
+  .round-timer__unit {
+    display: none;
+  }
+
+  // Board: ribbon smaller, sound in the top-right corner
+  .game__container:has(.game__header) {
+    padding-top: 1.375rem;
+  }
+  .game__header .warning-message--default {
+    display: block;
+    top: -0.875rem;
+    padding: 0.125rem 0.875rem;
+    font-size: 0.8125rem;
+    border-width: var(--ink-w);
+    border-radius: 0.625rem;
+    box-shadow: 0 0.1875rem 0 var(--clr-ink);
+  }
+  .volume-control.volume-control--panel {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    left: auto;
+    z-index: 3;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    background: var(--clr-bg-primary-dim);
+
+    img {
+      width: 1rem;
+      height: 1rem;
+      filter: brightness(0) invert(1);
+    }
+  }
+}
+
+// Top tiles: slide to their new place on every shuffle (see SelectedWord),
+// with a small bounce; the tilt follows along
+.selectedLetter {
+  transition:
+    translate 0.5s cubic-bezier(0.34, 1.45, 0.64, 1),
+    rotate 0.5s ease,
+    top 0.5s ease;
+
+  // Loose stickers: not all on the same line
+  &:nth-child(4n + 2) {
+    top: 0.375rem;
+  }
+  &:nth-child(4n + 4) {
+    top: 0.25rem;
+  }
+}
+.mobile .selectedLetter {
+  &:nth-child(4n + 2) {
+    top: 0.1875rem;
+  }
+  &:nth-child(4n + 4) {
+    top: 0.125rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .selectedLetter {
+    transition: none;
+  }
+}
+
+// Board rows: only as wide as their word (the found strip hugs the letters),
+// right-aligned in equal columns; the whole list no wider than it needs
+.wordlist {
+  max-width: calc(
+    3 * (var(--letters, 7) * (2.125rem + 1px) + 0.5rem) + 2 * 1.25rem
+  );
+  margin-inline: auto;
+
+  > .word {
+    justify-self: end;
+    justify-content: flex-end;
+  }
+}
+.wordlist--names {
+  max-width: calc(
+    3 * (var(--letters, 7) * (2.125rem + 1px) + 7rem) + 2 * 1.25rem
+  );
+
+  .playerName {
+    width: 6.25rem;
+    text-align: left;
+  }
+  // Empty slot on rows not found yet: same width, nothing drawn
+  .word:not(.active) .playerName {
+    visibility: hidden;
+  }
+}
+.mobile .wordlist {
+  max-width: none;
+}
+
+// Phones: the row must keep its column's width (its letters size from it),
+// so the found strip is drawn on the letters' wrapper instead
+.mobile .wordlist {
+  > .word {
+    justify-self: stretch;
+  }
+  .word,
+  .word.active {
+    padding: 0;
+    border-color: transparent;
+    background: none;
+    animation: none;
+  }
+  .wordLetters {
+    padding: 1px;
+    border: 0.09375rem solid transparent;
+    border-radius: 0.25rem;
+  }
+  .word.active .wordLetters {
+    background: var(--clr-accent-primary);
+    border-color: var(--clr-ink);
+    animation: correctWord 1s ease;
+  }
+  .word.active.word--other .wordLetters {
+    background: var(--clr-border-secondary);
+  }
+}
+
+// Podium rows: gold / silver (blue) / bronze tint and outline
+.ranking .ranking__row.ranking__row--p1,
+.player-row.player-row--p1 {
+  background: rgba(255, 204, 31, 0.22);
+  border-color: var(--clr-accent-primary);
+}
+.ranking .ranking__row.ranking__row--p2,
+.player-row.player-row--p2 {
+  background: rgba(29, 255, 238, 0.14);
+  border-color: var(--clr-win);
+}
+.ranking .ranking__row.ranking__row--p3,
+.player-row.player-row--p3 {
+  background: rgba(255, 154, 60, 0.18);
+  border-color: #ff9a3c;
+}
+.player-row--p1 h5:first-child {
+  color: var(--clr-accent-primary);
+}
+.player-row--p2 h5:first-child {
+  color: var(--clr-win);
+}
+.player-row--p3 h5:first-child {
+  color: #ff9a3c;
+}
+
+// ---------------------------------------------------------------------------
+// Lobby / end screens (A · Lobby): ribbon on the panel's top edge, stars,
+// a row of stat tiles, words + next challenge side by side
+// ---------------------------------------------------------------------------
+.game__container:has(> .screen-ribbon) {
+  position: relative;
+  padding-top: 3.5rem;
+  // Room for the ribbon under the logo
+  margin-top: 1.75rem;
+}
+.game__container > .screen-ribbon {
+  position: absolute;
+  top: -1.875rem;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 4;
+  margin: 0;
+  white-space: nowrap;
+}
+.mobile .game__container:has(> .screen-ribbon) {
+  padding-top: 1.75rem;
+  margin-top: 0.5rem;
+}
+// Phones: the corner buttons stay in the logo row
+.mobile .game__container:has(> .screen-ribbon) {
+  .back-control--corner,
+  .panel-actions {
+    top: -3.25rem;
+  }
+}
+.mobile .game__container > .screen-ribbon {
+  top: -1.125rem;
+  font-size: 1.125rem;
+}
+
+.lobby-advance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.125rem;
+
+  h3 {
+    font-size: 1.75rem;
+    color: var(--clr-cream);
+    text-shadow: 0 0.125rem 0 var(--clr-ink);
+  }
+}
+.level-stars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.375rem;
+}
+.level-stars__star {
+  width: 3rem;
+  height: 3rem;
+  fill: var(--clr-dark);
+  stroke: var(--clr-ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+
+  &.is-lit {
+    fill: var(--clr-accent-primary);
+  }
+  // Middle one bigger and higher; the outer ones tilted
+  .level-stars--3 &:nth-child(1) {
+    rotate: -10deg;
+  }
+  .level-stars--3 &:nth-child(2) {
+    width: 3.75rem;
+    height: 3.75rem;
+    translate: 0 -0.5rem;
+  }
+  .level-stars--3 &:nth-child(3) {
+    rotate: 10deg;
+  }
+  .level-stars--5 & {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+.mobile {
+  .lobby-advance {
+    gap: 0.5rem;
+
+    h3 {
+      font-size: 0.9375rem;
+    }
+  }
+  .level-stars__star {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  .level-stars--3 .level-stars__star:nth-child(2) {
+    width: 2.125rem;
+    height: 2.125rem;
+    translate: 0 -0.25rem;
+  }
+  .level-stars--5 .level-stars__star {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+}
+
+// Stat tiles in one row
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-auto-flow: column;
+  gap: 0.875rem;
+  width: 100%;
+}
+.mobile .stat-grid {
+  grid-auto-flow: row;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+
+  > :last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
+}
+.stat-box h3.stat-good {
+  color: var(--clr-still);
+}
+.stat-box h3.stat-bad {
+  color: var(--clr-lose);
+}
+
+// Lobby summary: stats across, then words (wide) + next challenge
+.game__container--lobby .game__summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 1.375rem;
+  width: 100%;
+  align-items: stretch;
+
+  > .stat-grid {
+    grid-column: 1 / -1;
+  }
+}
+.mobile .game__container--lobby .game__summary {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+// Next challenge: yellow sticker card
+.next-challenges.score__container--box {
+  justify-content: center;
+  color: var(--clr-ink);
+  background: var(--clr-accent-primary);
+  border-width: var(--ink-w-lg);
+  border-radius: 1.25rem;
+  box-shadow: 0 var(--ink-drop-lg) 0 var(--clr-ink);
+  text-shadow: none;
+  rotate: 1deg;
+
+  > p {
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    color: var(--clr-ink);
+    text-shadow: none;
+  }
+  h4 {
+    text-shadow: none;
+  }
+  .no-challenges-info {
+    color: var(--clr-ink);
+  }
+}
+.mobile .next-challenges.score__container--box {
+  rotate: none;
+}
+
+// Phones, board: sound at the bottom right, next to the word input
+.mobile .game__container:has(> .volume-control--panel) {
+  > .volume-control--panel {
+    top: auto;
+    bottom: 0.5rem;
+  }
+  > input {
+    width: calc(100% - 2.75rem);
+    margin-inline: 0 auto;
+  }
+}
+
+// Desktop: the ribbon title a bit smaller than a page title, so the end
+// screens still fit one screen
+html:not(.mobile) .game__container > .screen-ribbon {
+  font-size: 2.25rem;
+  top: -1.625rem;
+}
+html:not(.mobile) .game__container:has(> .screen-ribbon) {
+  margin-top: 1.25rem;
+  padding-top: 3rem;
+}
+
+// Room screens keep their own vertical padding (important) — leave room
+// for the ribbon
+.game__container--join:has(> .screen-ribbon) {
+  padding-top: 3rem !important;
+}
+.mobile .game__container--join:has(> .screen-ribbon) {
+  padding-top: 1.75rem !important;
+}
+.room-lobby .btn--start {
+  font-size: 1.5rem;
+  padding: 1rem 2.5rem;
 }

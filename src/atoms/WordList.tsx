@@ -51,10 +51,11 @@ export default function WordList({
   // Always 3 equal columns (phone and desktop): the board never reflows
   // while words are found
   const columns = 3;
+  const showNames = players === "multi" && !isMobile;
 
   return (
     <ul
-      className="wordlist"
+      className={`wordlist ${showNames ? "wordlist--names" : ""}`}
       style={
         {
           "--wordlist-rows": Math.ceil(words.length / columns),
@@ -80,10 +81,11 @@ export default function WordList({
           }`}
           ref={(el) => (wordRefs.current[index] = el)}
         >
-          {/* Who guessed it: desktop only (the host's screen) */}
-          {wordObj.guessed && !isMobile && (
+          {/* Who guessed it: rooms on desktop (the host's screen). The slot
+              is there on every row, so rows don't grow when a name appears */}
+          {showNames && (
             <span className="playerName">
-              {wordObj.guessedByName || playerName}
+              {wordObj.guessed ? wordObj.guessedByName || playerName : ""}
             </span>
           )}
           <span className="wordLetters">

@@ -1,15 +1,13 @@
 import { useRef } from "react";
 
-import ScoreContainer from "../../atoms/ScoreContainer";
+import GameHud from "../../atoms/GameHud";
 import WordInput, { type WordInputHandle } from "../../atoms/WordInput";
 import KeyboardReserve from "../../atoms/KeyboardReserve";
 import useMobileUserAgent from "../../hooks/useMobileUserAgent";
 import WarningMessage from "../../atoms/WarningMessage";
 import WordList from "../../atoms/WordList";
-import ProgressBar from "../../atoms/ProgressBar";
 import SelectedWord from "../../atoms/SelectedWord";
 import GameSound from "../../atoms/GameSound";
-import BackHomeButton from "../../atoms/BackHomeButton";
 import useMobileLayout from "../../hooks/useMobileLayout";
 import Word from "../../types/Word";
 import Difficulty from "../../types/Difficulty";
@@ -77,14 +75,20 @@ export default function HostGameView({
 
   return (
     <>
-      <ScoreContainer
+      <GameHud
         words={words}
         correctWordsPoints={correctWordsPoints}
         goalPoints={goalPoints}
         level={level}
         gameDifficulty={gameDifficulty}
         dailyChallengeOriginalDifficulty={dailyChallengeOriginalDifficulty}
-        showBackHome={isMobileLayout}
+        timeLeft={timeLeft}
+        startedAt={startedAt}
+        durationMs={durationMs}
+        percentage={percentage}
+        RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
+        SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
+        trailing={!isMobileLayout ? <GameSound className="volume-control--hud" /> : undefined}
       />
       <div
         className="game__container"
@@ -107,21 +111,6 @@ export default function HostGameView({
               SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
             />
           </div>
-          <ProgressBar
-            // Phones: the top corners hold the score boxes, so the sound
-            // button goes at the left of the seconds row
-            leading={
-              isMobileLayout ? (
-                <GameSound className="volume-control--inline" />
-              ) : undefined
-            }
-            timeLeft={timeLeft}
-            startedAt={startedAt}
-            durationMs={durationMs}
-            percentage={percentage}
-            RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
-            SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
-          />
         </div>
         <WordList
           words={words}
@@ -130,7 +119,6 @@ export default function HostGameView({
           gameMechanics={gameMechanics}
           SHOW_LETTERS_PERCENTAGE={showLettersPercentage}
         />
-        {!isMobileLayout && <BackHomeButton className="back-control--panel" />}
         {players === "single" && (
           <WordInput
             ref={wordInputRef}
@@ -143,7 +131,8 @@ export default function HostGameView({
             volume={volume}
           />
         )}
-        {!isMobileLayout && <GameSound />}
+        {/* Phones: sound in the board's top-right corner */}
+        {isMobileLayout && <GameSound className="volume-control--panel" />}
       </div>
       {isMobile && players === "single" && (
         <KeyboardReserve onActivate={() => wordInputRef.current?.focus()} />
