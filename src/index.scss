@@ -5967,3 +5967,17 @@ html:not(.mobile) .game__container--home {
     font-size: 0.9375rem;
   }
 }
+
+// Desktop start screen: logo + cards centred vertically when they fit (the
+// corner buttons stay fixed in the top bar)
+html:not(.mobile) main:has(.game__container--home) {
+  box-sizing: border-box;
+  min-height: 100dvh;
+  height: auto;
+  justify-content: center;
+  padding-block: 3.5rem;
+
+  > .container {
+    flex: 0 0 auto;
+  }
+}
