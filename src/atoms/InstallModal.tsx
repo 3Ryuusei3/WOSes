@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import SegmentedTabs from "./SegmentedTabs";
 import closeIcon from "../assets/close.svg";
+import logo from "../assets/lexio-logo.svg";
 import { ICONS } from "../utils/faIcons";
 import {
   canPromptInstall,
@@ -58,7 +59,7 @@ export default function InstallModal({ isOpen, setOpen }: InstallModalProps) {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label={t("install.title")}
+        aria-label={`${t("install.title")} LEXIO`}
       >
         <button
           type="button"
@@ -68,7 +69,10 @@ export default function InstallModal({ isOpen, setOpen }: InstallModalProps) {
         >
           <img src={closeIcon} alt="close" width={16} height={16} />
         </button>
-        <h2 className="won">{t("install.title")}</h2>
+        <h2 className="won install-modal__title">
+          {t("install.title")}
+          <img src={logo} alt="LEXIO" className="install-modal__logo" />
+        </h2>
         <p className="install-modal__intro">{t("install.intro")}</p>
         <SegmentedTabs
           tabs={[

@@ -6001,7 +6001,7 @@ html:not(.mobile) main:has(.game__container--home) {
 .install-modal__intro {
   font-size: 0.875rem;
   line-height: 1.35;
-  color: var(--clr-text-terciary);
+  color: var(--clr-cream);
 }
 .install-modal__now {
   align-self: center;
@@ -6078,4 +6078,46 @@ html:not(.mobile) main:has(.game__container--home) {
     padding-inline: 0.625rem;
     white-space: nowrap;
   }
+}
+
+// Start screen "Cómo jugar · Ranking · Descargar": dark with yellow text
+// and outline, so they stand out from the panel
+.game__container--home .secondary-actions .btn--ghost {
+  color: var(--clr-accent-primary) !important;
+  background: var(--clr-dark);
+  border-color: var(--clr-accent-primary);
+  box-shadow: 0 0.25rem 0 var(--clr-ink);
+
+  &:hover {
+    background: var(--clr-bg-primary-dim);
+  }
+}
+
+// "Descarga [logo]": the title with the LEXIO logo instead of the word
+.install-modal__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  line-height: 1;
+}
+.install-modal__logo {
+  display: block;
+  width: 5.5rem;
+  height: auto;
+  // Its shadow sits below the letters: up a touch so the letters line up
+  translate: 0 -0.0625rem;
+}
+
+// Player button: icon and name a bit closer, a little more room on the right
+.user-control {
+  gap: 0.25rem;
+}
+.mobile .user-control {
+  padding-left: 0.5rem;
+  padding-right: 0.75rem;
+}
+html:not(.mobile) .game__container--home .user-control {
+  padding-left: 0.875rem;
+  padding-right: 1.25rem;
 }
