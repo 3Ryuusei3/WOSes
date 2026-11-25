@@ -15,11 +15,17 @@ export default function DifficultyTag({
 
   return (
     <button
-      className={`btn btn--deco btn--xs mx-auto ${gameDifficulty === "easy" ? "btn--win" : gameDifficulty === "hard" ? "btn--lose" : gameDifficulty === "daily" ? "btn--daily" : ""}`}
+      className={`btn btn--deco btn--xs mx-auto difficulty-chip ${gameDifficulty === "easy" ? "btn--win" : gameDifficulty === "hard" ? "btn--lose" : gameDifficulty === "daily" ? "btn--daily" : ""}`}
     >
-      {t(`difficulties.${gameDifficulty}`)}{" "}
-      {dailyChallengeOriginalDifficulty &&
-        `(${t(`difficulties.${dailyChallengeOriginalDifficulty}`)})`}
+      {/* Full name, and a short one for tight spots (phones, see CSS) */}
+      <span className="difficulty-tag__long">
+        {t(`difficulties.${gameDifficulty}`)}{" "}
+        {dailyChallengeOriginalDifficulty &&
+          `(${t(`difficulties.${dailyChallengeOriginalDifficulty}`)})`}
+      </span>
+      <span className="difficulty-tag__short" aria-hidden="true">
+        {t(`difficulties.short.${gameDifficulty}`)}
+      </span>
     </button>
   );
 }

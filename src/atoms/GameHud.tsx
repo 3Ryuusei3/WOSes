@@ -76,7 +76,9 @@ export default function GameHud({
     <div className="game-hud">
       <div className="game-hud__side game-hud__side--start">
         <BackHomeButton className="back-control--hud" />
-        <div className="game-hud__card game-hud__card--level">
+        <div
+          className={`game-hud__card game-hud__card--level ${goalReached || allFound ? "is-goal" : ""}`}
+        >
           {!isDaily && (
             <div className="game-hud__stat">
               <span className="game-hud__label">

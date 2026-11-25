@@ -277,7 +277,7 @@ export default function GameLobby() {
             <RoomRankingPanel />
           </div>
         )}
-        {showSummary && view && (
+        {showSummary && view && !isMobile && (
           <LevelJump
             from={view.level - view.levelsToAdvance}
             to={view.level}
@@ -298,6 +298,7 @@ export default function GameLobby() {
                 numberOfRounds={view.numberOfRounds}
                 numberOfPerfectRounds={view.numberOfPerfectRounds}
                 secondsToRemove={view.secondsToRemove}
+                showLevel={isMobile}
               />
             )}
             <WordListDisplay

@@ -11,6 +11,8 @@ interface LobbyStatsContainerProps {
   numberOfRounds: number;
   numberOfPerfectRounds: number;
   secondsToRemove: number;
+  /** Phones: the level jump as one more tile (desktop shows LevelJump) */
+  showLevel?: boolean;
 }
 
 /** Level summary as a row of stat tiles */
@@ -23,12 +25,22 @@ export default function LobbyStatsContainer({
   numberOfRounds,
   numberOfPerfectRounds,
   secondsToRemove,
+  showLevel = false,
 }: LobbyStatsContainerProps) {
   const { t } = useTranslation();
   const perfect = levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR;
 
   return (
     <div className="stat-grid">
+      {showLevel && (
+        <StatBox
+          accent="white"
+          label={t("common.level").toUpperCase()}
+          value={level}
+          delta={`+${levelsToAdvance}`}
+          size="sm"
+        />
+      )}
       <StatBox
         accent="yellow"
         label={t("common.levelPoints", { level: level - levelsToAdvance })}

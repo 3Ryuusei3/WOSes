@@ -30,7 +30,6 @@ export default function WordListDisplay({
   return (
     <div className="v-section score__container--box word-review">
       <p>{t("common.lastWords")}</p>
-      <small className="word-review__hint">{t("game.wordMeaningHint")}</small>
       <ul
         className="word-review__list"
         style={

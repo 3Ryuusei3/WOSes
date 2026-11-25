@@ -149,7 +149,7 @@ const GamePage = () => {
       {/* Start screen (desktop): big logo with the tagline under it. While
           playing, the game bar takes the logo's place. */}
       {mode === "game" ? null : !isMobileLayout && mode === "start" ? (
-        <GameLogo large width={380} tagline={t("gameStart.nameAndDifficulty")} />
+        <GameLogo large width={320} tagline={t("gameStart.nameAndDifficulty")} />
       ) : (
         <GameLogo large={isScaled} />
       )}

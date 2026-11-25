@@ -5448,3 +5448,233 @@ html:not(.mobile) .round-timer__warning {
     border-radius: 0.5rem;
   }
 }
+
+// ===========================================================================
+// LEXIO · round of phone fixes (home, game bar, lobby)
+// ===========================================================================
+
+// Short difficulty name ("EST.") where space is tight: phones
+.difficulty-tag__short {
+  display: none;
+}
+.mobile .difficulty-chip {
+  .difficulty-tag__long {
+    display: none;
+  }
+  .difficulty-tag__short {
+    display: inline;
+  }
+}
+
+// Difficulty buttons: the chosen one tilts a little everywhere, and on
+// phones the rows are as close as the columns
+.difficulty-selector .btn.selected {
+  rotate: -1deg;
+}
+.mobile .difficulty-selector {
+  row-gap: 0.75rem;
+}
+
+// "¿Falta algo?": text on desktop, a "?" button on phones
+.help-button__icon {
+  display: none;
+}
+.mobile .help-button {
+  min-width: 2.5rem;
+  padding-inline: 0.5rem;
+
+  .help-button__text {
+    display: none;
+  }
+  .help-button__icon {
+    display: block;
+    font-size: 1.125rem;
+    line-height: 1;
+  }
+}
+
+// Desktop start screen: player and "¿Falta algo?" buttons yellow like the
+// others in the bar
+html:not(.mobile) .game__container--home {
+  .user-control,
+  .panel-actions .help-button {
+    background: var(--clr-accent-primary);
+    color: var(--clr-ink) !important;
+  }
+  .user-control img {
+    filter: none;
+  }
+}
+
+// Phones: taller fields (room code, group name, name...)
+.mobile input {
+  padding: 0.625rem 0.875rem;
+
+  &::placeholder {
+    font-size: 0.875rem;
+  }
+}
+.mobile .room-code-field__scan {
+  padding-inline: 1rem;
+}
+
+// ---------------------------------------------------------------------------
+// Phone game screen: everything fits, nothing scrolls
+// ---------------------------------------------------------------------------
+.mobile body:has(.keyboard-reserve) {
+  main {
+    padding-top: 0.5rem;
+  }
+  // No "¡Encuentra anagramas!" ribbon: its room goes to the words
+  .game__header .warning-message--default {
+    display: none;
+  }
+  .game__container:has(.game__header) {
+    padding-top: 0.5rem;
+  }
+  .game-hud {
+    margin-bottom: 0.625rem;
+  }
+  // Every row fits: tile + 2×2px outline + 2×1px word border; no minimum,
+  // the list never scrolls
+  .wordlist {
+    overflow: hidden;
+  }
+  .word,
+  .word.active {
+    border-width: 0;
+  }
+  .letter {
+    --tile: min(
+      1.875rem,
+      (
+          100cqw - (var(--wordlist-columns, 3) - 1) * 0.5rem -
+            var(--wordlist-columns, 3) * 6px -
+            (var(--sum-letters, 18) - var(--wordlist-columns, 3)) * 1px
+        ) / var(--sum-letters, 18),
+      100cqh / var(--wordlist-rows, 8) - 4px
+    );
+  }
+}
+
+// Phone game bar: clock in the exact middle (two equal sides), tighter
+.mobile .game-hud {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 0.375rem;
+}
+.mobile .game-hud__side--start {
+  display: flex;
+  gap: 0.375rem;
+
+  .game-hud__card {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+.mobile .game-hud__card {
+  gap: 0.375rem;
+  padding: 0.375rem 0.375rem;
+}
+.mobile .game-hud__card--score {
+  gap: 0.5rem;
+}
+.mobile .game-hud__value {
+  font-size: 1.125rem;
+  white-space: nowrap;
+
+  small {
+    font-size: 0.6875rem;
+  }
+}
+.mobile .back-control--hud {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+// The level card turns yellow too once the goal is reached
+.game-hud__card--level.is-goal .btn {
+  box-shadow: none;
+}
+
+// Phones: "¡Objetivo conseguido!" and "¡Últimos segundos!" in the bar,
+// hanging from the bottom of the clock (never over the letters)
+.mobile .round-burst {
+  top: calc(100% - 1.125rem);
+}
+.mobile .round-burst__ribbon {
+  padding: 0.125rem 0.625rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.1875rem 0 var(--clr-ink);
+}
+.mobile .round-burst__spark {
+  width: 0.625rem;
+  height: 0.625rem;
+  margin: -0.3125rem;
+}
+.mobile .round-timer__warning {
+  top: calc(100% - 0.625rem);
+  padding: 0.0625rem 0.5rem;
+  font-size: 0.6875rem;
+}
+
+// ---------------------------------------------------------------------------
+// Lobby / end screen on phones: more fits on one screen
+// ---------------------------------------------------------------------------
+// Difficulty tag in the logo row, right of the back button
+.mobile .game__container:has(> .screen-ribbon) {
+  padding-top: 2.25rem;
+
+  > .difficulty-tag {
+    top: -3.25rem;
+    left: 2.875rem;
+    display: flex;
+    align-items: center;
+    height: 2rem;
+
+    .btn {
+      font-size: 0.75rem;
+      padding: 0.125rem 0.5rem;
+    }
+  }
+}
+// Last words: rows closer
+.mobile .word-review__word {
+  line-height: 1.05;
+  padding-block: 0;
+}
+// Next challenges: the title sits on the card's top edge and the challenges
+// line up side by side
+.next-challenges.score__container--box {
+  position: relative;
+  padding-top: 1.25rem;
+  margin-top: 0.75rem;
+
+  > p {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% -50%;
+    margin: 0;
+    white-space: nowrap;
+  }
+  > .v-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.375rem;
+  }
+}
+.mobile .next-challenges.score__container--box {
+  padding: 1rem 0.5rem 0.625rem;
+}
+
+// Phones: the logo lined up with the corner buttons beside it
+.mobile main > .logo-container {
+  translate: 0 0.375rem;
+}
+
+// Phones, lobby: the level jump is one more tile (white), so the stats are
+// a 2 × 3 grid
+.stat-grid > .stat-box.stat-box--white {
+  --accent: var(--clr-cream);
+}

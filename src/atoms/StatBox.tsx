@@ -8,7 +8,7 @@ interface StatBoxProps {
   /** What changed this level, shown small after the value: "+48", "−2s" */
   delta?: string;
   /** Colour of the tile's band and number (inside a .stat-grid) */
-  accent?: "yellow" | "cyan" | "red" | "orange" | "green";
+  accent?: "yellow" | "cyan" | "red" | "orange" | "green" | "white";
 }
 
 /** Dark tile: small label on top, big yellow number */

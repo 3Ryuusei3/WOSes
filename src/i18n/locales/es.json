@@ -72,6 +72,12 @@
     "hard": "EXPERTO",
     "daily": "RETO DIARIO",
     "tooltip": "Palabras organizadas por niveles según la frecuencia de uso percibida por los usuarios. La dificultad \"EXPERTO\" contiene todas las palabras que existen en la RAE.",
+    "short": {
+      "easy": "EST.",
+      "medium": "DIF.",
+      "hard": "EXP.",
+      "daily": "RETO"
+    },
     "hints": {
       "easy": "PALABRAS COMUNES",
       "medium": "MENOS FRECUENTES",
