@@ -6,6 +6,9 @@ import Difficulty from "../types/Difficulty";
 import DifficultyTag from "./DifficultyTag";
 import BackHomeButton from "./BackHomeButton";
 import RoundTimer from "./RoundTimer";
+import useMobileLayout from "../hooks/useMobileLayout";
+import { useNavigate } from "react-router-dom";
+import { requestExit } from "../utils/leaveToHome";
 
 interface GameHudProps {
   words: Word[];
@@ -44,6 +47,10 @@ export default function GameHud({
   trailing,
 }: GameHudProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  // Phones: no back button in the bar (more room for the level card); the
+  // clock does its job when tapped
+  const isMobile = useMobileLayout();
   const guessedCount = words.filter((w) => w.guessed).length;
   const points = correctWordsPoints();
   const isDaily = gameDifficulty === "daily";
@@ -75,7 +82,7 @@ export default function GameHud({
   return (
     <div className="game-hud">
       <div className="game-hud__side game-hud__side--start">
-        <BackHomeButton className="back-control--hud" />
+        {!isMobile && <BackHomeButton className="back-control--hud" />}
         <div
           className={`game-hud__card game-hud__card--level ${goalReached || allFound ? "is-goal" : ""} ${level >= 100 ? "is-wide-level" : ""}`}
         >
@@ -101,6 +108,8 @@ export default function GameHud({
         durationMs={durationMs}
         RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
         SHOW_LETTERS_PERCENTAGE={SHOW_LETTERS_PERCENTAGE}
+        onClick={isMobile ? () => requestExit(navigate) : undefined}
+        clickLabel={t("game.backHome")}
       />
 
       {burst && (

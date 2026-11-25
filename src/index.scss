@@ -5777,3 +5777,17 @@ html:not(.mobile) .game__container--home {
     background-position: 0% 0;
   }
 }
+
+// Phones: the clock is the way out (tap → leave confirmation)
+.round-timer--button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active .round-timer__beat {
+    scale: 0.94;
+  }
+  &:focus-visible {
+    outline: 0.1875rem solid var(--clr-accent-primary);
+    outline-offset: 0.125rem;
+  }
+}

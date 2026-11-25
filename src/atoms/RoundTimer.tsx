@@ -11,6 +11,9 @@ interface RoundTimerProps {
   RUNNING_OUT_OF_TIME_PERCENTAGE: number;
   /** When the hidden letters show up: the ring turns yellow */
   SHOW_LETTERS_PERCENTAGE: number;
+  /** Phones: tapping the clock does what the back button does */
+  onClick?: () => void;
+  clickLabel?: string;
 }
 
 const R = 44;
@@ -26,6 +29,8 @@ export default function RoundTimer({
   durationMs,
   RUNNING_OUT_OF_TIME_PERCENTAGE,
   SHOW_LETTERS_PERCENTAGE,
+  onClick,
+  clickLabel,
 }: RoundTimerProps) {
   const { t } = useTranslation();
   const seconds = Math.max(0, Math.ceil(timeLeft / 1000));
@@ -43,9 +48,27 @@ export default function RoundTimer({
 
   return (
     <div
-      className={`round-timer round-timer--${tone} ${urgent ? "round-timer--urgent" : ""}`}
-      role="timer"
-      aria-label={t("game.secondsLeft", { count: seconds })}
+      className={`round-timer round-timer--${tone} ${urgent ? "round-timer--urgent" : ""} ${onClick ? "round-timer--button" : ""}`}
+      role={onClick ? "button" : "timer"}
+      aria-label={
+        onClick && clickLabel
+          ? `${clickLabel} · ${t("game.secondsLeft", { count: seconds })}`
+          : t("game.secondsLeft", { count: seconds })
+      }
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      // Don't close the device keyboard just by touching it
+      onMouseDown={onClick ? (e) => e.preventDefault() : undefined}
     >
       <div className="round-timer__beat" key={urgent ? seconds : "calm"}>
       <svg className="round-timer__ring" viewBox="0 0 100 100" aria-hidden="true">
