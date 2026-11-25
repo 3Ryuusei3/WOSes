@@ -80,13 +80,13 @@ export default function GameLost() {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   // Single player on mobile: ranking is a tab of the screen instead of a
   // modal. Multiplayer (any device): summary / room ranking / global top.
-  // Phones also get the last level's words in a tab of their own.
-  const [mobileTab, setMobileTab] = useState<"summary" | "words" | "ranking">(
+  // The summary tab has the stats and the last level's words together.
+  const [mobileTab, setMobileTab] = useState<"summary" | "ranking">(
     "summary",
   );
-  const [multiTab, setMultiTab] = useState<
-    "summary" | "words" | "ranking" | "top"
-  >("summary");
+  const [multiTab, setMultiTab] = useState<"summary" | "ranking" | "top">(
+    "summary",
+  );
   const { words } = useLanguageWords(gameDifficulty);
   // Single player: did this game make it into the ranking?
   const [placement, setPlacement] = useState<{
@@ -448,9 +448,6 @@ export default function GameLost() {
           <SegmentedTabs
             tabs={[
               { key: "summary", label: t("common.summary") },
-              ...(isMobileUa
-                ? [{ key: "words" as const, label: t("common.lastLevel") }]
-                : []),
               { key: "ranking", label: t("common.ranking") },
               { key: "top", label: t("common.globalTop") },
             ]}
@@ -462,7 +459,6 @@ export default function GameLost() {
             <SegmentedTabs
               tabs={[
                 { key: "summary", label: t("common.summary") },
-                { key: "words", label: t("common.lastLevel") },
                 { key: "ranking", label: t("common.ranking") },
               ]}
               active={mobileTab}
@@ -472,22 +468,21 @@ export default function GameLost() {
         )}
         {showSummary && isMulti && (
           // Desktop: points and levels (2x2) on the left, words on the right.
-          // Phones: the words have their own tab.
+          // Phones: one under the other.
           <div className="lost-summary">
             {reviewBlock}
-            {!isMobileUa && wordsBlock}
+            {wordsBlock}
           </div>
         )}
         {showSummary && !isMulti && reviewBlock}
+        {/* Phones: the words right under the stats, same tab */}
+        {showSummary && !isMulti && isMobileUa && wordsBlock}
         {showSummary && !isMulti && !isMobileUa && (
           <div className="game__summary">
             {wordsBlock}
             <div className="score__container--box pos-rel">{ranking}</div>
           </div>
         )}
-        {isMobileUa &&
-          (isMulti ? multiTab === "words" : mobileTab === "words") &&
-          wordsBlock}
         {/* Always mounted on phones (hidden outside its tab), so the note
             under the words knows where this game landed */}
         {!isMulti && isMobileUa && (
