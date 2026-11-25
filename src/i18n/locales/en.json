@@ -190,7 +190,8 @@
     "inAllTime": "YOU MADE THE ALL-TIME TOP! PLACE {{rank}}",
     "inWeekly": "YOU MADE THIS WEEK'S TOP! PLACE {{rank}}",
     "notIn": "YOU DIDN'T MAKE THE RANKING THIS TIME",
-    "notInHint": "THIS WEEK'S 10TH REACHED LEVEL {{level}}"
+    "notInHint": "THIS WEEK'S 10TH REACHED LEVEL {{level}}",
+    "empty": "NOBODY IN THIS RANKING YET. BE THE FIRST!"
   },
   "mechanics": {
     "title": "GAME MECHANICS",

@@ -190,7 +190,8 @@
     "inAllTime": "¡HAS ENTRADO EN EL TOP TOTAL! PUESTO {{rank}}",
     "inWeekly": "¡HAS ENTRADO EN EL TOP SEMANAL! PUESTO {{rank}}",
     "notIn": "ESTA VEZ NO HAS ENTRADO EN EL RANKING",
-    "notInHint": "EL 10º DEL TOP SEMANAL LLEGÓ AL NIVEL {{level}}"
+    "notInHint": "EL 10º DEL TOP SEMANAL LLEGÓ AL NIVEL {{level}}",
+    "empty": "TODAVÍA NO HAY NADIE EN ESTE RANKING. ¡SÉ EL PRIMERO!"
   },
   "mechanics": {
     "title": "MECÁNICAS DEL JUEGO",

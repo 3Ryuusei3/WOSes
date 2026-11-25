@@ -196,6 +196,10 @@ export default function TopScores({
   };
 
   const currentScores = showAllTime ? allTimeScores : weeklyScores;
+  const shownCount = Math.min(
+    10,
+    (isDaily ? dailyScores : currentScores).filter((e) => !!e?.name).length,
+  );
   // This game outside the visible top 10: its position goes under the list
   // (the rank is computed against the all-time ranking)
   const showOwnRank =
@@ -319,6 +323,10 @@ export default function TopScores({
             <div className="info-icon">i</div>
           </Tooltip>
         )}
+        {/* Nobody yet: a message instead of empty rows */}
+        {shownCount === 0 && !(showOwnRank && roomRank) ? (
+          <p className="ranking__empty">{t("topScores.empty")}</p>
+        ) : (
         <div className="ranking__grid">
           <div className="ranking__row ranking__row--head">
             <span className="ranking__cell ranking__cell--rank"></span>
@@ -332,7 +340,8 @@ export default function TopScores({
               {isDaily ? t("topScores.columnTime") : t("topScores.columnLevel")}
             </span>
           </div>
-          {Array.from({ length: 10 }, (_, index) => {
+          {/* Only the places that are taken */}
+          {Array.from({ length: shownCount }, (_, index) => {
             if (isDaily) {
               const entry = dailyScores[index];
               return (
@@ -424,6 +433,7 @@ export default function TopScores({
             </>
           )}
         </div>
+        )}
       </div>
     </div>
   );
