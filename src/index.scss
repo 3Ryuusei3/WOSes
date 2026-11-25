@@ -4613,7 +4613,7 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
     position: absolute;
     inset: 0 0 auto;
     height: 0.375rem;
-    background: var(--accent);
+    background: var(--band, var(--accent));
     border-bottom: 0.125rem solid var(--clr-ink);
   }
   h3 {
@@ -4628,7 +4628,7 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
     rotate: 0.75deg;
   }
   &:nth-child(5n + 3) {
-    --accent: var(--clr-lose);
+    --accent: var(--clr-mirrored);
     rotate: -0.5deg;
   }
   &:nth-child(5n + 4) {
@@ -4956,39 +4956,29 @@ html:not(.mobile) .round-timer__warning {
   }
 }
 
-// Stat tile that stands out (perfect round / time penalty): the whole tile
-// lights up instead of the number changing colour
-.stat-grid > .stat-box.stat-box--good {
-  --accent: var(--clr-still);
-  background: #0f5a2a;
-  border-color: var(--clr-still);
-  box-shadow:
-    0 0 0 0.1875rem rgba(26, 233, 64, 0.25),
-    0 0.3125rem 0 var(--clr-ink);
-
-  h3 {
-    color: var(--clr-cream);
-  }
-}
-// Penalty: bright pink sticker (the dark red looked dull)
-.stat-grid > .stat-box.stat-box--bad {
-  --accent: #ff8ab6;
-  background: var(--clr-lose);
-  box-shadow:
-    0 0 0 0.1875rem rgba(248, 80, 145, 0.35),
-    0 0.3125rem 0 var(--clr-ink);
-
-  p,
-  h3 {
-    color: var(--clr-ink);
-    text-shadow: none;
-  }
-}
-
 // What changed this level, after the value: "431 (+48)", "88s (−2s)"
 .stat-delta {
   margin-left: 0.375rem;
   font-size: 0.55em;
   vertical-align: 0.25em;
   opacity: 0.85;
+}
+
+// A stat that stands out only changes the tile's top band (and its change in
+// brackets): time penalty in red, perfect round in green
+.stat-grid > .stat-box.stat-box--bad {
+  --band: #ff3b5c;
+
+  .stat-delta {
+    color: #ff6b84;
+    opacity: 1;
+  }
+}
+.stat-grid > .stat-box.stat-box--good {
+  --band: var(--clr-still);
+
+  .stat-delta {
+    color: var(--clr-still);
+    opacity: 1;
+  }
 }
