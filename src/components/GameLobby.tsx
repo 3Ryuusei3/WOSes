@@ -9,7 +9,7 @@ import WordListDisplay from "../atoms/WordListDisplay";
 import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import HelpButton from "../atoms/HelpButton";
 import BackHomeButton from "../atoms/BackHomeButton";
-import LevelStars from "../atoms/LevelStars";
+import LevelJump from "../atoms/LevelJump";
 import LobbyStatsContainer from "../atoms/LobbyStatsContainer";
 import NextChallengesSection from "../atoms/NextChallengesSection";
 import ReconnectButton from "../atoms/ReconnectButton";
@@ -278,18 +278,10 @@ export default function GameLobby() {
           </div>
         )}
         {showSummary && view && (
-          <div className="lobby-advance">
-          <LevelStars levelsToAdvance={view.levelsToAdvance} />
-          <h3>
-            {t("lobby.youAdvanced")}
-            {view.levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
-              <span className="won"> {view.levelsToAdvance} </span>
-            ) : (
-              <span className="highlight"> {view.levelsToAdvance} </span>
-            )}
-            {view.levelsToAdvance > 1 ? t("lobby.levels") : t("lobby.level")}
-          </h3>
-          </div>
+          <LevelJump
+            from={view.level - view.levelsToAdvance}
+            to={view.level}
+          />
         )}
         {showSummary && !view && (
           <p className="txt-center unguessed">{t("lobby.loadingSummary")}</p>

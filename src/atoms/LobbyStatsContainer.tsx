@@ -38,7 +38,7 @@ export default function LobbyStatsContainer({
       <StatBox
         label={t("common.remainingTime")}
         value={`${gameTime}${t("common.seconds")}`}
-        valueClassName={perfect ? "stat-good" : secondsToRemove > 0 ? "stat-bad" : ""}
+        tone={perfect ? "good" : secondsToRemove > 0 ? "bad" : undefined}
         size="sm"
       />
       <StatBox
@@ -49,7 +49,7 @@ export default function LobbyStatsContainer({
       <StatBox
         label={t("common.perfectRounds")}
         value={numberOfPerfectRounds}
-        valueClassName={perfect ? "stat-good" : ""}
+        tone={perfect ? "good" : undefined}
         size="sm"
       />
     </div>

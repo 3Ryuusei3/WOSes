@@ -980,7 +980,7 @@ main {
 .selectedWord {
   display: flex;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -4159,18 +4159,18 @@ html:not(.mobile) .game__container--home .difficulty-hint {
 
   // Loose stickers: not all on the same line
   &:nth-child(4n + 2) {
-    top: 0.375rem;
-  }
-  &:nth-child(4n + 4) {
-    top: 0.25rem;
-  }
-}
-.mobile .selectedLetter {
-  &:nth-child(4n + 2) {
     top: 0.1875rem;
   }
   &:nth-child(4n + 4) {
     top: 0.125rem;
+  }
+}
+.mobile .selectedLetter {
+  &:nth-child(4n + 2) {
+    top: 0.125rem;
+  }
+  &:nth-child(4n + 4) {
+    top: 0.0625rem;
   }
 }
 
@@ -4294,74 +4294,6 @@ html:not(.mobile) .game__container--home .difficulty-hint {
   font-size: 1.125rem;
 }
 
-.lobby-advance {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.125rem;
-
-  h3 {
-    font-size: 1.75rem;
-    color: var(--clr-cream);
-    text-shadow: 0 0.125rem 0 var(--clr-ink);
-  }
-}
-.level-stars {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.375rem;
-}
-.level-stars__star {
-  width: 3rem;
-  height: 3rem;
-  fill: var(--clr-dark);
-  stroke: var(--clr-ink);
-  stroke-width: 2;
-  stroke-linejoin: round;
-
-  &.is-lit {
-    fill: var(--clr-accent-primary);
-  }
-  // Middle one bigger and higher; the outer ones tilted
-  .level-stars--3 &:nth-child(1) {
-    rotate: -10deg;
-  }
-  .level-stars--3 &:nth-child(2) {
-    width: 3.75rem;
-    height: 3.75rem;
-    translate: 0 -0.5rem;
-  }
-  .level-stars--3 &:nth-child(3) {
-    rotate: 10deg;
-  }
-  .level-stars--5 & {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-}
-.mobile {
-  .lobby-advance {
-    gap: 0.5rem;
-
-    h3 {
-      font-size: 0.9375rem;
-    }
-  }
-  .level-stars__star {
-    width: 1.75rem;
-    height: 1.75rem;
-  }
-  .level-stars--3 .level-stars__star:nth-child(2) {
-    width: 2.125rem;
-    height: 2.125rem;
-    translate: 0 -0.25rem;
-  }
-  .level-stars--5 .level-stars__star {
-    width: 1.375rem;
-    height: 1.375rem;
-  }
-}
-
 // Stat tiles in one row
 .stat-grid {
   display: grid;
@@ -4378,12 +4310,6 @@ html:not(.mobile) .game__container--home .difficulty-hint {
   > :last-child:nth-child(odd) {
     grid-column: span 2;
   }
-}
-.stat-box h3.stat-good {
-  color: var(--clr-still);
-}
-.stat-box h3.stat-bad {
-  color: var(--clr-lose);
 }
 
 // Lobby summary: stats across, then words (wide) + next challenge
@@ -4706,18 +4632,12 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
     rotate: -0.5deg;
   }
   &:nth-child(5n + 4) {
-    --accent: var(--clr-still);
+    --accent: #ff9a3c;
     rotate: 1deg;
   }
   &:nth-child(5n + 5) {
     --accent: var(--clr-mirrored);
     rotate: -0.75deg;
-  }
-  h3.stat-good {
-    color: var(--clr-still);
-  }
-  h3.stat-bad {
-    color: var(--clr-lose);
   }
 }
 .mobile .stat-grid > .stat-box {
@@ -4950,4 +4870,115 @@ html:not(.mobile) .round-timer__warning {
 }
 .custom-radio input[type="radio"]:checked ~ span {
   color: var(--clr-ink);
+}
+
+// Lobby: level just played → next level, with the jump in between
+.level-jump {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.level-jump__level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 5.5rem;
+  padding: 0.375rem 1rem 0.5rem;
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--clr-text-secondary);
+  background: var(--clr-dark);
+  border: var(--ink-w) solid var(--clr-ink);
+  border-radius: 1rem;
+  box-shadow: 0 0.3125rem 0 var(--clr-ink);
+  rotate: -2deg;
+
+  small {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: var(--clr-muted);
+  }
+  &--next {
+    color: var(--clr-ink);
+    background: var(--clr-accent-primary);
+    rotate: 2deg;
+
+    small {
+      color: var(--clr-ink);
+    }
+  }
+}
+.level-jump__arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  color: var(--clr-cream);
+
+  svg {
+    width: 3rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+.level-jump__plus {
+  font-size: 1.375rem;
+  color: var(--clr-accent-primary);
+  text-shadow: 0 0.125rem 0 var(--clr-ink);
+}
+.mobile {
+  .level-jump {
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+  .level-jump__level {
+    min-width: 4rem;
+    padding: 0.25rem 0.625rem 0.375rem;
+    font-size: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.1875rem 0 var(--clr-ink);
+
+    small {
+      font-size: 0.5rem;
+    }
+  }
+  .level-jump__arrow svg {
+    width: 2rem;
+  }
+  .level-jump__plus {
+    font-size: 1rem;
+  }
+}
+
+// Stat tile that stands out (perfect round / time penalty): the whole tile
+// lights up instead of the number changing colour
+.stat-grid > .stat-box.stat-box--good {
+  --accent: var(--clr-still);
+  background: #0f5a2a;
+  border-color: var(--clr-still);
+  box-shadow:
+    0 0 0 0.1875rem rgba(26, 233, 64, 0.25),
+    0 0.3125rem 0 var(--clr-ink);
+
+  h3 {
+    color: var(--clr-cream);
+  }
+}
+.stat-grid > .stat-box.stat-box--bad {
+  --accent: var(--clr-lose);
+  background: #6a1240;
+  border-color: var(--clr-lose);
+  box-shadow:
+    0 0 0 0.1875rem rgba(248, 80, 145, 0.25),
+    0 0.3125rem 0 var(--clr-ink);
+
+  h3 {
+    color: var(--clr-cream);
+  }
 }
