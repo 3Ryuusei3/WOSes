@@ -61,7 +61,8 @@
     "cancel": "CANCEL",
     "soundOn": "TURN SOUND ON",
     "soundOff": "MUTE",
-    "globalTop": "GLOBAL TOP"
+    "globalTop": "GLOBAL TOP",
+    "lastLevel": "LAST LEVEL"
   },
   "difficulties": {
     "easy": "STANDARD",
@@ -221,6 +222,32 @@
     "and": "AND",
     "warning": "WARNING! ",
     "hide": "HIDE"
+  },
+  "mechanicChips": {
+    "still": {
+      "long": "STUCK LETTER",
+      "short": "STUCK"
+    },
+    "dark": {
+      "long": "DARK LETTER",
+      "short": "DARK"
+    },
+    "fake": {
+      "long": "FAKE LETTER",
+      "short": "FAKE"
+    },
+    "hidden": {
+      "long": "HIDDEN LETTER",
+      "short": "HIDDEN"
+    },
+    "mirrored": {
+      "long": "MIRROR",
+      "short": "MIRROR"
+    },
+    "first": {
+      "long": "FIRST LETTER",
+      "short": "1ST LETTER"
+    }
   },
   "warning": {
     "stillLetter": "The letter <strong>{{letter}}</strong> stays still",

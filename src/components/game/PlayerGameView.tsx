@@ -293,7 +293,7 @@ export default function PlayerGameView({
             (it, idx) => (
               <h4
                 key={`${idx}-${it.word}`}
-                className={`${it.status === "correct" ? "highlight" : it.status === "tip" ? "tip" : "dark"} txt-center`}
+                className={`attempt attempt--${it.status} ${it.status === "correct" ? "highlight" : it.status === "tip" ? "tip" : "dark"} txt-center`}
               >
                 {it.word.toUpperCase()}
               </h4>

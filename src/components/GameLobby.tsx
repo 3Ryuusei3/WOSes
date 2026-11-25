@@ -256,9 +256,9 @@ export default function GameLobby() {
           />
         </div>
         {view?.levelsToAdvance === LEVELS_TO_ADVANCE.FIVE_STAR ? (
-          <h1 className="won">{t("lobby.perfect")}</h1>
+          <h1 className="screen-ribbon screen-ribbon--green">{t("lobby.perfect")}</h1>
         ) : (
-          <h1 className="highlight">{t("lobby.congratulations")}</h1>
+          <h1 className="screen-ribbon screen-ribbon--green">{t("lobby.congratulations")}</h1>
         )}
         {isMulti && (
           <SegmentedTabs

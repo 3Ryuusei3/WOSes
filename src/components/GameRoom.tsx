@@ -120,9 +120,10 @@ export default function GameRoom() {
       <div className="room-invite__qr">
         <QRCodeSVG
           value={window.location.href}
-          bgColor="#420072"
+          bgColor="#fff6dc"
           size={256}
-          fgColor="#ddccff"
+          fgColor="#24004a"
+          marginSize={2}
           style={{ width: "100%", height: "100%" }}
         />
       </div>
@@ -140,7 +141,10 @@ export default function GameRoom() {
       <div className="v-section gap-xs">
         {listedPlayers.length > 0 ? (
           listedPlayers.map((player, index) => (
-            <div className="h-section gap-sm f-ai-c" key={player.id}>
+            <div
+              className={`h-section gap-sm f-ai-c player-row ${player.id === playerId ? "player-row--me" : ""}`}
+              key={player.id}
+            >
               <h3 className="won">{String(index + 1).padStart(2, "0")}</h3>
               <h3 className={player.id === playerId ? "won" : "highlight"}>
                 {player.name}

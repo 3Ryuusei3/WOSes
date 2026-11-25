@@ -1,7 +1,7 @@
 {
-  "name": "Words on Stream en Español",
-  "short_name": "Woses",
-  "description": "Juego de palabras en español.",
+  "name": "LEXIO",
+  "short_name": "LEXIO",
+  "description": "Juego de anagramas en español: encuentra todas las palabras antes de que acabe el tiempo.",
   "lang": "es",
   "start_url": "/",
   "scope": "/",

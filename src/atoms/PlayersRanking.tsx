@@ -104,7 +104,10 @@ export default function PlayersRanking({
                     : "lost";
             const isMe = player.name === playerName;
             return (
-              <div className="h-section gap-sm" key={player.id}>
+              <div
+                className={`h-section gap-sm player-row ${index === 0 ? "player-row--first" : ""} ${isMe ? "player-row--me" : ""}`}
+                key={player.id}
+              >
                 <h5 className={placeClass}>
                   {String(index + 1).padStart(2, "0")}
                 </h5>

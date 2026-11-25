@@ -144,7 +144,8 @@ function useBestMobileColumns(
       );
       // Mirrors the .mobile .wordlist / .letter sizes in index.scss
       const colGap = 0.5 * rem;
-      const gap = 0.125 * rem;
+      const gap = 1; // px between letters
+      const rowChrome = 5; // px: row padding + outline, top and bottom
       const maxTile = 1.75 * rem;
       // Below this the list scrolls instead of shrinking (see index.scss)
       const minTileByHeight = 0.6875 * rem;
@@ -155,9 +156,10 @@ function useBestMobileColumns(
       for (const cols of [2, 3, 4]) {
         const colWidth = (width - (cols - 1) * colGap) / cols;
         const byWidth =
-          (colWidth - (maxLetters - 1) * gap - 0.25 * rem) / maxLetters;
+          (colWidth - (maxLetters - 1) * gap - 0.375 * rem) / maxLetters;
         const rows = Math.ceil(count / cols);
-        const byHeight = (height - (rows - 1) * rowGap) / rows;
+        const byHeight =
+          (height - (rows - 1) * rowGap) / rows - rowChrome;
         const tile = Math.min(
           byWidth,
           Math.max(byHeight, minTileByHeight),

@@ -5,6 +5,7 @@ interface StatBoxProps {
   size?: "sm" | "md";
 }
 
+/** Dark tile: small label on top, big yellow number */
 export default function StatBox({
   label,
   value,
@@ -14,7 +15,7 @@ export default function StatBox({
   const sizeClass = size === "sm" ? "score__container--box-sm" : "";
 
   return (
-    <div className={`score__container--box ${sizeClass} won`}>
+    <div className={`score__container--box ${sizeClass} stat-box`}>
       <p>{label}</p>
       <h3 className={valueClassName}>{value}</h3>
     </div>

@@ -61,7 +61,8 @@
     "cancel": "CANCELAR",
     "soundOn": "ACTIVAR SONIDO",
     "soundOff": "SILENCIAR",
-    "globalTop": "TOP GLOBAL"
+    "globalTop": "TOP GLOBAL",
+    "lastLevel": "ÚLTIMO NIVEL"
   },
   "difficulties": {
     "easy": "ESTÁNDAR",
@@ -221,6 +222,32 @@
     "and": "Y",
     "warning": "¡CUIDADO! ",
     "hide": "OCULTAN"
+  },
+  "mechanicChips": {
+    "still": {
+      "long": "LETRA ENREDADA",
+      "short": "ENREDADA"
+    },
+    "dark": {
+      "long": "LETRA OSCURA",
+      "short": "OSCURA"
+    },
+    "fake": {
+      "long": "LETRA FALSA",
+      "short": "FALSA"
+    },
+    "hidden": {
+      "long": "LETRA OCULTA",
+      "short": "OCULTA"
+    },
+    "mirrored": {
+      "long": "ESPEJO",
+      "short": "ESPEJO"
+    },
+    "first": {
+      "long": "PRIMERA LETRA",
+      "short": "1ª LETRA"
+    }
   },
   "lobby": {
     "perfect": "¡PERFECTO!",

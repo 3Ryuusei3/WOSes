@@ -296,7 +296,10 @@ export default function TopScores({
             if (isDaily) {
               const entry = dailyScores[index];
               return (
-                <div key={index} className="ranking__row">
+                <div
+                  key={index}
+                  className={`ranking__row ${!entry?.name ? "ranking__row--empty" : index === 0 ? "ranking__row--first" : ""}`}
+                >
                   <span className="ranking__cell ranking__cell--rank">
                     <span className={rankToneClass(index)}>
                       {String(index + 1).padStart(2, "0")}
@@ -334,7 +337,7 @@ export default function TopScores({
             return (
               <div
                 key={index}
-                className={`ranking__row ${isMine ? "ranking__row--mine" : ""}`}
+                className={`ranking__row ${isMine ? "ranking__row--mine" : !entry.name ? "ranking__row--empty" : index === 0 ? "ranking__row--first" : ""}`}
               >
                 <span className="ranking__cell ranking__cell--rank">
                   <span className={rankToneClass(index)}>

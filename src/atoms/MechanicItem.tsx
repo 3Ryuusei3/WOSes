@@ -14,7 +14,7 @@ export default function MechanicItem({ mechanicKey, onClick }: MechanicItemProps
 
   return (
     <h4
-      className={`mechanic-button ${mechanicInfo.cssClass}`}
+      className={`mechanic-button mechanic-chip mechanic-chip--${mechanicKey}`}
       onClick={() => onClick(mechanicKey)}
       // Keyboard accessible: it opens the letter-type explanation
       role="button"

@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap");
-
 :root {
   --clr-bg-primary: #420072;
   --clr-bg-primary-dim: #4e0582;
@@ -14,11 +12,11 @@
   --clr-border-primary: #5a1e9a;
   --clr-border-secondary: #f5f0ff;
 
-  --clr-accent-primary: #f7c351;
-  --clr-accent-primary-highlight: #ffe600;
-  --clr-accent-primary-dim: #f7c35180;
-  --clr-accent-secondary: #e66820;
-  --clr-accent-secondary-highlight: #702f01;
+  --clr-accent-primary: #ffcc1f;
+  --clr-accent-primary-highlight: #ffd84d;
+  --clr-accent-primary-dim: #ffcc1f80;
+  --clr-accent-secondary: #24004a;
+  --clr-accent-secondary-highlight: #24004a;
   --clr-accent-terciary: #f9d27f;
 
   --clr-dark: #3a0078;
@@ -48,17 +46,26 @@
   --border-width: 0.125rem;
   --box-shadow-width: 0.25rem;
 
+  // LEXIO "sticker" look: thick dark outline + solid drop shadow
+  --clr-ink: #24004a;
+  --clr-cream: #fff6dc;
+  --clr-muted: #c9b8ea;
+  --font-display: "Lilita One", "M PLUS Rounded 1c", system-ui, sans-serif;
+  --ink-w: 0.1875rem; // outline of buttons, tiles, inputs
+  --ink-w-lg: 0.25rem; // outline of panels
+  --ink-drop: 0.3125rem; // solid shadow under buttons
+  --ink-drop-lg: 0.5rem; // solid shadow under panels
+
   font-family:
     "M PLUS Rounded 1c", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 900;
   color: var(--clr-text-secondary);
-  background: repeating-linear-gradient(
-    45deg,
-    var(--clr-bg-primary-dim),
-    var(--clr-bg-primary-dim) 0.3125rem,
-    var(--clr-bg-primary) 0.3125rem,
-    var(--clr-bg-primary) 0.625rem
+  background-color: var(--clr-bg-primary);
+  background-image: radial-gradient(
+    var(--clr-border-primary) 0.125rem,
+    transparent 0.1625rem
   );
+  background-size: 1.375rem 1.375rem;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   font-variant-numeric: tabular-nums;
@@ -105,25 +112,32 @@ body {
   width: 100%;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
 h1 {
   font-size: 2.5rem;
   line-height: 1.1;
   text-align: center;
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-bg-terciary);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
 }
 
 h2 {
   font-size: 1.5rem;
   line-height: 1.1;
   text-align: center;
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-bg-terciary);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
 }
 
 h3 {
   font-size: 1.375rem;
   line-height: 1.1;
   text-align: center;
-  font-weight: 900;
 }
 
 h4 {
@@ -184,19 +198,24 @@ button,
   gap: 0.25rem;
   width: fit-content;
   padding: 0.75rem 2.25rem;
-  color: var(--clr-text-primary) !important;
+  color: var(--clr-ink) !important;
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 1.125rem;
-  border: 1px solid var(--clr-accent-primary);
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  border: var(--ink-w) solid var(--clr-ink);
   background-color: var(--clr-accent-primary);
-  box-shadow:
-    0 0.1875rem 0 0 var(--clr-accent-secondary),
-    0 -0.1875rem 0 0 var(--clr-accent-terciary),
-    0 0.375rem 0 0 var(--clr-text-primary);
-  border-radius: 0.25rem;
+  box-shadow: 0 var(--ink-drop) 0 0 var(--clr-ink);
+  border-radius: 0.875rem;
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    opacity 0.2s ease;
 
   span {
     text-transform: uppercase;
@@ -205,17 +224,17 @@ button,
   &:hover,
   &.selected {
     background-color: var(--clr-accent-primary-highlight);
-    box-shadow:
-      0 0.1875rem 0 0 var(--clr-accent-secondary),
-      0 -0.1875rem 0 0 var(--clr-accent-terciary);
+  }
+
+  // Pressed: the sticker sinks onto its shadow
+  &:active:not(:disabled) {
+    transform: translateY(calc(var(--ink-drop) * 0.6));
+    box-shadow: 0 calc(var(--ink-drop) * 0.4) 0 0 var(--clr-ink);
   }
 
   &:disabled {
-    background-color: var(--clr-accent-primary-dim);
-    border: 1px solid var(--clr-accent-primary-dim);
-    box-shadow:
-      0 0.1875rem 0 0 var(--clr-accent-primary-dim),
-      0 -0.1875rem 0 0 var(--clr-accent-primary-dim);
+    opacity: 0.5;
+    background-color: var(--clr-accent-primary);
     cursor: not-allowed;
   }
 
@@ -227,16 +246,9 @@ button,
   &--xs {
     font-size: 0.75rem;
     padding: 0.125rem 0.625rem;
-    box-shadow: 0 0.1875rem 0 0 var(--clr-accent-secondary);
-
-    &.btn--win {
-      box-shadow: 0 0.1875rem 0 0 var(--clr-win-highlight);
-    }
-
-    &.btn--lose,
-    &.btn--lost {
-      box-shadow: 0 0.1875rem 0 0 var(--clr-lose-highlight);
-    }
+    border-width: 0.125rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.1875rem 0 0 var(--clr-ink);
   }
 
   &--deco {
@@ -245,60 +257,30 @@ button,
   }
 
   &--win {
-    border: 1px solid var(--clr-win);
     background-color: var(--clr-win);
-    box-shadow:
-      0 0.1875rem 0 0 var(--clr-win-highlight),
-      0 -0.1875rem 0 0 var(--clr-win-dim),
-      0 0.375rem 0 0 var(--clr-text-primary);
-    transition: all 0.3s ease;
 
     &:hover,
     &.selected {
-      border: 1px solid var(--clr-win-dim);
       background-color: var(--clr-win-dim);
-      box-shadow:
-        0 0.1875rem 0 0 var(--clr-win-highlight),
-        0 -0.1875rem 0 0 var(--clr-win-dim);
     }
   }
 
   &--lose,
   &--lost {
-    border: 1px solid var(--clr-lose);
     background-color: var(--clr-lose);
-    box-shadow:
-      0 0.1875rem 0 0 var(--clr-lose-highlight),
-      0 -0.1875rem 0 0 var(--clr-lose-dim),
-      0 0.375rem 0 0 var(--clr-text-primary);
-    transition: all 0.3s ease;
 
     &:hover,
     &.selected {
-      border: 1px solid var(--clr-lose-dim);
       background-color: var(--clr-lose-dim);
-      box-shadow:
-        0 0.1875rem 0 0 var(--clr-lose-highlight),
-        0 -0.1875rem 0 0 var(--clr-lose-dim);
     }
   }
 
   &--daily {
     background-color: var(--clr-still);
-    border: 1px solid var(--clr-still);
-    box-shadow:
-      0 0.1875rem 0 0 var(--clr-still-highlight),
-      0 -0.1875rem 0 0 var(--clr-still-dim),
-      0 0.375rem 0 0 var(--clr-text-primary);
-    transition: all 0.3s ease;
 
     &:hover,
     &.selected {
-      border: 1px solid var(--clr-still-dim);
       background-color: var(--clr-still-dim);
-      box-shadow:
-        0 0.1875rem 0 0 var(--clr-still-highlight),
-        0 -0.1875rem 0 0 var(--clr-still-dim);
     }
   }
 }
@@ -315,79 +297,91 @@ hr {
 }
 
 input {
-  padding: 0.5rem;
-  background-color: var(--clr-text-secondary);
-  border: 0.1875rem solid var(--clr-border-primary);
-  box-shadow: 0 0 0px 0.125rem var(--clr-bg-quaternary);
-  font-size: 1.125rem;
-  border-radius: 0.25rem;
+  padding: 0.625rem 0.875rem;
+  color: var(--clr-ink);
+  background-color: var(--clr-cream);
+  border: var(--ink-w) solid var(--clr-ink);
+  box-shadow: inset 0 0.25rem 0 #e9dcff;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.25rem;
+  letter-spacing: 0.06em;
+  border-radius: 0.875rem;
   text-transform: uppercase;
   width: 100%;
   max-width: 26.25rem;
 
   &::placeholder {
-    color: var(--clr-text-terciary);
+    color: #66568a;
+    font-family: "M PLUS Rounded 1c", system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  &:focus-visible {
+    outline: 0.1875rem solid var(--clr-accent-primary);
+    outline-offset: 0.125rem;
   }
 }
 
 @keyframes shake {
   0% {
     transform: translateX(0);
-    border: 0.1875rem solid var(--clr-border-primary);
+    border: var(--ink-w) solid var(--clr-ink);
   }
   25% {
     transform: translateX(-0.3125rem);
-    border: 0.1875rem solid var(--clr-lose);
+    border: var(--ink-w) solid var(--clr-lose);
   }
   50% {
     transform: translateX(0.3125rem);
-    border: 0.1875rem solid var(--clr-lose);
+    border: var(--ink-w) solid var(--clr-lose);
   }
   75% {
     transform: translateX(-0.3125rem);
-    border: 0.1875rem solid var(--clr-lose);
+    border: var(--ink-w) solid var(--clr-lose);
   }
   100% {
     transform: translateX(0);
-    border: 0.1875rem solid var(--clr-border-primary);
+    border: var(--ink-w) solid var(--clr-ink);
   }
 }
 
 @keyframes success {
   0% {
     transform: scale(1);
-    border: 0.1875rem solid var(--clr-border-primary);
+    border: var(--ink-w) solid var(--clr-ink);
   }
   50% {
     transform: scale(1.05);
-    border: 0.1875rem solid var(--clr-win);
+    border: var(--ink-w) solid var(--clr-win);
   }
   100% {
     transform: scale(1);
-    border: 0.1875rem solid var(--clr-border-primary);
+    border: var(--ink-w) solid var(--clr-ink);
   }
 }
 
 @keyframes repeat {
   0% {
     transform: translateX(0);
-    border: 0.1875rem solid var(--clr-border-primary);
+    border: var(--ink-w) solid var(--clr-ink);
   }
   25% {
     transform: translateX(-0.3125rem);
-    border: 0.1875rem solid var(--clr-accent-primary);
+    border: var(--ink-w) solid var(--clr-accent-primary);
   }
   50% {
     transform: translateX(0.3125rem);
-    border: 0.1875rem solid var(--clr-accent-primary);
+    border: var(--ink-w) solid var(--clr-accent-primary);
   }
   75% {
     transform: translateX(-0.3125rem);
-    border: 0.1875rem solid var(--clr-accent-primary);
+    border: var(--ink-w) solid var(--clr-accent-primary);
   }
   100% {
     transform: translateX(0);
-    border: 0.1875rem solid var(--clr-border-primary);
+    border: var(--ink-w) solid var(--clr-ink);
   }
 }
 
@@ -507,54 +501,54 @@ main {
 
   &.lost {
     color: var(--clr-lose);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-lose-highlight);
+    text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
   }
 
   &.still {
     color: var(--clr-still);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-still-highlight);
+    text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
   }
 
   &.highlight {
     color: var(--clr-accent-primary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-secondary);
+    text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
   }
 
   &.won {
     color: var(--clr-win);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-win-highlight);
+    text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
   }
 
   &.mirrored {
     color: var(--clr-mirrored);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-mirrored-highlight);
+    text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
   }
 }
 
 .title {
-  color: var(--clr-text-secondary);
-  text-shadow: 0px var(--text-shadow-position) 0.625rem var(--clr-bg-primary);
+  color: var(--clr-cream);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
 }
 
 .highlight {
   color: var(--clr-accent-primary);
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-secondary);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
   text-decoration-color: var(--clr-accent-primary);
 }
 
 .lost {
   color: var(--clr-lose);
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-lose-highlight);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
 }
 
 .still {
   color: var(--clr-still);
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-still-highlight);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
 }
 
 .won {
   color: var(--clr-win);
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-win-highlight);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
 }
 
 .dark {
@@ -564,13 +558,12 @@ main {
 
 .mirrored {
   color: var(--clr-mirrored);
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-mirrored-highlight);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
 }
 
 .unguessed {
-  color: var(--clr-accent-secondary);
-  text-shadow: 0px var(--text-shadow-position) 0
-    var(--clr-accent-secondary-highlight);
+  color: var(--clr-muted);
+  text-shadow: none;
 }
 
 .tip {
@@ -638,13 +631,13 @@ main {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(45deg);
+    transform: translate(-50%, -50%) rotate(-6deg);
     width: 6.875rem;
     height: 6.875rem;
-    background-color: var(--clr-bg-primary);
-    border: 0.1875rem solid var(--clr-accent-primary);
-    border-radius: 0.5rem;
-    box-shadow: 0 0 1.25rem 0.25rem var(--clr-progress-bg);
+    background-color: var(--clr-bg-secondary);
+    border: var(--ink-w-lg) solid var(--clr-ink);
+    border-radius: 22%;
+    box-shadow: 0 0.5rem 0 var(--clr-ink);
     z-index: -1;
     animation: scaleBoxAnimation 1s infinite;
   }
@@ -673,16 +666,16 @@ main {
 
 @keyframes scaleBoxAnimation {
   0% {
-    transform: translate(-50%, -50%) rotate(45deg) scale(1);
+    transform: translate(-50%, -50%) rotate(-6deg) scale(1);
   }
   30% {
-    transform: translate(-50%, -50%) rotate(45deg) scale(1.2);
+    transform: translate(-50%, -50%) rotate(-6deg) scale(1.2);
   }
   30% {
-    transform: translate(-50%, -50%) rotate(45deg) scale(0.9);
+    transform: translate(-50%, -50%) rotate(-6deg) scale(0.9);
   }
   100% {
-    transform: translate(-50%, -50%) rotate(45deg) scale(1);
+    transform: translate(-50%, -50%) rotate(-6deg) scale(1);
   }
 }
 
@@ -726,12 +719,21 @@ main {
   padding: 0.5rem;
   gap: 0.5rem;
   color: var(--clr-accent-primary);
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-accent-secondary);
+  text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
   background-color: var(--clr-bg-secondary);
-  border: var(--border-width) solid var(--clr-accent-primary);
-  box-shadow: 0 0 0 var(--box-shadow-width) var(--clr-progress-bg);
-  border-radius: 0.25rem;
+  border: var(--ink-w) solid var(--clr-ink);
+  box-shadow: 0 var(--ink-drop) 0 var(--clr-ink);
+  border-radius: 1rem;
   text-align: center;
+
+  // Labels (NIVEL, PALABRAS...): small, muted, no shadow
+  > .score__info p,
+  > .score__info .v-section > p {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--clr-muted);
+    text-shadow: none;
+  }
 
   &-sm {
     padding: 0.5rem 1rem;
@@ -739,14 +741,19 @@ main {
   }
 
   &.dark {
-    background-color: var(--clr-bg-primary-dim);
+    background-color: var(--clr-dark);
     padding: 1rem;
   }
 
+  // Goal reached: the box turns into a yellow sticker
   &.won {
-    color: var(--clr-accent-primary-highlight);
-    border: 0.125rem solid var(--clr-accent-primary-highlight);
-    background-color: var(--clr-bg-terciary);
+    color: var(--clr-ink);
+    text-shadow: none;
+    background-color: var(--clr-accent-primary);
+
+    p {
+      color: var(--clr-ink) !important;
+    }
   }
 }
 
@@ -789,11 +796,11 @@ main {
   gap: 1.5rem;
   padding: 1.5rem;
   background-color: var(--clr-bg-secondary);
-  border: 0.375rem solid var(--clr-text-secondary);
-  border-radius: 0.5rem;
+  border: var(--ink-w-lg) solid var(--clr-ink);
+  border-radius: 1.5rem;
   // box-shadow, not filter: drop-shadow — iOS draws the filter as a big
   // shadowed layer that also covers children placed outside (corner buttons)
-  box-shadow: 0 0 0.625rem var(--clr-bg-terciary);
+  box-shadow: 0 var(--ink-drop-lg) 0 var(--clr-ink);
 
   &--join {
     position: relative;
@@ -894,12 +901,7 @@ main {
     padding: 0.875rem 0.5rem;
     font-size: 1rem;
 
-    &:not(.selected) {
-      opacity: 0.55;
-    }
-    &:hover:not(.selected) {
-      opacity: 0.85;
-    }
+    // All in their full colour; the chosen one gets a cream ring (LEXIO)
     // Odd number of buttons (no daily challenge): last one full width
     &:last-of-type:nth-of-type(odd) {
       grid-column: span 2;
@@ -912,28 +914,37 @@ main {
   width: 100%;
   gap: 0.25rem;
   padding: 0.25rem;
-  background-color: var(--clr-bg-primary-dim);
-  border-radius: 0.25rem;
+  background-color: var(--clr-dark);
+  border: var(--ink-w) solid var(--clr-ink);
+  border-radius: 1rem;
 
   .btn {
     flex: 1 1 0;
     gap: 0.375rem;
     padding: 0.5rem;
+    font-family: "M PLUS Rounded 1c", system-ui, sans-serif;
+    font-weight: 800;
     font-size: 0.875rem;
+    letter-spacing: 0;
     background: transparent;
     border-color: transparent;
+    border-radius: 0.75rem;
     box-shadow: none;
-    // Not selected: our usual yellow (label and icon)
-    color: var(--clr-accent-primary) !important;
+    color: var(--clr-text-secondary) !important;
 
     &:hover {
-      background: transparent;
+      background: rgba(255, 255, 255, 0.06);
       box-shadow: none;
+    }
+    &:active {
+      transform: none;
     }
     &.selected,
     &.selected:hover {
-      color: var(--clr-text-primary) !important;
+      color: var(--clr-ink) !important;
       background-color: var(--clr-accent-primary);
+      border-color: var(--clr-ink);
+      box-shadow: 0 0.1875rem 0 var(--clr-ink);
     }
   }
 }
@@ -972,77 +983,106 @@ main {
 
 .selectedLetter {
   position: relative;
-  width: 4.125rem;
-  height: 4.125rem;
+  width: 4.5rem;
+  height: 4.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--clr-text-primary);
-  background-color: var(--clr-text-secondary);
-  border-radius: 0.25rem;
-  font-size: 3.3125rem;
-  font-weight: 900;
+  color: var(--clr-ink);
+  background-color: var(--clr-cream);
+  border-radius: 1.125rem;
+  font-family: var(--font-display);
+  font-size: 2.875rem;
+  font-weight: 400;
+  line-height: 1;
   text-transform: uppercase;
   text-align: center;
-  border: var(--border-width) solid var(--clr-border-secondary);
-  box-shadow: 0 0 0 var(--box-shadow-width) var(--clr-border-primary);
-  text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
+  border: var(--ink-w) solid var(--clr-ink);
+  box-shadow: 0 0.375rem 0 var(--clr-ink);
+  text-shadow: none;
   transform: rotateX(0deg);
   animation: selectedLetter 0.5s linear forwards;
+
+  // Loose stickers: each tile slightly tilted (own property, so it combines
+  // with the flip/mirror transforms of the animations)
+  &:nth-child(5n + 1) {
+    rotate: -3deg;
+  }
+  &:nth-child(5n + 2) {
+    rotate: 2deg;
+  }
+  &:nth-child(5n + 3) {
+    rotate: -1.5deg;
+  }
+  &:nth-child(5n + 4) {
+    rotate: 3deg;
+  }
+  &:nth-child(5n + 5) {
+    rotate: -2deg;
+  }
 
   &.mirrored {
     animation: mirroredSelectedLetter 0.5s linear forwards;
     transform: scaleX(-1);
   }
 
+  // Stuck letter: green, wrapped in a vine (SVG) that leaves the points
+  // corner (bottom right) free
   &.still {
     background-color: var(--clr-still);
-    border: var(--border-width) solid var(--clr-still-highlight);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-still-highlight);
     animation: none !important;
     transform: none !important;
+    rotate: none;
 
     &::before {
       content: "";
       position: absolute;
-      top: 51%;
-      left: 51%;
-      transform: translate(-50%, -50%);
-      width: 123%;
-      height: 123%;
-      background: url("./assets/vines.png") no-repeat center center;
-      background-size: contain;
+      inset: -16%;
+      background: url("./assets/vine.svg") no-repeat center / 100% 100%;
+      pointer-events: none;
     }
   }
 
   &.fake {
     background-color: var(--clr-lose);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-lose-highlight);
+    text-shadow: none;
     animation: fakeSelectedLetter 0.5s linear forwards;
   }
 
   &.hidden {
     background-color: var(--clr-accent-primary);
-    text-shadow: 0px var(--text-shadow-position) 0
-      var(--clr-accent-primary-highlight);
+    text-shadow: none;
     animation: hiddenSelectedLetter 0.5s linear forwards;
   }
 
+  // Dark letter: nothing visible (letter and points in the tile's colour),
+  // only a dashed outline tells where it is
   &.dark {
-    color: transparent;
-    background-color: var(--clr-text-primary);
+    color: var(--clr-ink);
+    background-color: var(--clr-ink);
+    border: var(--ink-w) dashed var(--clr-mirrored);
+    box-shadow:
+      0 0 0 0.3125rem rgba(200, 142, 254, 0.28),
+      0 0.375rem 0 var(--clr-ink);
     text-shadow: none;
     animation: darkSelectedLetter 0.5s linear forwards;
+
+    .letterPoints {
+      color: var(--clr-ink);
+    }
   }
 
+  // About to go dark: still readable, already outlined
   &.dark-outline {
-    border: 0.125rem solid var(--clr-dark);
-    box-shadow: 0 0 0 0.25rem var(--clr-dark-dim);
+    border: var(--ink-w) dashed var(--clr-mirrored);
+    box-shadow:
+      0 0 0 0.3125rem rgba(200, 142, 254, 0.28),
+      0 0.375rem 0 var(--clr-ink);
   }
 
   &.common {
     background-color: var(--clr-tip);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
+    text-shadow: none;
     animation: commonSelectedLetter 0.5s linear forwards;
   }
 }
@@ -1059,8 +1099,8 @@ main {
     transform: rotateX(90deg);
   }
   100% {
-    color: var(--clr-text-primary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
+    color: var(--clr-ink);
+    text-shadow: none;
     transform: rotateX(0deg);
   }
 }
@@ -1080,7 +1120,7 @@ main {
   }
   100% {
     color: var(--clr-text-primary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-lose-highlight);
+    text-shadow: 0 var(--text-shadow-position) 0 var(--clr-ink);
     background-color: var(--clr-lose);
     transform: rotateX(0deg);
   }
@@ -1110,21 +1150,21 @@ main {
 
 @keyframes darkSelectedLetter {
   0% {
-    color: transparent;
-    background-color: var(--clr-text-primary);
+    color: var(--clr-ink);
+    background-color: var(--clr-ink);
     text-shadow: none;
     transform: rotateX(180deg);
   }
   50% {
-    color: transparent;
-    background-color: var(--clr-text-primary);
+    color: var(--clr-ink);
+    background-color: var(--clr-ink);
     text-shadow: none;
     transform: rotateX(90deg);
   }
   100% {
-    color: transparent;
+    color: var(--clr-ink);
     text-shadow: none;
-    background-color: var(--clr-text-primary);
+    background-color: var(--clr-ink);
     transform: rotateX(0deg);
   }
 }
@@ -1162,26 +1202,30 @@ main {
     transform: rotateX(90deg) scaleX(-1);
   }
   100% {
-    color: var(--clr-text-primary);
-    text-shadow: 0px var(--text-shadow-position) 0 var(--clr-border-secondary);
+    color: var(--clr-ink);
+    text-shadow: none;
     transform: rotateX(0deg) scaleX(-1);
   }
 }
 
 .letterPoints {
   position: absolute;
-  font-size: 0.625rem;
-  bottom: 0;
-  right: 0.125rem;
+  right: 0.375rem;
+  bottom: 0.25rem;
+  font-family: "M PLUS Rounded 1c", system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: inherit;
 }
 
 .progress__container {
   position: relative;
   width: 100%;
-  border-radius: 0.5rem;
-  height: 0.875rem;
-  border: var(--border-width) solid var(--clr-border-secondary);
-  box-shadow: 0 0 0 var(--box-shadow-width) var(--clr-border-primary);
+  border-radius: 999px;
+  height: 1.125rem;
+  border: var(--ink-w) solid var(--clr-ink);
+  box-shadow: 0 0.25rem 0 var(--clr-ink);
   background: var(--clr-progress-bg);
   overflow: hidden;
 }
@@ -1221,19 +1265,25 @@ main {
 }
 
 .progress__time {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.125rem;
+  color: var(--clr-cream);
+  text-shadow: 0 0.125rem 0 var(--clr-ink);
   padding-block: 0.25rem;
   margin-left: auto;
 }
 
 .wordlist {
   display: grid;
-  grid-template: repeat(var(--wordlist-rows), 1fr) / repeat(
+  grid-template: repeat(var(--wordlist-rows), auto) / repeat(
       var(--wordlist-columns),
-      1fr
+      auto
     );
-  column-gap: 1rem;
-  row-gap: 0.125rem;
+  justify-content: center;
+  align-content: center;
+  column-gap: 0.875rem;
+  row-gap: 1px;
   grid-auto-flow: column dense;
 }
 
@@ -1241,16 +1291,18 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 1.5625rem;
-  height: 1.5625rem;
-  color: var(--clr-text-primary);
+  width: 1.625rem;
+  height: 1.625rem;
+  color: var(--clr-ink);
   background-color: var(--clr-text-primary);
   border-radius: 0.25rem;
-  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1;
   text-transform: uppercase;
   text-align: center;
-  border: var(--border-width) solid var(--clr-border-primary);
-  box-shadow: 0 0 0 var(--border-width) var(--clr-bg-secondary);
+  border: 0.125rem solid var(--clr-border-primary);
   transform: rotateX(180deg);
   transition:
     background-color 0.3s ease,
@@ -1267,22 +1319,24 @@ main {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: 0.5rem;
-  border: var(--border-width) solid var(--clr-bg-secondary);
-  transition: all 0.3s ease;
+  gap: 1px;
+  padding: 0.125rem;
+  border-radius: 0.375rem;
+  border: 0.125rem solid transparent;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 
+  // Found: the whole row lights up in yellow with a dark outline
   &.active {
-    background-color: var(--clr-bg-terciary);
-    border: var(--border-width) solid var(--clr-bg-quaternary);
+    background-color: var(--clr-accent-primary);
+    border-color: var(--clr-ink);
     justify-content: space-between;
     animation: correctWord 1s ease;
 
     .letter {
-      background-color: var(--clr-text-secondary);
-      border: var(--border-width) solid var(--clr-border-secondary);
-      box-shadow: 0 0 0 var(--border-width) var(--clr-border-primary);
+      background-color: var(--clr-cream);
+      border-color: #e0a400;
       transform: rotateX(0);
       animation: correctLetter 0.3s ease;
 
@@ -1296,8 +1350,18 @@ main {
 .wordLetters {
   display: flex;
   justify-content: flex-end;
-  gap: 0.3125rem;
+  gap: 1px;
   margin-left: auto;
+}
+
+// Found by another player: white instead of yellow
+.word.active.word--other {
+  background-color: var(--clr-border-secondary);
+
+  .letter {
+    background-color: #ffffff;
+    border-color: var(--clr-muted);
+  }
 }
 
 // Multiplayer (player): words sent this round, newest first
@@ -1310,25 +1374,24 @@ main {
 }
 
 .playerName {
-  color: var(--clr-text-primary);
-  font-size: 1rem;
-  padding-left: 0.25rem;
-  font-weight: 600;
-  letter-spacing: 0.05px;
+  color: var(--clr-ink);
+  font-size: 0.75rem;
+  padding: 0 0.375rem 0 0.1875rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes correctWord {
   0% {
-    background-color: var(--clr-accent-primary-highlight);
+    background-color: var(--clr-cream);
   }
   40% {
-    background-color: var(--clr-accent-primary);
-  }
-  80% {
-    background-color: var(--clr-accent-primary);
+    background-color: var(--clr-accent-primary-highlight);
   }
   100% {
-    background-color: var(--clr-bg-terciary);
+    background-color: var(--clr-accent-primary);
   }
 }
 
@@ -1427,10 +1490,11 @@ main {
   width: 1.25rem;
   height: 1.25rem;
   padding: 0.25rem;
+  color: var(--clr-accent-primary);
   border: 0.125rem solid var(--clr-accent-primary);
-  box-shadow: 0 0 0 0.1875rem var(--clr-progress-bg);
+  box-shadow: 0 0 0 0.1875rem var(--clr-ink);
   border-radius: 1rem;
-  background-color: var(--clr-bg-primary);
+  background-color: var(--clr-ink);
   font-size: 0.875rem;
   font-weight: 600;
   rotate: 5deg;
@@ -1450,12 +1514,12 @@ main {
   left: -0.625rem;
   width: max-content;
   max-width: 13.75rem;
-  padding: 0.5rem;
-  color: var(--clr-accent-primary);
-  background-color: var(--clr-bg-primary);
-  border: 0.125rem solid var(--clr-accent-primary);
-  box-shadow: 0 0 0 0.125rem var(--clr-progress-bg);
-  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  color: var(--clr-ink);
+  background-color: var(--clr-cream);
+  border: var(--ink-w) solid var(--clr-ink);
+  box-shadow: 0 0.25rem 0 var(--clr-ink);
+  border-radius: 0.75rem;
   font-weight: 500;
   z-index: 1000;
   text-align: center;
@@ -1477,7 +1541,7 @@ main {
   min-height: 100%;
   width: 100%;
   padding: 3rem 0.75rem 1.5rem;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(28, 12, 47, 0.78);
   z-index: 10000;
 
   &.open {
@@ -1503,10 +1567,10 @@ main {
     align-items: center;
     margin-inline: auto;
     padding: 1.25rem;
-    background-color: var(--clr-bg-primary);
-    border: 0.125rem solid var(--clr-accent-primary);
-    box-shadow: 0 0 0 0.25rem var(--clr-progress-bg);
-    border-radius: 0.25rem;
+    background-color: var(--clr-bg-secondary);
+    border: var(--ink-w-lg) solid var(--clr-ink);
+    box-shadow: 0 var(--ink-drop-lg) 0 var(--clr-ink);
+    border-radius: 1.5rem;
   }
 }
 
@@ -1577,7 +1641,7 @@ main {
 
   .game__container {
     padding: 2.25rem 1.5rem;
-    border: 0.625rem solid var(--clr-text-secondary);
+    border: var(--ink-w-lg) solid var(--clr-ink);
     min-height: 34.375rem;
     max-width: unset;
     max-height: unset;
@@ -1650,6 +1714,10 @@ main {
 .mobile {
   --border-width: 1px;
   --box-shadow-width: 0.125rem;
+  --ink-w: 0.125rem;
+  --ink-w-lg: 0.1875rem;
+  --ink-drop: 0.1875rem;
+  --ink-drop-lg: 0.375rem;
 
   // App-like shell: every screen fills the viewport, content at the top and
   // the main actions in a bar at the bottom (.screen-actions)
@@ -1691,7 +1759,7 @@ main {
   }
   .btn {
     font-size: 0.875rem;
-    border-radius: 0.125rem;
+    border-radius: 0.625rem;
 
     &--sm {
       font-size: 0.75rem;
@@ -1716,8 +1784,9 @@ main {
     gap: 0.75rem;
     max-height: none;
     padding: 0.75rem;
-    border: 0.25rem solid var(--clr-text-secondary);
-    border-radius: 0.5rem;
+    border: var(--ink-w) solid var(--clr-ink);
+    border-radius: 1.125rem;
+    box-shadow: 0 0.375rem 0 var(--clr-ink);
 
     // It gets focused (Enter to continue); no focus ring on touch screens
     &:focus {
@@ -1784,36 +1853,41 @@ main {
     // Lets .selectedLetter size itself from the row width (cqw)
     container-type: inline-size;
     width: 100%;
-    gap: 0.375rem;
+    gap: 0.3125rem;
+    // Room for the tiles' tilt and shadow
+    padding-block: 0.125rem 0.25rem;
   }
   .selectedLetter {
     // Up to 36px (less on short screens), shrinking to fit up to 10 letters
     // (--count, set in SelectedWord). Font follows the box size.
     --box: min(
-      2.25rem,
-      5.5dvh,
-      (100cqw - (var(--count, 7) - 1) * 0.375rem - 0.5rem) / var(--count, 7)
+      3.5rem,
+      6.5dvh,
+      (100cqw - (var(--count, 7) - 1) * 0.3125rem - 0.5rem) / var(--count, 7)
     );
     width: var(--box);
     height: var(--box);
-    font-size: calc(var(--box) * 0.72);
-    border-radius: 0.25rem;
+    font-size: calc(var(--box) * 0.64);
+    border-radius: calc(var(--box) * 0.24);
+    border-width: max(0.125rem, calc(var(--box) * 0.05));
+    box-shadow: 0 max(0.1875rem, calc(var(--box) * 0.08)) 0 var(--clr-ink);
   }
   // Points of each top letter: follow the box size, never tiny
   .letterPoints {
-    font-size: max(0.5625rem, calc(var(--box, 2.25rem) * 0.28));
+    font-size: max(0.5rem, calc(var(--box, 2.25rem) * 0.17));
     line-height: 1;
-    bottom: 0.0625rem;
-    right: 0.125rem;
+    bottom: calc(var(--box, 2.25rem) * 0.06);
+    right: calc(var(--box, 2.25rem) * 0.09);
   }
   .score__info {
     gap: 0.5rem;
   }
   .progress__container {
-    height: 0.5rem;
+    height: 0.75rem;
+    box-shadow: 0 0.1875rem 0 var(--clr-ink);
   }
   .progress__time {
-    font-size: 0.5rem;
+    font-size: 0.8125rem;
     padding: 0;
   }
   .wordlist {
@@ -1824,20 +1898,14 @@ main {
   .word {
     // Lets .letter size itself from the column width (cqw)
     container-type: inline-size;
-    gap: 0.125rem;
-    padding: 0.5px 1px 0.5px 0;
-    border-radius: 0.125rem;
-    &.active {
-      border: var(--border-width) solid transparent;
-    }
+    gap: 1px;
+    padding: 1px;
+    border-width: 0.09375rem;
+    border-radius: 0.25rem;
   }
   .wordLetters {
-    gap: 0.125rem;
+    gap: 1px;
     flex-shrink: 0;
-  }
-  // Multiplayer: word guessed by another player (yours keep the normal one)
-  .word.active.word--other {
-    background-color: var(--clr-accent-primary-dim);
   }
   // Default "¡Encuentra anagramas!" text: not needed on a phone
   .warning-message--default {
@@ -1857,19 +1925,22 @@ main {
     // WordList) and by the list height divided by its rows (cqh = .wordlist,
     // see "game screen" below). The height limit stops at 11px: with that
     // many words the list scrolls instead of becoming unreadable.
+    // 1px between letters and 5px per row for the row's padding + outline
+    // (mirrored in WordList's useBestMobileColumns)
     --tile: min(
       1.75rem,
-      (100cqw - (var(--letters, 7) - 1) * 0.125rem - 0.25rem) / var(--letters, 7),
+      (100cqw - (var(--letters, 7) - 1) * 1px - 0.375rem) / var(--letters, 7),
       max(
         0.6875rem,
         (100cqh - (var(--wordlist-rows, 8) - 1) * 1px) /
-          var(--wordlist-rows, 8)
+          var(--wordlist-rows, 8) - 5px
       )
     );
     width: var(--tile);
     height: var(--tile);
-    font-size: calc(var(--tile) * 0.75);
-    border-radius: 0.1875rem;
+    font-size: calc(var(--tile) * 0.66);
+    border-width: max(1px, calc(var(--tile) * 0.08));
+    border-radius: calc(var(--tile) * 0.16);
   }
   .no-challenges-info {
     max-width: unset;
@@ -1942,8 +2013,7 @@ main {
     }
     .word,
     .word.active {
-      padding: 0;
-      border: none;
+      padding: 1px;
     }
     .wordlist {
       flex: 1 1 0;
@@ -1976,10 +2046,10 @@ main {
   height: 0.5rem;
   border-radius: 50%;
   background-color: var(--clr-lose);
-  box-shadow: 0 0 0 0.125rem var(--clr-dark);
+  box-shadow: 0 0 0 0.125rem var(--clr-ink);
 
   &--online {
-    background-color: var(--clr-win);
+    background-color: var(--clr-still);
   }
 }
 
@@ -1991,9 +2061,9 @@ main {
   transform: translateX(-50%);
   z-index: 9999;
   padding: 0.625rem 1.25rem;
-  border-radius: 0.25rem;
+  border-radius: 999px;
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 800;
   text-align: center;
   animation: slideDown 0.3s ease-out;
 
@@ -2018,27 +2088,23 @@ main {
 
   &--disconnected {
     background-color: var(--clr-lose);
-    border: 0.125rem solid var(--clr-lose-highlight);
-    box-shadow:
-      0 0.1875rem 0 0 var(--clr-lose-highlight),
-      0 -0.1875rem 0 0 var(--clr-lose-dim);
-    color: var(--clr-text-primary);
+    border: var(--ink-w) solid var(--clr-ink);
+    box-shadow: 0 0.25rem 0 0 var(--clr-ink);
+    color: var(--clr-ink);
   }
 
   &--reconnecting {
     background-color: var(--clr-accent-primary);
-    border: 0.125rem solid var(--clr-accent-secondary-highlight);
-    box-shadow:
-      0 0.1875rem 0 0 var(--clr-accent-secondary),
-      0 -0.1875rem 0 0 var(--clr-accent-terciary);
-    color: var(--clr-text-primary);
+    border: var(--ink-w) solid var(--clr-ink);
+    box-shadow: 0 0.25rem 0 0 var(--clr-ink);
+    color: var(--clr-ink);
 
     .connection-status__text::before {
       content: "";
       display: inline-block;
       width: 1rem;
       height: 1rem;
-      border: 0.125rem solid var(--clr-text-primary);
+      border: 0.1875rem solid var(--clr-ink);
       border-top-color: transparent;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
@@ -2083,9 +2149,12 @@ main {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  border-radius: 0.25rem;
+  color: var(--clr-ink);
+  border: var(--ink-w) solid var(--clr-ink) !important;
+  border-radius: 0.875rem;
+  box-shadow: 0 0.3125rem 0 var(--clr-ink);
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 800;
   animation: slideInRight 0.3s ease-out;
   min-width: 18.75rem;
 
@@ -2132,7 +2201,7 @@ main {
   }
 
   &--success {
-    background-color: var(--clr-win);
+    background-color: var(--clr-still);
     border: 0.125rem solid var(--clr-win-highlight);
     color: var(--clr-text-primary);
   }
@@ -2272,28 +2341,37 @@ main {
   gap: 0.25rem;
   width: 100%;
   padding: 0.25rem;
-  background-color: var(--clr-bg-primary-dim);
-  border-radius: 0.25rem;
+  background-color: var(--clr-dark);
+  border: var(--ink-w) solid var(--clr-ink);
+  border-radius: 1rem;
 
   &__tab {
     flex: 1 1 0;
     padding: 0.5rem 0.75rem;
+    font-family: "M PLUS Rounded 1c", system-ui, sans-serif;
+    font-weight: 800;
     font-size: 0.8125rem;
+    letter-spacing: 0;
     color: var(--clr-text-secondary) !important;
     background: transparent;
-    border: none;
-    border-radius: 0.25rem;
+    border: var(--ink-w) solid transparent;
+    border-radius: 0.75rem;
     box-shadow: none;
 
     &:hover {
-      background: transparent;
+      background: rgba(255, 255, 255, 0.06);
       box-shadow: none;
+    }
+    &:active {
+      transform: none;
     }
 
     &.is-active,
     &.is-active:hover {
-      color: var(--clr-text-primary) !important;
+      color: var(--clr-ink) !important;
       background-color: var(--clr-accent-primary);
+      border-color: var(--clr-ink);
+      box-shadow: 0 0.1875rem 0 var(--clr-ink);
     }
   }
 }
@@ -2398,14 +2476,18 @@ main {
   width: auto;
   margin: 0 -0.75rem;
   padding: 0;
-  background: var(--clr-bg-primary-dim);
+  background: var(--clr-dark);
   border: none;
-  border-top: var(--border-width) solid var(--clr-border-primary);
+  border-top: var(--ink-w) solid var(--clr-ink);
   border-radius: 0;
   box-shadow: none;
 
   &:hover {
-    background: var(--clr-bg-primary-dim);
+    background: var(--clr-dark);
+    box-shadow: none;
+  }
+  &:active:not(:disabled) {
+    transform: none;
     box-shadow: none;
   }
 }
@@ -2506,23 +2588,21 @@ main {
 // Prev / next: outline buttons with the arrow
 .modal__nav {
   padding: 0.375rem 0.875rem;
-  background: transparent;
-  border: var(--border-width) solid var(--clr-accent-primary);
-  box-shadow: none;
+  background: var(--clr-bg-primary-dim);
 
   img {
     display: block;
     width: 1.25rem;
   }
+  img {
+    filter: brightness(0) invert(1);
+  }
   &:hover {
-    background: var(--clr-accent-primary-dim);
-    box-shadow: none;
+    background: var(--clr-dark);
   }
   &:disabled {
     opacity: 0.35;
-    background: transparent;
-    border-color: var(--clr-accent-primary);
-    box-shadow: none;
+    background: var(--clr-bg-primary-dim);
   }
 }
 
@@ -2533,19 +2613,18 @@ main {
   gap: 0.375rem;
 }
 .modal__dot {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.625rem;
+  height: 0.625rem;
   border-radius: 999px;
-  background-color: var(--clr-bg-terciary);
-  opacity: 0.5;
+  background-color: var(--clr-border-primary);
   transition:
     width 0.2s ease,
     opacity 0.2s ease;
 
   &.is-active {
-    width: 1.25rem;
+    width: 1.5rem;
     background-color: var(--clr-accent-primary);
-    opacity: 1;
+    box-shadow: 0 0 0 0.125rem var(--clr-ink);
   }
 }
 
@@ -2555,14 +2634,11 @@ main {
 
 // Secondary action (e.g. "Cómo jugar"): outline only
 .btn--ghost {
-  color: var(--clr-accent-primary) !important;
-  background: transparent;
-  border: var(--border-width) solid var(--clr-accent-primary);
-  box-shadow: none;
+  color: var(--clr-text-secondary) !important;
+  background: var(--clr-bg-primary-dim);
 
   &:hover {
-    background: var(--clr-accent-primary-dim);
-    box-shadow: none;
+    background: var(--clr-dark);
   }
 }
 
@@ -2615,12 +2691,6 @@ main {
     height: auto;
     align-self: stretch;
     padding: 0 0.875rem;
-    border: 0.1875rem solid var(--clr-accent-secondary);
-    box-shadow: 0 0 0 0.125rem var(--clr-bg-quaternary);
-
-    &:hover {
-      box-shadow: 0 0 0 0.125rem var(--clr-bg-quaternary);
-    }
 
     svg {
       display: block;
@@ -2666,8 +2736,9 @@ main {
   margin-inline: auto;
   aspect-ratio: 1;
   overflow: hidden;
-  background: #000;
-  border-radius: 0.5rem;
+  background: #1c0c2f;
+  border: var(--ink-w-lg) solid var(--clr-ink);
+  border-radius: 1.125rem;
 
   video {
     display: block;
@@ -2680,9 +2751,9 @@ main {
 .qr-scanner__frame {
   position: absolute;
   inset: 15%;
-  border: 0.1875rem solid var(--clr-accent-primary);
-  border-radius: 0.5rem;
-  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+  border: 0.375rem solid var(--clr-accent-primary);
+  border-radius: 1rem;
+  box-shadow: 0 0 0 100vmax rgba(28, 12, 47, 0.45);
   pointer-events: none;
 }
 
@@ -2739,8 +2810,9 @@ main {
 // Mobile: corner buttons with the same height on both sides
 .mobile .user-control,
 .mobile .panel-actions .btn {
-  height: 1.25rem;
+  height: 2rem;
   padding-block: 0;
+  font-size: 0.6875rem;
 }
 // Mobile: the panel is tight, so it goes up to the logo row (left side)
 .mobile .user-control {
@@ -2748,8 +2820,8 @@ main {
   left: 0;
 
   img {
-    width: 0.8125rem;
-    height: 0.8125rem;
+    width: 0.9375rem;
+    height: 0.9375rem;
   }
 }
 
@@ -2790,8 +2862,9 @@ main {
     width: 3.5rem;
     height: 3.5rem;
     background-color: var(--clr-accent-primary);
+    border: var(--ink-w) solid var(--clr-ink);
     border-radius: 50%;
-    box-shadow: 0 0 0 0.25rem var(--clr-bg-primary-dim);
+    box-shadow: 0 0.25rem 0 var(--clr-ink);
 
     img {
       width: 1.75rem;
@@ -2819,9 +2892,10 @@ main {
   -webkit-tap-highlight-color: transparent;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  background-color: var(--clr-bg-primary-dim);
-  border-radius: 0.25rem;
+  padding: 0.625rem 0.75rem;
+  background-color: var(--clr-dark);
+  border: var(--ink-w) solid var(--clr-ink);
+  border-radius: 0.875rem;
   cursor: pointer;
 
   // Real checkbox (accessibility), invisible and 1px: it must not inherit
@@ -2841,30 +2915,32 @@ main {
   &__switch {
     position: relative;
     flex: 0 0 auto;
-    width: 2.5rem;
-    height: 1.375rem;
-    background-color: var(--clr-bg-terciary);
+    width: 3rem;
+    height: 1.75rem;
+    background-color: var(--clr-bg-primary-dim);
+    border: var(--ink-w) solid var(--clr-ink);
     border-radius: 999px;
+    box-shadow: 0 0.1875rem 0 var(--clr-ink);
     transition: background-color 0.2s ease;
 
     &::after {
       content: "";
       position: absolute;
-      top: 0.1875rem;
-      left: 0.1875rem;
-      width: 1rem;
-      height: 1rem;
-      background-color: var(--clr-text-secondary);
+      top: 0.125rem;
+      left: 0.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
+      background-color: var(--clr-cream);
+      border: var(--ink-w) solid var(--clr-ink);
       border-radius: 50%;
       transition: transform 0.2s ease;
     }
   }
   input:checked + &__switch {
-    background-color: var(--clr-accent-primary);
+    background-color: var(--clr-still);
 
     &::after {
-      transform: translateX(1.125rem);
-      background-color: var(--clr-text-primary);
+      transform: translateX(1.25rem);
     }
   }
   input:focus-visible + &__switch {
@@ -2876,12 +2952,13 @@ main {
     display: grid;
     flex: 1 1 auto;
     font-size: 0.875rem;
-    color: var(--clr-accent-primary);
+    color: var(--clr-cream);
     text-align: left;
 
     small {
       font-size: 0.625rem;
-      color: var(--clr-text-secondary);
+      font-weight: 600;
+      color: var(--clr-muted);
     }
   }
   // On / off texts in the same cell: constant height whichever is shown
@@ -2920,15 +2997,15 @@ main {
 .feedback-modal__textarea {
   width: 100%;
   min-height: 7.5rem;
-  padding: 0.5rem 0.625rem;
+  padding: 0.625rem 0.75rem;
   font-size: max(16px, 0.9375rem);
   font-weight: 600;
   text-transform: none;
-  color: var(--clr-text-primary);
-  background-color: var(--clr-text-secondary);
-  border: 0.1875rem solid var(--clr-border-primary);
-  box-shadow: 0 0 0 0.125rem var(--clr-bg-quaternary);
-  border-radius: 0.25rem;
+  color: var(--clr-ink);
+  background-color: var(--clr-cream);
+  border: var(--ink-w) solid var(--clr-ink);
+  box-shadow: inset 0 0.25rem 0 #e9dcff;
+  border-radius: 0.875rem;
   resize: vertical;
 
   &::placeholder {
@@ -3004,11 +3081,12 @@ main {
 }
 .mobile .back-control,
 .mobile .panel-actions .back-control {
-  height: 1.25rem;
+  height: 2rem;
+  min-width: 2.5rem;
 
   svg {
-    width: 0.875rem;
-    height: 0.875rem;
+    width: 1rem;
+    height: 1rem;
   }
 }
 // Mobile game: right before the level box, as tall as it
@@ -3108,11 +3186,11 @@ html:has(.keyboard-reserve) {
   }
 }
 .mobile .panel-actions .volume-control {
-  padding-inline: 0.375rem;
+  padding-inline: 0.625rem;
 
   img {
-    width: 0.875rem;
-    height: 0.875rem;
+    width: 1rem;
+    height: 1rem;
   }
 }
 
@@ -3267,4 +3345,406 @@ html:not(.mobile) .multi-tab-panel {
       grid-column: span 2;
     }
   }
+}
+
+// ===========================================================================
+// LEXIO
+// ===========================================================================
+
+// Wordmark: cream letters with a dark outline, the X a tilted yellow sticker
+.lexio-logo {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--clr-cream);
+  -webkit-text-stroke: 0.1em var(--clr-ink);
+  paint-order: stroke fill;
+  text-shadow: 0 0.07em 0 var(--clr-ink);
+  filter: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.lexio-logo__x {
+  display: inline-block;
+  color: var(--clr-accent-primary);
+  transform: rotate(-12deg) scale(1.18);
+  margin: 0 0.05em;
+}
+.mobile main .lexio-logo {
+  width: auto !important;
+  font-size: 1.75rem !important;
+}
+
+// Default ribbon over the tiles ("¡Encuentra anagramas!")
+.warning-message--default {
+  align-self: center;
+  width: fit-content;
+  margin-inline: auto;
+  padding: 0.25rem 1.25rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+  color: var(--clr-ink);
+  background: var(--clr-lose);
+  border: var(--ink-w) solid var(--clr-ink);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.3125rem 0 var(--clr-ink);
+  rotate: -2deg;
+}
+
+// Mechanic chips: one line, each in its mechanic's colour
+.mechanic-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0.375rem;
+  margin: 0 auto;
+  max-width: 100%;
+}
+.mechanic-chip {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--clr-ink);
+  background: var(--clr-cream);
+  border: var(--ink-w) solid var(--clr-ink);
+  border-radius: 999px;
+  text-shadow: none;
+
+  &--still {
+    background: var(--clr-still);
+  }
+  &--dark {
+    color: var(--clr-cream);
+    background: var(--clr-dark);
+    border-style: dashed;
+    border-color: var(--clr-mirrored);
+  }
+  &--fake {
+    background: var(--clr-lose);
+  }
+  &--hidden {
+    background: var(--clr-accent-primary);
+  }
+  &--mirrored {
+    background: var(--clr-mirrored);
+  }
+  &--first {
+    background: var(--clr-win);
+  }
+}
+.mechanic-chip__short {
+  display: none;
+}
+// Phones: short labels so every chip fits in one line
+.mobile {
+  .mechanic-chips {
+    gap: 0.25rem;
+  }
+  .mechanic-chip {
+    padding: 0.125rem 0.4375rem;
+    font-size: 0.5625rem;
+  }
+  .mechanic-chip__long {
+    display: none;
+  }
+  .mechanic-chip__short {
+    display: inline;
+  }
+}
+
+// Lobby "next challenges": same chips, stacked and clickable
+.mechanic-button.mechanic-chip {
+  margin: 0.125rem auto;
+  font-size: 0.875rem;
+  text-shadow: none;
+  box-shadow: 0 0.1875rem 0 var(--clr-ink);
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Difficulty buttons: chosen one gets a cream ring, the rest stay dimmed
+.difficulty-selector .btn.selected {
+  outline: 0.25rem solid var(--clr-cream);
+  outline-offset: 0.1875rem;
+}
+
+// Stats (end screens): dark tile, muted label, big yellow number
+.score__container--box.stat-box {
+  background-color: var(--clr-dark);
+  box-shadow: none;
+  gap: 0.125rem;
+
+  p {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--clr-muted);
+    text-shadow: none;
+  }
+  h3 {
+    font-size: 2rem;
+    color: var(--clr-accent-primary);
+    text-shadow: 0 0.125rem 0 var(--clr-ink);
+  }
+}
+.mobile .score__container--box.stat-box h3 {
+  font-size: 1.5rem;
+}
+
+// Last level's words on the lobby / end screens: same tiles as the board,
+// with every letter shown (missed words muted)
+.word-review {
+  background-color: var(--clr-dark);
+  box-shadow: none;
+
+  > p {
+    text-shadow: none;
+  }
+}
+.wordlist--review {
+  justify-content: center;
+
+  .word {
+    text-decoration: none;
+    color: inherit !important;
+  }
+  .letter {
+    transform: none;
+
+    span {
+      opacity: 1;
+    }
+  }
+  .word--missed .letter {
+    color: var(--clr-text-terciary);
+  }
+  .word:hover {
+    border-color: var(--clr-cream);
+  }
+  .word:focus-visible {
+    outline: 0.1875rem solid var(--clr-accent-primary);
+    outline-offset: 0.0625rem;
+  }
+}
+.mobile .wordlist--review {
+  container-type: normal;
+  column-gap: 0.5rem;
+
+  .word {
+    container-type: normal;
+  }
+  // Fits the phone's width whatever the columns and the longest word
+  .letter {
+    --tile: min(
+      1.25rem,
+      (100vw - 3.5rem) / var(--wordlist-columns, 3) / var(--letters, 7) - 1px
+    );
+  }
+}
+
+// Panels that get focus (Enter to continue): no focus ring
+.game__container:focus {
+  outline: none;
+}
+
+// Screen title as a tilted sticker ribbon (level passed, game over...)
+.screen-ribbon {
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 0.375rem 1.5rem;
+  color: var(--clr-ink);
+  background: var(--clr-accent-primary);
+  border: var(--ink-w-lg) solid var(--clr-ink);
+  border-radius: 1rem;
+  box-shadow: 0 0.375rem 0 var(--clr-ink);
+  text-shadow: none;
+  rotate: -2deg;
+
+  &--green {
+    background: var(--clr-still);
+  }
+  &--pink {
+    background: var(--clr-lose);
+  }
+}
+.mobile .screen-ribbon {
+  padding: 0.25rem 1rem;
+  border-radius: 0.75rem;
+}
+
+// Ranking: each row a compact strip (subgrid keeps the columns aligned).
+// First place yellow, this game green, empty places dashed.
+.ranking__grid {
+  row-gap: 0.1875rem;
+}
+.ranking .ranking__row:not(.ranking__row--head):not(.ranking__row--gap) {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
+  padding: 0.1875rem 0.625rem;
+  background: var(--clr-bg-primary-dim);
+  border: 0.125rem solid var(--clr-ink);
+  border-radius: 0.625rem;
+}
+.ranking .ranking__row--head {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  padding: 0 0.75rem;
+}
+.ranking .ranking__row.ranking__row--first {
+  background: var(--clr-accent-primary);
+
+  > .ranking__cell,
+  > .ranking__cell > span {
+    color: var(--clr-ink) !important;
+    text-shadow: none !important;
+  }
+}
+.ranking .ranking__row.ranking__row--mine {
+  background: var(--clr-still);
+
+  > .ranking__cell,
+  > .ranking__cell > span {
+    color: var(--clr-ink) !important;
+    text-shadow: none !important;
+  }
+}
+.ranking .ranking__row.ranking__row--empty {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--clr-border-primary);
+
+  > .ranking__cell {
+    color: var(--clr-text-terciary);
+  }
+}
+.mobile .ranking .ranking__row:not(.ranking__row--head):not(.ranking__row--gap) {
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.5rem;
+}
+
+// Players in a room / room ranking: one strip per player
+.player-row {
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background: var(--clr-bg-primary-dim);
+  border: 0.125rem solid var(--clr-ink);
+  border-radius: 0.625rem;
+
+  h3,
+  h5 {
+    text-shadow: none;
+  }
+
+  &--first,
+  &--me {
+    h3,
+    h5 {
+      color: var(--clr-ink) !important;
+    }
+  }
+  &--first {
+    background: var(--clr-accent-primary);
+  }
+  &--me {
+    background: var(--clr-still);
+  }
+}
+.room-players .v-section.gap-xs {
+  gap: 0.25rem;
+}
+
+// Room QR: cream sticker
+.room-invite__qr {
+  padding: 0.5rem;
+  background: var(--clr-cream);
+  border: var(--ink-w-lg) solid var(--clr-ink);
+  border-radius: 1rem;
+  box-shadow: 0 0.375rem 0 var(--clr-ink);
+}
+.room-invite .btn {
+  font-size: 1.5rem;
+  letter-spacing: 0.12em;
+}
+
+// Countdown: the number sits on a yellow tile, with purple tiles behind it
+.loading__container > h2 {
+  color: var(--clr-ink);
+  text-shadow: none;
+}
+.loading__container--box:not(.loading__container--box-md):not(
+    .loading__container--box-lg
+  ):not(.loading__container--box-xl) {
+  background-color: var(--clr-accent-primary);
+}
+.loading__container--box-xl,
+.loading__container--box-lg {
+  background-color: var(--clr-bg-primary-dim);
+}
+
+// Modal titles in yellow (they used several colours before)
+.modal__content h2 {
+  color: var(--clr-accent-primary);
+}
+
+// Old browsers without subgrid (iOS < 16): back to plain rows, no strips
+@supports not (grid-template-columns: subgrid) {
+  .ranking .ranking__row:not(.ranking__row--gap),
+  .ranking .ranking__row--head {
+    display: contents;
+  }
+}
+
+.mobile .mechanic-button.mechanic-chip {
+  font-size: 0.75rem;
+}
+
+// Player's attempts (multiplayer): one strip per word
+.attempt {
+  padding: 0.25rem 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  border-radius: 0.625rem;
+  border: 0.125rem dashed var(--clr-border-primary);
+  text-shadow: none;
+
+  &--correct {
+    color: var(--clr-ink) !important;
+    background: var(--clr-accent-primary);
+    border: 0.125rem solid var(--clr-ink);
+  }
+  &--tip {
+    color: var(--clr-ink) !important;
+    background: var(--clr-tip);
+    border: 0.125rem solid var(--clr-ink);
+  }
+  &--invalid,
+  &--rejected {
+    color: var(--clr-text-terciary) !important;
+    text-decoration: line-through;
+  }
+  &--pending {
+    color: var(--clr-text-secondary) !important;
+  }
+}
+.attemptList {
+  gap: 0.25rem;
 }
