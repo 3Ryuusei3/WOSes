@@ -5951,3 +5951,19 @@ html:not(.mobile) .game__container--home {
   font-size: 0.8125rem;
   line-height: 1.3;
 }
+
+// Phones, start screen: each difficulty with its hint under the name (like
+// desktop), name a little bigger
+.mobile .game__container--home {
+  .difficulty-hint {
+    display: block;
+    font-size: 0.625rem;
+    line-height: 1.15;
+  }
+  .difficulty-selector .btn {
+    flex-direction: column;
+    gap: 0.125rem;
+    padding-block: 0.625rem;
+    font-size: 0.9375rem;
+  }
+}
