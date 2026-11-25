@@ -34,22 +34,36 @@ export default function LobbyStatsContainer({
         value={lastRoundPoints}
         size="sm"
       />
-      <StatBox label={t("common.totalPoints")} value={totalPoints} size="sm" />
+      <StatBox
+        label={t("common.totalPoints")}
+        value={totalPoints}
+        delta={lastRoundPoints > 0 ? `+${lastRoundPoints}` : undefined}
+        size="sm"
+      />
       <StatBox
         label={t("common.remainingTime")}
         value={`${gameTime}${t("common.seconds")}`}
         tone={perfect ? "good" : secondsToRemove > 0 ? "bad" : undefined}
+        delta={
+          perfect
+            ? `+1${t("common.seconds")}`
+            : secondsToRemove > 0
+              ? `−${secondsToRemove}${t("common.seconds")}`
+              : undefined
+        }
         size="sm"
       />
       <StatBox
         label={t("common.numberOfRounds")}
         value={numberOfRounds}
+        delta="+1"
         size="sm"
       />
       <StatBox
         label={t("common.perfectRounds")}
         value={numberOfPerfectRounds}
         tone={perfect ? "good" : undefined}
+        delta={perfect ? "+1" : undefined}
         size="sm"
       />
     </div>

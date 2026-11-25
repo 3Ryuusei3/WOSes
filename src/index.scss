@@ -4636,7 +4636,7 @@ html:not(.mobile) .game__container--home .top-scores > .score__container--box {
     rotate: 1deg;
   }
   &:nth-child(5n + 5) {
-    --accent: var(--clr-mirrored);
+    --accent: #ffffff;
     rotate: -0.75deg;
   }
 }
@@ -4970,15 +4970,25 @@ html:not(.mobile) .round-timer__warning {
     color: var(--clr-cream);
   }
 }
+// Penalty: bright pink sticker (the dark red looked dull)
 .stat-grid > .stat-box.stat-box--bad {
-  --accent: var(--clr-lose);
-  background: #6a1240;
-  border-color: var(--clr-lose);
+  --accent: #ff8ab6;
+  background: var(--clr-lose);
   box-shadow:
-    0 0 0 0.1875rem rgba(248, 80, 145, 0.25),
+    0 0 0 0.1875rem rgba(248, 80, 145, 0.35),
     0 0.3125rem 0 var(--clr-ink);
 
+  p,
   h3 {
-    color: var(--clr-cream);
+    color: var(--clr-ink);
+    text-shadow: none;
   }
+}
+
+// What changed this level, after the value: "431 (+48)", "88s (−2s)"
+.stat-delta {
+  margin-left: 0.375rem;
+  font-size: 0.55em;
+  vertical-align: 0.25em;
+  opacity: 0.85;
 }
