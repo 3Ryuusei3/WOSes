@@ -19,9 +19,13 @@ export default function DifficultyTag({
     >
       {/* Full name, and a short one for tight spots (phones, see CSS) */}
       <span className="difficulty-tag__long">
-        {t(`difficulties.${gameDifficulty}`)}{" "}
-        {dailyChallengeOriginalDifficulty &&
-          `(${t(`difficulties.${dailyChallengeOriginalDifficulty}`)})`}
+        {t(`difficulties.${gameDifficulty}`)}
+        {dailyChallengeOriginalDifficulty && (
+          <span className="difficulty-tag__orig">
+            {" "}
+            ({t(`difficulties.${dailyChallengeOriginalDifficulty}`)})
+          </span>
+        )}
       </span>
       <span className="difficulty-tag__short" aria-hidden="true">
         {t(`difficulties.short.${gameDifficulty}`)}

@@ -5457,12 +5457,31 @@ html:not(.mobile) .round-timer__warning {
 .difficulty-tag__short {
   display: none;
 }
-.mobile .difficulty-chip {
+// Phones: the full name fits (without the daily challenge's "(ESTÁNDAR)");
+// only a game bar too narrow for it falls back to the short one
+.mobile .difficulty-tag__orig {
+  display: none;
+}
+.mobile .game-hud__card--level {
+  container: level-card / inline-size;
+}
+// (also with a 3-digit level)
+.mobile .game-hud__card--level.is-wide-level .difficulty-chip {
   .difficulty-tag__long {
     display: none;
   }
   .difficulty-tag__short {
     display: inline;
+  }
+}
+@container level-card (max-width: 5rem) {
+  .difficulty-chip {
+    .difficulty-tag__long {
+      display: none;
+    }
+    .difficulty-tag__short {
+      display: inline;
+    }
   }
 }
 
@@ -5480,8 +5499,8 @@ html:not(.mobile) .round-timer__warning {
   display: none;
 }
 .mobile .help-button {
-  min-width: 2.5rem;
-  padding-inline: 0.5rem;
+  min-width: 2.125rem;
+  padding-inline: 0.375rem;
 
   .help-button__text {
     display: none;
@@ -5525,6 +5544,10 @@ html:not(.mobile) .game__container--home {
   main {
     padding-top: 0.5rem;
   }
+  // Game bar right on top of the board
+  .container:has(> .game-hud) {
+    gap: 0.375rem;
+  }
   // No "¡Encuentra anagramas!" ribbon: its room goes to the words
   .game__header .warning-message--default {
     display: none;
@@ -5533,7 +5556,7 @@ html:not(.mobile) .game__container--home {
     padding-top: 0.5rem;
   }
   .game-hud {
-    margin-bottom: 0.625rem;
+    margin-bottom: 0;
   }
   // Every row fits: tile + 2×2px outline + 2×1px word border; no minimum,
   // the list never scrolls
@@ -5677,4 +5700,80 @@ html:not(.mobile) .game__container--home {
 // a 2 × 3 grid
 .stat-grid > .stat-box.stat-box--white {
   --accent: var(--clr-cream);
+}
+
+// Phones: icon-only buttons a bit narrower (back, sound, "?")
+.mobile .back-control,
+.mobile .panel-actions .back-control,
+.mobile .panel-actions .volume-control {
+  min-width: 2.125rem;
+  padding-inline: 0.375rem;
+}
+.mobile .back-control--hud {
+  width: 2.25rem;
+}
+
+// Phone game bar: number and difficulty closer, tag a touch smaller
+.mobile .game-hud__card--level {
+  gap: 0.25rem;
+  padding-inline: 0.3125rem;
+
+  .btn--xs {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.5625rem;
+  }
+}
+
+// "Últimas palabras": same size as the stat tiles' labels
+.word-review > p {
+  font-size: 0.75rem;
+}
+
+// Podium rows (1st / 2nd / 3rd): a soft metal sheen, and now and then a
+// glint sweeps across
+.ranking .ranking__row.ranking__row--p1,
+.ranking .ranking__row.ranking__row--p2,
+.ranking .ranking__row.ranking__row--p3 {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0) 55%,
+    rgba(0, 0, 0, 0.1)
+  );
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.3) 47%,
+      rgba(255, 255, 255, 0.08) 52%,
+      transparent 60%
+    );
+    background-size: 300% 100%;
+    background-position: 100% 0;
+    animation: podium-glint 6s ease-in-out infinite;
+  }
+}
+.ranking .ranking__row.ranking__row--p2::after {
+  animation-delay: 0.25s;
+}
+.ranking .ranking__row.ranking__row--p3::after {
+  animation-delay: 0.5s;
+}
+@keyframes podium-glint {
+  0%,
+  70% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
 }
