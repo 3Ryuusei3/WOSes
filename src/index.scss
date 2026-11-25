@@ -5427,3 +5427,24 @@ html:not(.mobile) .round-timer__warning {
     border-color: var(--clr-win);
   }
 }
+
+// Phones: more room between the ribbon title and the first row (tabs /
+// stats); the difficulty tag sits in that room, bigger
+.mobile .game__container:has(> .screen-ribbon) {
+  padding-top: 2.75rem;
+}
+.difficulty-tag .btn {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-width: var(--ink-w);
+}
+.mobile .difficulty-tag {
+  top: 0.75rem;
+  left: 0.75rem;
+
+  .btn {
+    font-size: 0.75rem;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 0.5rem;
+  }
+}
