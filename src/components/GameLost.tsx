@@ -11,6 +11,7 @@ import useRequestSummary from "../hooks/useRequestSummary";
 import useGroupName from "../hooks/useGroupName";
 import { useRoomRealtimeStore } from "../realtime/roomRealtime";
 import GameSound from "../atoms/GameSound";
+import FullscreenButton from "../atoms/FullscreenButton";
 import DifficultyTag from "../atoms/DifficultyTag";
 import WordListDisplay from "../atoms/WordListDisplay";
 import StatBox from "../atoms/StatBox";
@@ -495,6 +496,7 @@ export default function GameLost() {
         <div className="panel-actions">
           {!isMobileUa && <BackHomeButton />}
           <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
+          <FullscreenButton />
           <GameSound />
         </div>
         <WordFeedbackModal

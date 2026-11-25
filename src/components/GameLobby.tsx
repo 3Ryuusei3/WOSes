@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import GameSound from "../atoms/GameSound";
+import FullscreenButton from "../atoms/FullscreenButton";
 import DifficultyTag from "../atoms/DifficultyTag";
 import MechanicsModal from "../atoms/MechanicsModal";
 import WordListDisplay from "../atoms/WordListDisplay";
@@ -354,6 +355,7 @@ export default function GameLobby() {
         <div className="panel-actions">
           {!isMobile && <BackHomeButton />}
           <HelpButton onClick={() => setIsFeedbackModalOpen(true)} />
+          <FullscreenButton />
           <GameSound />
         </div>
         <WordFeedbackModal

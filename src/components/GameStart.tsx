@@ -18,6 +18,7 @@ import SegmentedTabs from "../atoms/SegmentedTabs";
 import { showToast } from "../atoms/Toast";
 import { primeMobileKeyboard } from "../utils/mobileKeyboard";
 import GameSound from "../atoms/GameSound";
+import FullscreenButton from "../atoms/FullscreenButton";
 import PlayersSelector, { type StartMode } from "../atoms/PlayersSelector";
 import QrScannerModal from "../atoms/QrScannerModal";
 import UserBadge from "../atoms/UserBadge";
@@ -541,6 +542,7 @@ export default function GameStart() {
         {/* Top-right corner: "¿Falta algo?" next to the sound button */}
         <div className="panel-actions">
           <HelpButton onClick={() => setFeedbackOpen(true)} />
+          <FullscreenButton />
           <GameSound />
         </div>
       </div>

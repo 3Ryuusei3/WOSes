@@ -4528,3 +4528,21 @@ html:not(.mobile) .game__container:has(> .screen-ribbon) {
   font-size: 1.5rem;
   padding: 1rem 2.5rem;
 }
+
+// Full screen button (computers only): same look as the sound one
+.fullscreen-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 0;
+
+  svg {
+    display: block;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+html:not(.mobile) .game__container--home .panel-actions .fullscreen-control svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}

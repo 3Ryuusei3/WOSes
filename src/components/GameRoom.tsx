@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import BackHomeButton from "../atoms/BackHomeButton";
+import FullscreenButton from "../atoms/FullscreenButton";
 import { QRCodeSVG } from "qrcode.react";
 import useGameStore from "../store/useGameStore";
 import useRandomWords from "../hooks/useRandomWords";
@@ -224,6 +225,10 @@ export default function GameRoom() {
     <>
       <div className="game__container game__container--join">
         <BackHomeButton className="back-control--corner" />
+        {/* Computers (e.g. the main screen everyone looks at): full screen */}
+        <div className="panel-actions">
+          <FullscreenButton />
+        </div>
         {/* Ribbon on the panel's top edge: what this screen is */}
         <h1
           className={`screen-ribbon ${showJoinForm && !isHost ? "" : "screen-ribbon--green"}`}

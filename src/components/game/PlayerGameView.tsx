@@ -19,6 +19,7 @@ import WarningMessage from "../../atoms/WarningMessage";
 import SelectedWord from "../../atoms/SelectedWord";
 import KeyboardReserve from "../../atoms/KeyboardReserve";
 import GameSound from "../../atoms/GameSound";
+import FullscreenButton from "../../atoms/FullscreenButton";
 import useMobileLayout from "../../hooks/useMobileLayout";
 import WordList from "../../atoms/WordList";
 import useMobileUserAgent from "../../hooks/useMobileUserAgent";
@@ -204,7 +205,14 @@ export default function PlayerGameView({
         percentage={percentage}
         RUNNING_OUT_OF_TIME_PERCENTAGE={RUNNING_OUT_OF_TIME_PERCENTAGE}
         SHOW_LETTERS_PERCENTAGE={board?.show_letters_percentage ?? 0}
-        trailing={!isMobileLayout ? <GameSound className="volume-control--hud" /> : undefined}
+        trailing={
+          !isMobileLayout ? (
+            <>
+              <FullscreenButton className="volume-control--hud" />
+              <GameSound className="volume-control--hud" />
+            </>
+          ) : undefined
+        }
       />
       <div
         className="game__container game__container--player"

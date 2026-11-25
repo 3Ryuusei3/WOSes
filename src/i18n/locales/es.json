@@ -62,7 +62,9 @@
     "soundOn": "ACTIVAR SONIDO",
     "soundOff": "SILENCIAR",
     "globalTop": "TOP GLOBAL",
-    "lastLevel": "ÚLTIMO NIVEL"
+    "lastLevel": "ÚLTIMO NIVEL",
+    "fullscreen": "PANTALLA COMPLETA",
+    "exitFullscreen": "SALIR DE PANTALLA COMPLETA"
   },
   "difficulties": {
     "easy": "ESTÁNDAR",

@@ -62,7 +62,9 @@
     "soundOn": "TURN SOUND ON",
     "soundOff": "MUTE",
     "globalTop": "GLOBAL TOP",
-    "lastLevel": "LAST LEVEL"
+    "lastLevel": "LAST LEVEL",
+    "fullscreen": "FULL SCREEN",
+    "exitFullscreen": "EXIT FULL SCREEN"
   },
   "difficulties": {
     "easy": "STANDARD",
