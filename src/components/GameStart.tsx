@@ -24,6 +24,7 @@ import QrScannerModal from "../atoms/QrScannerModal";
 import UserBadge from "../atoms/UserBadge";
 import HelpButton from "../atoms/HelpButton";
 import InstallModal from "../atoms/InstallModal";
+import { prefetchRankings } from "../services/rankingCache";
 import WordFeedbackModal from "../atoms/WordFeedbackModal";
 import useJoinRoom from "../hooks/useJoinRoom";
 import { saveRoomSession, unmarkRoomLeft } from "../realtime/roomSession";
@@ -95,7 +96,13 @@ export default function GameStart() {
     useState(false);
   const isMobileUa = useMobileLayout();
   const showInstall = isMobileUa && !isInstalledPwa();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Rankings of every difficulty loaded in the background: switching between
+  // them (or opening the ranking) shows them at once
+  useEffect(() => {
+    prefetchRankings(i18n.language);
+  }, [i18n.language]);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   void searchParams;

@@ -21,6 +21,10 @@ type DbResponse<T> = {
   error: PostgrestError | null;
 };
 
+// Only what the rankings show (smaller, faster answers than "*")
+const RANKING_COLUMNS =
+  "id, code, name, score, level, difficulty, language, created_at, rounds, perfects";
+
 // Get all-time top scores for a specific difficulty and language
 export async function getAllTimeTopScores(
   difficulty: string,
@@ -29,7 +33,7 @@ export async function getAllTimeTopScores(
 ): Promise<DbResponse<ScoreRecord[]>> {
   return await supabase
     .from("rooms")
-    .select("*")
+    .select(RANKING_COLUMNS)
     .eq("difficulty", difficulty)
     .eq("language", language)
     .eq("state", "lost")
@@ -109,7 +113,7 @@ export async function getWeeklyTopScores(
 ): Promise<DbResponse<ScoreRecord[]>> {
   return await supabase
     .from("rooms")
-    .select("*")
+    .select(RANKING_COLUMNS)
     .eq("difficulty", difficulty)
     .eq("language", language)
     .eq("state", "lost")

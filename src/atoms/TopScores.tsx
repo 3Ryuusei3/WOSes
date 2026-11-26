@@ -9,21 +9,20 @@ import TopScore from "../types/TopScore";
 import Difficulty from "../types/Difficulty";
 import { DailyChallengeRankingEntry } from "../types/DailyChallenge";
 
+import { getRoomRank, type RoomRank } from "../services/rooms";
 import {
-  getAllTimeTopScores,
-  getRoomRank,
-  getWeeklyTopScores,
-  type RoomRank,
-} from "../services/rooms";
-import { getDailyChallengeRanking } from "../services/dailyChallenge";
+  cachedDailyRanking,
+  cachedDifficultyRanking,
+  fetchDailyRanking,
+  fetchDifficultyRanking,
+} from "../services/rankingCache";
 import { onScoreAdded } from "../realtime/scoresRealtime";
-
-import { getThisWeekDateRange } from "../utils";
 
 import arrowLeft from "../assets/arrow-left.svg";
 import arrowRight from "../assets/arrow-right.svg";
 
 const dots = (n: number) => ".".repeat(Math.max(0, n));
+const isDailyDifficulty = (d: Difficulty) => d === "daily";
 
 interface TopScoresProps {
   hasTooltip?: boolean;
@@ -55,10 +54,25 @@ export default function TopScores({
 }: TopScoresProps) {
   const { t, i18n } = useTranslation();
   const { highestScore } = useGameStore();
-  const [allTimeScores, setAllTimeScores] = useState<TopScore[]>([]);
-  const [weeklyScores, setWeeklyScores] = useState<TopScore[]>([]);
+  // What's already known for this ranking shows at once (cache), then the
+  // fresh copy replaces it
+  // (Not for a game that just ended: its own result must come in first)
+  const useCache = !ownGame && !highlightCode;
+  const cached =
+    useCache && !isDailyDifficulty(difficulty)
+      ? cachedDifficultyRanking(difficulty, i18n.language)
+      : undefined;
+  const [allTimeScores, setAllTimeScores] = useState<TopScore[]>(
+    cached?.allTime ?? [],
+  );
+  const [weeklyScores, setWeeklyScores] = useState<TopScore[]>(
+    cached?.weekly ?? [],
+  );
   const [dailyScores, setDailyScores] = useState<DailyChallengeRankingEntry[]>(
-    [],
+    () =>
+      useCache && isDailyDifficulty(difficulty) && challengeNumber
+        ? (cachedDailyRanking(challengeNumber) ?? [])
+        : [],
   );
   const [showAllTime, setShowAllTime] = useState(true);
   const [roomRank, setRoomRank] = useState<RoomRank | null>(null);
@@ -66,54 +80,20 @@ export default function TopScores({
   const isDaily = difficulty === "daily";
   const today = new Date().toLocaleDateString();
 
-  const mapScores = (
-    data: {
-      id: number;
-      code?: string;
-      name: string;
-      score: number;
-      level: number;
-      created_at: string;
-      updated_at?: string;
-    }[],
-  ): TopScore[] =>
-    data.map((item) => ({
-      id: String(item.id),
-      code: item.code,
-      name: item.name,
-      score: item.score,
-      level: item.level,
-      created_at: item.created_at,
-    }));
-
   const fetchScores = async () => {
     try {
       if (isDaily) {
         // Challenge not loaded yet: nothing to ask for
         if (!challengeNumber) return;
-        const { data: dailyData, error: dailyError } =
-          await getDailyChallengeRanking(challengeNumber);
-        if (dailyError) throw dailyError;
-        if (dailyData) setDailyScores(dailyData);
+        setDailyScores(await fetchDailyRanking(challengeNumber));
       } else {
-        const weekRange = getThisWeekDateRange();
         const currentLanguage = i18n.language;
-
-        const { data: allTimeData, error: allTimeError } =
-          await getAllTimeTopScores(difficulty, currentLanguage);
-        if (allTimeError) throw allTimeError;
-
-        const { data: weeklyData, error: weeklyError } =
-          await getWeeklyTopScores(
-            difficulty,
-            currentLanguage,
-            weekRange.start,
-            weekRange.end,
-          );
-        if (weeklyError) throw weeklyError;
-
-        if (allTimeData) setAllTimeScores(mapScores(allTimeData));
-        if (weeklyData) setWeeklyScores(mapScores(weeklyData));
+        const ranking = await fetchDifficultyRanking(
+          difficulty,
+          currentLanguage,
+        );
+        setAllTimeScores(ranking.allTime);
+        setWeeklyScores(ranking.weekly);
 
         if (highlightCode) {
           const { data: rankData } = await getRoomRank(
@@ -128,6 +108,21 @@ export default function TopScores({
       console.error("Error fetching scores:", error);
     }
   };
+
+  // Another ranking chosen: show its cached copy right away (or empty)
+  useEffect(() => {
+    if (!useCache) return;
+    if (isDaily) {
+      setDailyScores(
+        challengeNumber ? (cachedDailyRanking(challengeNumber) ?? []) : [],
+      );
+    } else {
+      const known = cachedDifficultyRanking(difficulty, i18n.language);
+      setAllTimeScores(known?.allTime ?? []);
+      setWeeklyScores(known?.weekly ?? []);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [difficulty, i18n.language, isDaily, challengeNumber]);
 
   useEffect(() => {
     fetchScores();
