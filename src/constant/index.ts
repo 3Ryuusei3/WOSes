@@ -59,6 +59,19 @@ const POINTS_PER_LETTER_ES = {
   w: 10,
 };
 
+// First levels are a warm-up in every difficulty:
+// - WARMUP: board word of 5–6 letters, no rare letters, and most of the
+//   words to find from the Estándar list
+// - EARLY: board word of up to 7 letters, at most one rare letter
+// After EARLY.MAX, any word (START / MID letters still apply by level).
+const EARLY_LEVELS = {
+  WARMUP: { MAX: 5, MIN_LEN: 5, MAX_LEN: 6, MIN_EASY_SHARE: 0.7 },
+  EARLY: { MAX: 15, MAX_LEN: 7, MAX_RARE: 1 },
+};
+
+const RARE_LETTERS_ES = ["ñ", "x", "z", "j", "q", "k", "w"];
+const RARE_LETTERS_EN = ["q", "x", "z", "j", "k"];
+
 const WORD_LEVEL_RANGES_ES = {
   START: {
     MIN: 1,
@@ -151,16 +164,19 @@ export const getLanguageConstants = (language: string) => {
       LETTERS: LETTERS_EN,
       POINTS_PER_LETTER: POINTS_PER_LETTER_EN,
       WORD_LEVEL_RANGES: WORD_LEVEL_RANGES_EN,
+      RARE_LETTERS: RARE_LETTERS_EN,
     };
   }
   return {
     LETTERS: LETTERS_ES,
     POINTS_PER_LETTER: POINTS_PER_LETTER_ES,
     WORD_LEVEL_RANGES: WORD_LEVEL_RANGES_ES,
+    RARE_LETTERS: RARE_LETTERS_ES,
   };
 };
 
 export {
+  EARLY_LEVELS,
   START_TIME,
   THRESHHOLD,
   COUNTDOWN,

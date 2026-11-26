@@ -44,6 +44,9 @@ const useLanguageWords = (difficulty: Difficulty) => {
 
   return {
     words: getWordsForLanguage(),
+    // Estándar list (most common words): the first levels lean on it
+    easyWords: (i18n.language === "en" ? DIFFICULTY_WORDS_EN : DIFFICULTY_WORDS_ES)
+      .easy.words,
     language: i18n.language,
   };
 };
