@@ -1874,7 +1874,7 @@ main {
     );
     width: var(--box);
     height: var(--box);
-    font-size: calc(var(--box) * 0.64);
+    font-size: calc(var(--box) * 0.7);
     border-radius: calc(var(--box) * 0.24);
     border-width: max(0.125rem, calc(var(--box) * 0.05));
     box-shadow: 0 max(0.1875rem, calc(var(--box) * 0.08)) 0 var(--clr-ink);
@@ -6120,4 +6120,14 @@ html:not(.mobile) main:has(.game__container--home) {
 html:not(.mobile) .game__container--home .user-control {
   padding-left: 0.875rem;
   padding-right: 1.25rem;
+}
+
+// Scrambled letters: the glyph a little bigger in its tile (desktop; phones
+// scale with the tile size above); the hidden-letter eye keeps its size
+html:not(.mobile) .selectedLetter {
+  font-size: 3.125rem;
+}
+.selectedLetter .hidden-letter-icon {
+  width: 0.8em;
+  height: 0.8em;
 }
