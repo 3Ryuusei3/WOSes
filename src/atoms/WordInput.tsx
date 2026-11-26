@@ -17,7 +17,8 @@ interface WordInputProps {
   possibleWords: string[];
   correctWords: string[];
   percentage: number;
-  volume: number;
+  /** Not used any more (the hit sound plays from the word list) */
+  volume?: number;
 }
 
 const WordInput = forwardRef<WordInputHandle, WordInputProps>(
@@ -29,7 +30,6 @@ const WordInput = forwardRef<WordInputHandle, WordInputProps>(
       possibleWords,
       correctWords,
       percentage,
-      volume,
     },
     ref,
   ) {
@@ -42,7 +42,6 @@ const WordInput = forwardRef<WordInputHandle, WordInputProps>(
         inputWord,
         correctWords,
         handleKeyDown,
-        volume,
       );
 
     useImperativeHandle(

@@ -12,7 +12,7 @@ import Mechanics from "../types/Mechanics";
 import Word from "../types/Word";
 
 import shuffleSound from "../assets/shuffle.mp3";
-import { playSound } from "../utils/sound";
+import { playSound, preloadSound } from "../utils/sound";
 
 const createLetterObject = (
   word: string,
@@ -257,6 +257,7 @@ const useShuffledWord = (
       if (effectiveVol > 0) playSound(audio);
     };
 
+    preloadSound(shuffleSound);
     const interval = setInterval(shuffleAndAddLetter, intervalTime);
     return () => clearInterval(interval);
   }, [

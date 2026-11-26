@@ -39,7 +39,7 @@ import {
   type RtBoard,
 } from "../realtime/roomRealtime";
 import { showToast } from "../atoms/Toast";
-import { playSound } from "../utils/sound";
+import { playSound, preloadSound } from "../utils/sound";
 
 /** Host: cada cuánto reenvía sus letras (cubre móviles que (re)conectan) */
 const BOARD_RESEND_MS = 4000;
@@ -185,7 +185,6 @@ export default function GameScreen() {
   const [hasPlayedRevealSound, setHasPlayedRevealSound] = useState(false);
   const [hasPlayedEndSound, setHasPlayedEndSound] = useState(false);
   const hasCalledEndOfLevelRef = useRef(false);
-  const hostPrevGuessedRef = useRef<number>(0);
   const isEndingLevelRef = useRef<boolean>(false);
   const wordsRef = useRef(words);
 
@@ -438,6 +437,7 @@ export default function GameScreen() {
     if (!hitAudioRef.current) {
       hitAudioRef.current = new Audio(hitSound);
     }
+    [hitSound, goalSound, revealSound, endSound].forEach(preloadSound);
     if (!goalAudioRef.current) {
       goalAudioRef.current = new Audio(goalSound);
     }
@@ -478,22 +478,6 @@ export default function GameScreen() {
       endAudioRef.current.volume = effectiveVolume;
     }
   }, [effectiveVolume]);
-
-  // Host: play a short success sound whenever a new word gets revealed
-  useEffect(() => {
-    if (players === "multi" && role === "host") {
-      const guessedCount = words.filter((w) => w.guessed).length;
-      if (guessedCount > hostPrevGuessedRef.current) {
-        if (hitAudioRef.current && effectiveVolume > 0) {
-          try {
-            hitAudioRef.current.currentTime = 0;
-            playSound(hitAudioRef.current);
-          } catch (_) {}
-        }
-      }
-      hostPrevGuessedRef.current = guessedCount;
-    }
-  }, [words, players, role, effectiveVolume]);
 
   // Palabras acertadas de la ronda (vienen del servidor vía roomRealtime)
   const roundCorrectWords = useRoomRealtimeStore(selectCurrentRoundWords);

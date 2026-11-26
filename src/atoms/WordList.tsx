@@ -5,7 +5,7 @@ import hitSound from "../assets/hit.mp3";
 import useGameStore from "../store/useGameStore";
 import Mechanics from "../types/Mechanics";
 import useMobileLayout from "../hooks/useMobileLayout";
-import { playSound } from "../utils/sound";
+import { playSound, preloadSound } from "../utils/sound";
 
 interface WordListProps {
   words: Word[];
@@ -28,6 +28,7 @@ export default function WordList({
 
   useEffect(() => {
     if (!audioRef.current) audioRef.current = new Audio(hitSound);
+    preloadSound(hitSound);
   }, []);
 
   useEffect(() => {

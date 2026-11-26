@@ -1,40 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 
-import hitMusic from '../assets/hit.mp3';
-import { playSound } from "../utils/sound";
-
-export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void, volume: number) {
+export default function useInputResponse(possibleWords: string[], inputWord: string, correctWords: string[], handleKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void) {
   const [animateError, setAnimateError] = useState(false);
   const [animateSuccess, setAnimateSuccess] = useState(false);
   const [animateRepeated, setAnimateRepeated] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio(hitMusic);
-    }
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
-
-  const playHitAudio = () => {
-    if (audioRef.current) {
-      playSound(audioRef.current);
-    }
-    return audioRef.current;
-  };
-
   const triggerAnimateErrpr = () => {
     setAnimateError(true);
     setTimeout(() => setAnimateError(false), 500);
@@ -42,7 +11,8 @@ export default function useInputResponse(possibleWords: string[], inputWord: str
 
   const triggerAnimateSuccess = () => {
     setAnimateSuccess(true);
-    playHitAudio();
+    // The hit sound is played by the word list when the word turns found
+    // (it used to sound twice, once from here)
     setTimeout(() => {
       setAnimateSuccess(false);
     }, 500);
