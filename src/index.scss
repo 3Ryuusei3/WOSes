@@ -4685,7 +4685,13 @@ body::after {
   z-index: -1;
   pointer-events: none;
   background-size: 1.375rem 1.375rem;
-  animation: bg-drift 5s linear infinite;
+  animation: bg-drift 3.5s linear infinite;
+  will-change: transform;
+}
+// Big screens: the same drift reads slower, so a bit quicker there
+html:not(.mobile) body::before,
+html:not(.mobile) body::after {
+  animation-duration: 2.75s;
 }
 body::before {
   background-image: radial-gradient(
